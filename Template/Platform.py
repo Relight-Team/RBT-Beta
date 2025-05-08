@@ -78,7 +78,7 @@ class Platform:
 
         for Name, Object in inspect.getmembers(Module):
 
-            if inspect.isclass(Object) and inspect.isfunction(Object):
+            if inspect.isclass(Object):
                 Types.append(Object)
 
         # For each instance, run the RegBuildPlatform

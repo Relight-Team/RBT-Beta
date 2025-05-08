@@ -22,15 +22,15 @@ class ToolchainSDK:
         return ""
 
     # Compile the inputted C++ files
-    def CompileCPPs(CompileEnv, InputFiles, OutDir, ActionList):
+    def CompileCPPs(CompileEnv, InputFiles, OutDir, OutputActionList):
         pass # Will be overwritten with child class
 
     # Compiles the inputted RCF files
-    def CompileRCFs(CompileEnv, InputFiles, OutDir, ActionList):
+    def CompileRCFs(CompileEnv, InputFiles, OutDir, OutputActionList):
         pass # TODO: Make this return new instance of CppOutput
 
     # Link files in the LinkEnvironment
-    def LinkFiles(LinkEnv, BuiltLibraryImportOnly, ActionList):
+    def LinkFiles(LinkEnv, LibraryImportOnly, OutputActionList):
         pass # Will be overwritten with child class
 
     # Link every file in the LinkEnvironment

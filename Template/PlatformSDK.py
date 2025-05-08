@@ -9,25 +9,25 @@ sys.path.append("../")
 
 class PlatformSDK:
 
-    InstalledSDKString = "Installed.txt" #CurrentlyInstalledSDKStringManifest
+    InstalledSDKString = "Installed.txt"
 
-    LastScriptVersion = "InstalledVersion.txt" #LastRunScriptVersionManifest
+    LastScriptVersion = "InstalledVersion.txt"
 
-    EnvironmentVar = "EnvVars.txt" #SDKEnvironmentVarsFile
+    EnvironmentVar = "EnvVars.txt"
 
-    RootEnvironment = "RELIGHT_SDKS_ROOT" #SDKRootEnvVar
+    RootEnvironment = "RELIGHT_SDKS_ROOT"
 
-    SetupEnviornment = "AutoSDKSetup" #AutoSetupEnvVar
+    SetupEnviornment = "AutoSDKSetup"
 
-    AllowAutoSDKSwitching = True #bAllowAutoSDKSwitching
+    AllowAutoSDKSwitching = True
 
-    _CheckedAutoSDKRoot = False #bCheckedAutoSDKRootEnvVar
+    _CheckedAutoSDKRoot = False
 
-    _AutoSDKSystem = False #bAutoSDKSystemEnabled
+    _AutoSDKSystem = False
 
-    _SDKStatusTrack = -1 #SDKCheckStatus
+    _SDKStatusTrack = -1
 
-    _LocalSetupAutoSDK = False #bLocalProcessSetupAutoSDK
+    _LocalSetupAutoSDK = False
 
     _HostOS = platform.system()
 

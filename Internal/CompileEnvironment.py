@@ -1,13 +1,15 @@
-class Platform:
-    Unix = 0
+from enum import Enum
+
+class Platform(Enum):
+    Linux = 0
     Windows = 1
 
-class Config:
+class Config(Enum):
     Debug = 0
     Dev = 1
     Final = 2
 
-class PCHAction:
+class PCHAction(Enum):
     Null = 0
     Include = 1
     Create = 2

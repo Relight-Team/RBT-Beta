@@ -48,3 +48,31 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
                 if os.path.isdir(NewDir):
                     Env = NewDir
         return Env
+
+
+    # Return's the location of the SDK for an arch
+    def GetSDKArchPath(Arch):
+        Env = GetSDKLoc()
+
+        # If Environment is empty, we can get it from LINUX_ROOT
+        if Env == None or Env == "":
+            return str(os.environ.get("LINUX_ROOT"))
+
+        # Else, we will get the directory from the LINUX_ROOT_MULTIARCH's archtecture path
+        else:
+            return str(os.path.join(Env, Arch))
+
+    # Return's true if we found the Clang file
+    def IsClangValid(BasePath):
+        FilePath = os.path.join(BasePath, "bin")
+
+        #TODO: Add Window's support
+
+        FileName = "Clang++"
+
+        File = os.path.join(FilePath, FileName)
+
+        return os.path.exists(File)
+
+    # FIXME: ADD THIS ONCE WE ADD LINUXPLATFORM
+    def InternalHasRequiredManualSDK

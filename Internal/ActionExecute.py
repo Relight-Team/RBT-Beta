@@ -4,7 +4,7 @@ import os
 
 # This handles the different types of execution of the list of actions
 
-class Thread:
+class RBTThread:
 
     ExitCode = 0
 
@@ -13,7 +13,7 @@ class Thread:
     Finished = False
 
     def __init__(self, InAction):
-        Action = InAction
+        self.Action = InAction
 
     # These 2 functions will allow the program to print the output that should be printed from the command line
     def _ReadOutput(self, pipe):
@@ -34,7 +34,7 @@ class Thread:
         try:
             try:
                 args = [self.Action.CommandPath, self.Action.Arguments] # Combines file path and arguments
-                RunningProgram = subprocess.Popen(args, cwd=self.Action.CurrentDirectory, stdout=self.subprocess.PIPE, stderr=self.subprocess.PIPE, text=True)
+                RunningProgram = subprocess.Popen(args, cwd=self.Action.CurrentDirectory, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
                 # Run ReadOutput and ReadError
 
@@ -43,9 +43,9 @@ class Thread:
             except:
                 pass
 
-            process.wait() # Wait until program stops running
+            RunningProgram.wait() # Wait until program stops running
 
-            self.ExitCode = Process.returncode
+            self.ExitCode = RunningProgram.returncode
 
         except:
             pass
@@ -56,24 +56,24 @@ class Thread:
 
     # Starts the threading
     def Start(self):
-        thread = threading.Thread(target=self.FunctionToRun)
-        thread.start()
+        athread = threading.Thread(target=self.FunctionToRun)
+        athread.start()
 
 class ExecuteBase:
 
-    def Name():
+    def Name(self):
         return "Base"
 
-    def ExecuteActionList(ActionList):
+    def ExecuteActionList(self, ActionList):
         pass # Overritten by child class
 
 # Executes actions one at a time
 class LinearExecuter(ExecuteBase):
 
-    def Name():
+    def Name(self):
         return "Linear"
 
-    def ExecuteActionList(ActionList):
+    def ExecuteActionList(self, ActionList):
 
         ActionThreadDict = {} # A dictionary of Action : Thread
 
@@ -105,7 +105,7 @@ class LinearExecuter(ExecuteBase):
                         NonExeAction += 1
 
             # Update the progress
-            Progress = len(Actions) + 1 - NonExeAction
+            Progress = len(ActionList) + 1 - NonExeAction
 
             # If we have no more actions that isn't executed, then we can stop
             if NonExeAction == 0:
@@ -131,7 +131,7 @@ class LinearExecuter(ExecuteBase):
                         ContainFailedPre = False # If any action's Precondition has failed
 
                         # Detect if any Precondition Actions is either outdated or has failed
-                        for j in self.Action.PreconditionActions:
+                        for j in i.PreconditionActions:
 
                             # Detect if any Precondition Actions is either outdated or has failed
                             if j in ActionThreadDict:
@@ -155,7 +155,7 @@ class LinearExecuter(ExecuteBase):
                         # If it hasn't failed and isn't outdated, add action and the thread to the dictionary
                         elif ContainFailedPre == False:
 
-                            TD = Thread(i) # Store action to execute
+                            TD = RBTThread(i) # Store action to execute
                             try:
                                 TD.Start() # Execute action
 
@@ -170,9 +170,9 @@ class LinearExecuter(ExecuteBase):
         Ret = True
 
         # If there's any errors in the dictionary, return false
-        for Action, Thread in ActionThreadDict:
+        for Action, ThreadItem in ActionThreadDict.items():
 
-            if thread == None or thread.ExitCode != 0:
+            if ThreadItem == None or ThreadItem.ExitCode != 0:
                 Ret = False
 
         # Return's the Ret value, this will let us know if there was any errors (true if no errors, false if there was errors)
