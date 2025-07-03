@@ -1,0 +1,6 @@
+UEBuildModule [X]
+UEBuildBinary [X]
+UEBuildTarget [/]
+UEBuildLinux [/]
+BuildMode []
+main []

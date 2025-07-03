@@ -8,16 +8,24 @@ import Internal.Core as C
 
 # Stores target-specific arguments from the command line/Config File, will overwrite any default settings
 class StartingTarget:
-    pass
+
+    Modules = [] # Modules to compile (Command Line: "-Module=")
+
+    _Platform = None # the platform we will be compiling
+
+    def __init__(self, InPlatform):
+        _Platform = InPlatform
 
 
 # The main target class, stores everything store in .target file
 class Target:
 
+    # -- GLOBAL -- #
+
     # The name of the target, will be used as the executable name (unless project file or command argument overrides it). If blank or none, we will use the target file name instead
     Name = None
 
-    # The target type, can be either Game, Editior, Client, Server, or Program. Used for enabiling some settings
+    # The target type, can be either Game, Editor, Client, Server, or Program. Used for enabiling some settings
     TargetType = "Game"
 
     # The Build type, determines what debugging tools we should include, can be either Debug, Development, and Final
@@ -30,7 +38,7 @@ class Target:
     IntermediateType = "Default"
 
     # All additional dependencies for the target to compile
-    ExtraDependencies = []
+    Modules = []
 
     # If true, will not create any debug related files
     DisableDebugInfo = False
@@ -62,17 +70,59 @@ class Target:
     # Any additional arguments to pass when Linking
     ExtraLinkingArgs = []
 
+    # A toolchain we will override
+    ToolchainOverride = None
+
     # The file of the target
     _File = None
 
     # The project file if it exists
     _Project = None
 
+    # If true, we will link object files into final binary, if false, we will just output the object files
+    LinkFilesTogether = True
+
+    # if not empty, we will put the binaries in a subfolder
+    BinSubPaths = None
+
+
+    Arch = ""
+
+
+    # -- LINUX -- #
+
+    # If we should use Address Sanitizer
+    UseAddressSanitizer = False
+
+    # If we should use Thread Sanitizer
+    UseThreadSanitizer = False
+
+    # IF we should use Unkown/Undefined Sanitizer
+    UseUnknownSanitizer = False
+
+    # If true, we will save portable symbol file
+    SavePSYM = False
 
     def __init__(self, TargetFile, Args, ProjectFile=None):
+
+        # Set private variables
+
+        _File = TargetFile
 
         # Set public variables
 
         Name = C.GetVar(TargetFile, "Name")
         TargetType = C.GetVar(TargetFile, "TargetType")
-        ExtraDependencies = C.GetVar(TargetFile, "ExtraDependencies")
+        Modules = C.GetVar(TargetFile, "Modules")
+
+
+
+        # Set LinkType if default
+
+        if self.LinkType == "Default":
+
+            if self.TargetType == "Editor":
+                self.LinkType = "Modular"
+
+            else:
+                self.LinkType = "Monolithic"

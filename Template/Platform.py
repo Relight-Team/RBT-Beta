@@ -5,14 +5,16 @@ import subprocess
 import inspect
 import importlib
 
-sys.path.append("../Internal")
-import CompileEnvironment as CE
-import ConfigManager as ConfigM
-import TargetPlatforms as TP
+from Internal import CompileEnvironment as CE
+from Internal import ConfigManager as ConfigM
+from Internal import Logger
 
-import Template.PlatformFactory as PF
 
-EngineDir = "../../.."
+from Configuration import TargetPlatforms as TP
+
+from . import PlatformFactory as PF
+
+EngineDir = "../.."
 
 ConfigDir = EngineDir + "/Configs"
 
@@ -28,22 +30,30 @@ class PlatformInfo:
     @staticmethod
     def ImportFactory():
 
+        Logger.Logger(0, "Running ImportFactory() from PlatformInfo")
+
         if os.path.isfile(EngineDir + "/Programs/RelightBuildTool/SDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory"):
+            Logger.Logger(1, "Platform Factory found in base SDK directory: " + EngineDir + "/Programs/RelightBuildTool/SDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py")
             return importlib.import_module(EngineDir + "/Programs/RelightBuildTool/SDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory")
 
         elif os.path.isfile(EngineDir + "/Extras/CustomSDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory"):
+            Logger.Logger(1, "Platform Factory found in Custom SDK directory: " + EngineDir + "/Extras/CustomSDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py")
             return importlib.import_module(EngineDir + "/Extras/CustomSDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory")
         else:
-            raise ValueError("Error, couldn't find " + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py in either RelightBuildTool's SDK directory or CustomSDK directory")
+            Logger.Logger(5, "Couldn't find " + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py in either RelightBuildTool's SDK directory or CustomSDK directory")
 
     # Return true if the config file's platform value is valid
     @staticmethod
     def IsValid(InPlatform):
+        Logger.Logger(0, "Running IsValid(" + InPlatform + ")")
         if InPlatform == "Linux":
+            Logger.Logger(1, "Returned True")
             return True
 
         elif PlatformInfo.Platform == InPlatform:
+            Logger.Logger(1, "Returned True")
             return True
+        Logger.Logger(1, "Returned False")
         return False
 
 class Platform:
@@ -70,6 +80,9 @@ class Platform:
     @staticmethod
     def RegPlatform(IncNonInstalledPlats):
 
+
+        Logger.Logger(0, "Running RegPlatform(" + IncNonInstalledPlats + ")")
+
         Module = PlatformInfo.ImportFactory()
 
         Types = []
@@ -79,6 +92,7 @@ class Platform:
         for Name, Object in inspect.getmembers(Module):
 
             if inspect.isclass(Object):
+
                 Types.append(Object)
 
         # For each instance, run the RegBuildPlatform
@@ -88,12 +102,14 @@ class Platform:
                 TempInit = T()
 
                 if IncNonInstalledPlats == True or PlatformInfo.IsValid(TempInit.TargetPlatform()) == True:
+                    Logger.Logger(1, "Registering " + TempInit.TargetPlatform() + " to Types")
                     TempInit.RegBuildPlatform()
 
 
     # Return's the array of platform folders
     @staticmethod
     def GetPlatformFolders():
+        Logger.Logger(0, "Running GetPlatformFolders()")
         if PlatformCachedFolder == None or PlatformCachedFolder == []:
             PlatFolder = []
 
@@ -106,10 +122,12 @@ class Platform:
 
             PlatformCachedFolder = PlatFolder
 
+        Logger.Logger(1, "Running GetPlatformFolders()")
         return PlatformCachedFolder
 
     # Return's all folders that we are going to include for this platform
     def GetIncludeFolders():
+        Logger.Logger(0, "Running GetIncludeFolders()")
         if IncludeCachedFolder == None or IncludeCachedFolder == []:
             IncFolder = []
 
@@ -125,6 +143,7 @@ class Platform:
 
     # Return's all folder that we are going to exclude for this platform
     def GetExcludeFolders():
+        Logger.Logger(0, "Running GetExcludeFolders()")
         if ExcludeCachedFolder == None or ExcludeCachedFolder == []:
             ExcludeCachedFolder = GetPlatformFolders().difference(GetIncludeFolders)
 
@@ -137,6 +156,7 @@ class Platform:
     # Return's all platforms that are registered
     @staticmethod
     def GetRegPlatforms():
+        Logger.Logger(0, "Running GetRegPlatforms()")
         List = []
         for Key in ReturnGroupDict():
             List.append(Key)
@@ -148,6 +168,7 @@ class Platform:
 
     # Return's the folder name of the architecture
     def GetFolderNameArch(Arch):
+        Logger.Logger(0, "Platform class's arch is " + Arch)
         return Arch
 
     # Finds all build files and directories to clean, store these files and directories in CleanFiles and CleanDirs
@@ -195,7 +216,7 @@ class Platform:
     # Return's true if the name is the main RBT name format without extension
     # Example: Test-Linux-Debug.so
     @staticmethod
-    def IsBuildProductName(Name, Index, SubInt, TitlePrefixes, TitleSuffixes):
+    def IsBuildProductNameNoExtension(Name, Index, SubInt, TitlePrefixes, TitleSuffixes):
         for Prefix in TitlePrefixes:
 
             if SubInt >= len(Prefix):
@@ -223,7 +244,7 @@ class Platform:
     # Return's true if the name is the main RBT name format without extension
     # Example: Test-Linux-Debug.so
     @staticmethod
-    def IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, Extension):
+    def IsBuildProductNameNoIndex(Name, TitlePrefixes, TitleSuffixes, Extension):
         return IsBuildProductName(Name, 0, len(Name), TitlePrefixes, TitleSuffixes, Extension)
 
     # Stuff to execute after the build process has been done but before we sync the target platform (which is when we prepare and transfer build artifacts to the target platform)
@@ -278,7 +299,7 @@ class Platform:
         elif AllowFailure == True:
             return None
         else:
-            raise ValueError("BuildPlatform does not has key '" + str(InPlatform) + "' when running GetBuildPlatform")
+            Logger.Logger(5, "BuildPlatform does not has key '" + str(InPlatform) + "' when running GetBuildPlatform")
 
     # modify each Module in BuildPlatform
     @staticmethod
@@ -350,7 +371,7 @@ class Platform:
         return False
 
     # Returns if we should override whether to append the arch to bin name
-    def RequiresArchSuffix():
+    def NeedsArchSuffix():
         return True
 
     # Return's the array of binary output files (by default, it will only return 1 item)

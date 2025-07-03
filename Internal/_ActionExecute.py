@@ -56,7 +56,8 @@ class RBTThread:
 
     # Starts the threading
     def Start(self):
-        print(self.Action.CommandPath + " " + self.Action.Arguments)
+        athread = threading.Thread(target=self.FunctionToRun)
+        athread.start()
 
 class ExecuteBase:
 

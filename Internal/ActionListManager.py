@@ -2,6 +2,7 @@ import Action
 import ActionExecute
 
 from functools import cmp_to_key
+from . import Logger
 
 
 # Sort the list (this is to help executer)

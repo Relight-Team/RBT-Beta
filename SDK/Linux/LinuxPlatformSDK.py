@@ -1,9 +1,12 @@
 import importlib
+import sys
 import os
 
-sys.path.append("../../Template")
+from . import Common
 
-import PlatformSDK
+from Template import PlatformSDK
+
+from Configuration import Directory_Manager
 
 class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
@@ -33,26 +36,31 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
             return True
         return False
 
+
+    #FIXME: Find a way to make this work, and test both internal and external SDK
+    def GetTreeSDKRoot(self):
+        pass
+
     # Return's the location of the SDK, will either retrieve it from environment variable "LINUX_ROOT_MULTIARCH", or generate one if it isn't set
     def GetSDKLoc(self):
 
         Env = os.getenv('LINUX_ROOT_MULTIARCH')
 
         if Env == None or Env == "":
-
-            Dir = GetTreeSDKRoot()
+            Dir = self.GetTreeSDKRoot()
 
             if Dir != None and Dir != "":
                 NewDir = os.path.join(Dir, self.SDKVersionFileName())
 
                 if os.path.isdir(NewDir):
                     Env = NewDir
+
         return Env
 
 
     # Return's the location of the SDK for an arch
-    def GetSDKArchPath(Arch):
-        Env = GetSDKLoc()
+    def GetSDKArchPath(self, Arch):
+        Env = self.GetSDKLoc()
 
         # If Environment is empty, we can get it from LINUX_ROOT
         if Env == None or Env == "":
@@ -63,7 +71,7 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
             return str(os.path.join(Env, Arch))
 
     # Return's true if we found the Clang file
-    def IsClangValid(BasePath):
+    def IsClangValid(self, BasePath):
         FilePath = os.path.join(BasePath, "bin")
 
         #TODO: Add Window's support
@@ -74,5 +82,18 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
         return os.path.exists(File)
 
-    # FIXME: ADD THIS ONCE WE ADD LINUXPLATFORM
-    def InternalHasRequiredManualSDK
+
+    def InternalHasRequiredManualSDK(self):
+
+        BasePath = GetSDKArchPath(Platform.DefaultArch)
+
+        if not (BasePath == None or BasePath == ""):
+
+            if IsClangValid(BasePath):
+                return True
+
+        if _HostOS == "Linux":
+            if (Common.WhichClang() != None and Common.WhichClang() != "") and (Common.WhichGCC() != None and Common.WhichGCC() != ""):
+                return True
+
+        return False

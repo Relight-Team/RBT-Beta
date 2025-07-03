@@ -1,5 +1,8 @@
-import CompileEnvironment as CE
+from . import CompileEnvironment as CE
 
+
+
+# Configuration to link all objects file into the final binary file
 class LinkEnvironment:
 
     Platform = CE.Platform
@@ -84,12 +87,14 @@ class LinkEnvironment:
 
     AdditionalProperty = []
 
-    def __init__(self, InPlatform, InConfig, InArch):
+    CrossedReference = False
+
+    def __init__(self, InPlatform=None, InConfig=None, InArch=None):
         self.Platform = InPlatform
         self.Config = InConfig
         self.Arch = InArch
 
-    def __init__(self, Second):
+    def Dup(self, Second):
         self.Platform = Second.Platform
         self.Config = Second.Config
         self.Arch = Second.Arch
@@ -131,6 +136,7 @@ class LinkEnvironment:
         self.IncFunctions = self.IncFunctions + Second.IncFunctions
         self.DefineFiles = self.DefineFiles + Second.DefineFiles
         self.AdditionalProperty = self.AdditionalProperty + Second.AdditionalProperty
+        self.CrossedReference = Second.CrossedReference
 
     def OutputFilePath():
         if len(OutputPaths) == 1:

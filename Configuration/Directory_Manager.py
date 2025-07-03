@@ -1,7 +1,11 @@
+#FIXME MAJOR: THIS WILL COMPLETLY BREAK WHEN TESTING ON INDIVIDUAL FILES, FIND A WAY TO MAKE IT "UNIVERSIAL"
+
+
 import os
 import sys
+from pathlib import Path
 
-_Internal_Script_Dir = os.path.abspath(os.getcwd())
+_Internal_Script_Dir = Path(__file__).resolve().parent
 
 # Engine Directory (/USER/Relight_Engine/)
 Engine_Directory = os.path.join(_Internal_Script_Dir, "..", "..", "..")

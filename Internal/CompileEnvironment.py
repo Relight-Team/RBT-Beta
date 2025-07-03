@@ -19,21 +19,22 @@ class Output:
     DebugFiles = []
     PCHFile = ""
 
+# Configuration to compile source files into oject files
 class CompileEnvironment:
 
-    Plat = Platform
+    Plat = Platform # The platform we are compiling
 
-    Conf = Config
+    Conf = Config # What debugging mode we will use
 
-    PCH_Act = PCHAction.Null
+    PCH_Act = PCHAction.Null # The action we will use for PCH files
 
-    Out = Output
+    Out = Output # All output info
 
-    Arch = ""
+    Arch = "" # The CPU architecture
 
-    SharedPCH = []
+    SharedPCH = [] # The Header file we will use globally
 
-    PCHIncludeName = ""
+    PCHIncludeName = "" # The name of the header file we will precompile
 
     UseSharedBuildEnv = False
 
@@ -105,9 +106,9 @@ class CompileEnvironment:
 
     ForceIncFiles = []
 
-    Defines = []
+    Defines = [] # Definitions we will use across the engine
 
-    AdditionalArgs = ""
+    AdditionalArgs = "" # Any additional arguments we will use
 
     AdditionalFrameworks = []
 
@@ -115,7 +116,7 @@ class CompileEnvironment:
 
     UsingRHT = False
 
-    DefaultHideSymbols = False
+    HideSymbols = False
 
     def __init__(self, InPlatform, InConfig, InArch):
         self.Plat = InPlatform
@@ -128,10 +129,10 @@ class CompileEnvironment:
 
         self.UserIncPaths = []
 
-        self.SysIncPaths - []
+        self.SysIncPaths = []
 
 
-    def __init__(self, Second):
+    def Dup(self, Second):
         self.Plat = Second.Plat
         self.Conf = Second.Conf
         self.PCH_Act = Second.PCH_Act
@@ -179,4 +180,4 @@ class CompileEnvironment:
         self.AdditionalFrameworks = self.AdditionalArgs + Second.AdditionalArgs
         self.PCHFile = Second.PCHFile
         self.UsingRHT = Second.UsingRHT
-        self.DefaultHideSymbols = Second.DefaultHideSymbols
+        self.HideSymbols = Second.DefaultHideSymbols

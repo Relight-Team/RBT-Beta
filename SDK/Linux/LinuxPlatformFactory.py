@@ -1,3 +1,24 @@
-# ExamplePlatformFactory handles the universial functions for running the building and having an interface for RBT to interact with
+import os
+import sys
 
-# Examples include The main run function and the platform name function
+import LinuxPlatform
+import LinuxPlatformSDK
+
+sys.path.append("../../Template")
+
+import PlatformFactory
+
+class LinuxFactory(PlatformFactory.FactorySDK):
+
+    # Return's the target platform for this factory
+    def TargetPlatform():
+        return "Linux"
+
+    # Register the Build Platform w/ Platform Class
+    def RegBuildPlatform():
+
+        SDK = LinuxPlatformSDK.LinuxPlatformSDK()
+
+        SDK.ManageAndValidate()
+
+        #TODO: FINISH ONCE GENERATE PROJECT FILES IS FINISHED

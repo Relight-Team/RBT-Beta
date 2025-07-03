@@ -3,11 +3,10 @@ import platform
 import sys
 import subprocess
 
-sys.path.append("../")
+from . import PlatformSDK
 
-import Template.PlatformSDK
 
-import Internal.LinkEnvironment as LE
+from Internal import LinkEnvironment as LE
 
 
 class ToolchainSDK:
@@ -24,6 +23,12 @@ class ToolchainSDK:
     # Compile the inputted C++ files
     def CompileCPPs(CompileEnv, InputFiles, OutDir, OutputActionList):
         pass # Will be overwritten with child class
+
+
+    #FIXME: This isn't complete, as a placeholder just returns CompileCPPs, please replace!
+    # CompileCPPs for multi-arch compiles
+    def CompileMultiArchCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList):
+        return CompileCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList)
 
     # Compiles the inputted RCF files
     def CompileRCFs(CompileEnv, InputFiles, OutDir, OutputActionList):
@@ -59,7 +64,7 @@ class ToolchainSDK:
         pass # Will be overwritten with child class
 
     # Actions to finish the output
-    def FinishOutput(Target, Makefile):
+    def FinishOutput(Target, FileBuilder):
         pass # Will be overwritten with child class
 
     # Return's true if we should add debug information

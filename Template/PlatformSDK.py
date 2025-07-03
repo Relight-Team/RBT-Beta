@@ -3,9 +3,9 @@ import platform
 import sys
 import subprocess
 
-import Platform as Plat
+from . import Platform as Plat
+from Internal import Logger
 
-sys.path.append("../")
 
 class PlatformSDK:
 

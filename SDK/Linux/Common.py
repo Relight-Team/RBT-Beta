@@ -1,20 +1,22 @@
 import os
 import subprocess
 
+from Internal import Logger
+
 def Which(Name):
 
-    args = ["/bin/sh",  "-c 'which " + Name + "'"]
+    args = ["/bin/sh", "-c",  f"which {Name}"]
 
     RunningProgram = subprocess.Popen(args, stdout=subprocess.PIPE)
 
-    stdout = RunningProgram.communicate
+    stdout, stderr = RunningProgram.communicate()
 
     if RunningProgram.returncode == 0:
-        return stdout.decode()
+        return stdout.decode().strip()
     return None
 
 def WhichClang():
-    return Which("Clang++")
+    return Which("clang++")
 
 def WhichGCC():
     return Which("g++")

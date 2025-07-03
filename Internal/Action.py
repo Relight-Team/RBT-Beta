@@ -31,7 +31,7 @@ class Action:
 
     OutputItems = [] # All files this action creates
 
-    DependencyList_File = None # A dependency list file to check each header
+    DependencyListFile = [] # A dependency list file to check each header
 
     CurrentDirectory = None # The directory we will produce our OutputItems
 
@@ -39,7 +39,7 @@ class Action:
 
     CommandPath = None # the command file to run when we are creating our output files
 
-    Arguments = None # Parameters to run in the console when running the program
+    Arguments = "" # Parameters to run in the console when running the program
 
     DebugGroupNames = [] # For multiple compilers, this will add a group name everytime we change the target, mainly used for debugging
 
