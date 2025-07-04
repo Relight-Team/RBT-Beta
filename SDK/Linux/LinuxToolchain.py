@@ -694,7 +694,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         Ret = ""
 
         if self.UsingLld(LinkEnv.Arch) == True and LinkEnv.IsBuildingDynamic == False:
-            Ret += " -fuse-ld=lld"
+            Ret += " -Wl,-fuse-ld=lld"
 
         Ret += " -rdynamic"
 
@@ -813,7 +813,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             f.write("#!/bin/sh\n")
             f.write("set -o errexit\n")
             f.write(Com + "\n")
-            f.write(self.GetEncodeCommand(LinkEnv, Output))
+            #f.write(self.GetEncodeCommand(LinkEnv, Output)) # FIXME: Readd this once we add Breakpad!
 
         Action.CommandPath = "/bin/sh"
         Action.Arguments = ' "' + LinkFile + '"'
@@ -874,9 +874,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             Com += '"' + self.ClangPath + '"'
 
         else:
-            Com += '"' + GCCPath + '"'
+            Com += '"' + self.GCCPath + '"'
 
-        Com = self._LinkArgs(LinkEnv)
+        Com += self._LinkArgs(LinkEnv)
 
         NewAction.CreateImportLib = LinkEnv.IsBuildingDynamic
 
@@ -917,9 +917,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     if not Temp.startswith("/"):
                         Relative += Temp
 
-                if Relative not in Rpath:
+                if Relative not in RPath:
                     RPath.append(Relative)
-                    Resp.append('-rpath=$"{{ORIGIN}}' + Relative + '"')
+                    Resp.append(' -rpath=$"{{ORIGIN}}' + Relative + '"')
 
         for Item in LinkEnv.RuntimeLibPaths:
 
@@ -931,7 +931,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 ItemTemp = os.path.join("..", "..", "..", RootPath)
 
             if ItemTemp not in RPath:
-                Rpath.append(ItemTemp)
+                RPath.append(ItemTemp)
                 Resp.append(' -rpath="${{ORIGIN}}' + ItemTemp + '"')
 
 
@@ -952,7 +952,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         NewAction.PreconditionItems.append(RespFile)
 
-        Com += " -Wl, --startgroup" + ExternalLibs + " -Wl, --startgroup -lrt -lm"
+        Com += " -Wl,--start-group" + ExternalLibs + " -Wl,--end-group -lrt -lm"
 
         # FIXME: Add libCXX support
 

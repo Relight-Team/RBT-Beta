@@ -13,13 +13,13 @@ class LinkEnvironment:
 
     BundleDir = ""
 
-    OutputDir = ""
+    OutputDir = "" # The directory that will store non-binary data in
 
     IntermediateDir = ""
 
-    LocalShadowDir = ""
+    LocalShadowDir = None
 
-    OutputPaths = []
+    OutputPaths = [] # The full output binary files and it's path that this linker will produce
 
     LibraryPaths = []
 

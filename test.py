@@ -16,19 +16,21 @@ NewConpileEnv = CompileEnv.CompileEnvironment("Linux", "Development", "x86")
 ActionList = []
 
 
-a = NewToolchain.CompileFiles(NewConpileEnv, ["/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Runtime/Core/Src/Etc/Config.cpp"], "/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest", "Test", ActionList)
+a = NewToolchain.CompileFiles(NewConpileEnv, ["/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/Temp.cpp"], "/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest", "Test", ActionList)
 
 NewLinkEnv = LinkEnv.LinkEnvironment()
 
-NewLinkEnv.IntermediateDir = "/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/LinkDire/"
-NewLinkEnv.LocalShadowDir = "/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/LinkShadow/"
+NewLinkEnv.IntermediateDir = "/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/"
+NewLinkEnv.LocalShadowDir = "/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/Shadow/"
 NewLinkEnv.Arch = "x86_64"
 
 Options = Toolchain.Options()
 
 NewToolchain.Option = Options
 
-NewLinkEnv.OutputPaths.append("/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/LinkOutput/Test.a")
+NewLinkEnv.InputFiles.append("/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/Temp.cpp.o")
+NewLinkEnv.OutputPaths.append("/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Programs/RelightBuildTool/BuildTest/Temp.bin")
+
 
 NewToolchain.LinkFiles(NewLinkEnv, False, ActionList)
 
