@@ -5,95 +5,96 @@ from . import CompileEnvironment as CE
 # Configuration to link all objects file into the final binary file
 class LinkEnvironment:
 
-    Platform = CE.Platform
+    Platform = None # The platform we are compiling
 
-    Config = CE.Config
+    Config = None # The config we are compiling
 
-    Arch = ""
+    Arch = "" # The arch we are borrowing
 
-    BundleDir = ""
+    BundleDir = "" # Bundle software path on MacOS
 
     OutputDir = "" # The directory that will store non-binary data in
 
-    IntermediateDir = ""
+    IntermediateDir = "" # The intermediate directory
 
-    LocalShadowDir = None
+    LocalShadowDir = None # The local shadow directory, this directory serves as a temp directory of source files, mainly used when linking via mutliple servers
 
     OutputPaths = [] # The full output binary files and it's path that this linker will produce
 
-    LibraryPaths = []
+    LibraryPaths = [] # Paths to search for libraries
 
-    ExcludeLibs = []
+    ExcludeLibs = [] # Libraries we will not link
 
-    AdditionalLibs = []
+    AdditionalLibs = [] # Additional Libraries we will link
 
-    RuntimeLibPaths = []
+    RuntimeLibPaths = [] # Paths to search for Runtime Libraries
 
-    AdditionalFrameworks = []
+    AdditionalFrameworks = [] # Additional framworks to link
 
-    AdditionalBundlesRes = []
+    AdditionalBundlesRes = [] # Additional bundles to link
 
-    DelayLoadDynamics = []
+    DelayLoadDynamics = [] # A list of "Delayed Load Dynamics". These are Dynamic libraries that will not load into the software until they are first called
 
-    AdditionalArgs = ""
+    AdditionalArgs = "" # Additional arguments to pass
 
-    AddDebugInfo = True
+    AddDebugInfo = True # If we should create debug information
 
-    DisableSymbolCashe = False
+    DisableSymbolCashe = False # If true, we shall not create cached symbols
 
-    IsBuildingLibrary = False
+    IsBuildingLibrary = False # If true, then we are linking to a static Library (.a, .lib, etc)
 
-    IsBuildingDynamic = False
+    IsBuildingDynamic = False # If true, then we are linking to a dynamic Library (.so, .dll, etc)
 
-    IsTerminalSoftware = False
+    IsTerminalSoftware = False # TODO: Do we even need this? Unlike The parent reference, RBT doesn't care if the software is terminal or not, might remove this
 
-    DefaultStackSize = 5000000
+    DefaultStackSize = 5000000 # Default memory size allocation
 
-    OptimizeSize = False
+    OptimizeSize = False # If True, the software will be optimize for size
 
-    ExcludeFramePointers = True
+    ExcludeFramePointers = True # If true, we will not include frame pointers
 
-    IncrementalLinking = False
+    IncrementalLinking = False # If true, then we will use Incremental Linking. A system which modifies the Output executable instead of rebuilding everything from scratch
 
-    AllowLTCG = False
+    AllowLTCG = False # If true, then we will use LTCG (Link Time Code Generation)
 
-    PGOProfile = False
+    PGOProfile = False # If true, then we will use PGO Profile (Profile Guided Optimization)
 
-    PGOOptimize = False
+    PGOOptimize = False # If true, then we will use PGO Optimize
 
-    PGODirectory = ""
+    PGODirectory = "" # Directory that PGO Profiling will be saved
 
-    PGOFilePrefix = ""
+    PGOFilePrefix = "" # file prefix for the PGO Profiling, usually platform specific
 
-    CreateMapFile = False
+    CreateMapFile = False # If true, we will attempt to create map file, which stores detailed overview about the linker
 
-    AllowASLR = False
+    AllowASLR = False # If true, we will attempt ASLR (address space layout randomization)
 
-    UseFastPDBLinking = False
+    UseFastPDBLinking = False #
 
-    PrintTimingInfo = False
+    PrintTimingInfo = False #
 
-    InputFiles = []
+    InputFiles = [] # A list of files that will be linked
 
-    InputLibs = []
+    InputLibs = [] #
 
-    DefaultResFiles = []
+    DefaultResFiles = [] #
 
-    GlobalResFiles = []
+    GlobalResFiles = [] #
 
-    IncFunctions = []
+    IncFunctions = [] #
 
-    DefineFiles = []
+    DefineFiles = [] #
 
-    AdditionalProperty = []
+    AdditionalProperty = [] #
 
-    CrossedReference = False
+    CrossedReference = False #
 
     def __init__(self, InPlatform=None, InConfig=None, InArch=None):
         self.Platform = InPlatform
         self.Config = InConfig
         self.Arch = InArch
 
+    # combine all values to a second LinkEnvironment, Prioritizes second LinkEnv
     def Dup(self, Second):
         self.Platform = Second.Platform
         self.Config = Second.Config

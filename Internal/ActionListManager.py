@@ -1,8 +1,9 @@
-import Action
-import ActionExecute
+from . import Action
+from . import ActionExecute
+from . import Logger
 
 from functools import cmp_to_key
-from . import Logger
+
 
 
 # Sort the list (this is to help executer)

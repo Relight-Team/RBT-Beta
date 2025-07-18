@@ -9,12 +9,17 @@ import Internal.Core as C
 # Stores target-specific arguments from the command line/Config File, will overwrite any default settings
 class StartingTarget:
 
+    Name = None # The target file we are loading (Command Line: "-Target=")
+
+    Project = None # The Project file we are compiling (Command Line: "-Project=")
+
+    Platform = None # The platform we are targeting (Command Line: "-Platform=")
+
     Modules = [] # Modules to compile (Command Line: "-Module=")
 
-    _Platform = None # the platform we will be compiling
-
     def __init__(self, InPlatform):
-        _Platform = InPlatform
+        self.Platform = InPlatform
+
 
 
 # The main target class, stores everything store in .target file
@@ -65,10 +70,10 @@ class Target:
     LaunchName = "Launch"
 
     # Any additional arguments to pass when compiling
-    ExtraCompileArgs = []
+    ExtraCompileArgs = ""
 
     # Any additional arguments to pass when Linking
-    ExtraLinkingArgs = []
+    ExtraLinkingArgs = ""
 
     # A toolchain we will override
     ToolchainOverride = None
@@ -103,7 +108,7 @@ class Target:
     # If true, we will save portable symbol file
     SavePSYM = False
 
-    def __init__(self, TargetFile, Args, ProjectFile=None):
+    def __init__(self, TargetFile, ProjectFile=None):
 
         # Set private variables
 

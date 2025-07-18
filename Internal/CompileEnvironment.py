@@ -4,11 +4,6 @@ class Platform(Enum):
     Linux = 0
     Windows = 1
 
-class Config(Enum):
-    Debug = 0
-    Dev = 1
-    Final = 2
-
 class PCHAction(Enum):
     Null = 0
     Include = 1
@@ -24,7 +19,7 @@ class CompileEnvironment:
 
     Plat = Platform # The platform we are compiling
 
-    Conf = Config # What debugging mode we will use
+    Conf = None # What debugging mode we will use
 
     PCH_Act = PCHAction.Null # The action we will use for PCH files
 
@@ -181,3 +176,5 @@ class CompileEnvironment:
         self.PCHFile = Second.PCHFile
         self.UsingRHT = Second.UsingRHT
         self.HideSymbols = Second.DefaultHideSymbols
+
+

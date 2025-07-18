@@ -1,5 +1,8 @@
 import os
-import FileSystem as FS
+
+from . import FileSystem as FS
+
+from . import Logger
 
 
 
@@ -29,6 +32,7 @@ def GetVarOptional(URL, VarName, Alt):
 
 def CheckFolder(URL):
     if not os.path.exists(URL):
+        Logger.Logger(2, "Creating Dir: " + URL)
         os.makedirs(URL)
 
 

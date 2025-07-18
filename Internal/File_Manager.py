@@ -27,8 +27,10 @@ def CreateIntermedFile(Path, Content):
     # Backup old data
     else:
 
+
         BackupFile = Path + ".backup"
         #TODO: Add windows support
+        Logger.Logger(2, "Creating backup of " + Path + " called " + BackupFile + ". Writing to initial path now")
         os.system("mv " + Path + " " + BackupFile)
 
         Fil = open(Path, "w")

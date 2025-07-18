@@ -422,13 +422,13 @@ class Platform:
 
         # Set Define based on why type of build it is
         if Target.BuildType == "Debug":
-            CompileEnv.Defines.append("BUILDTYPE_DEBUG=1")
+            CompileEnv.Defines.append("RE_BUILDTYPE_DEBUG=1")
 
         elif Target.BuildType == "Development":
-            CompileEnv.Defines.append("BUILDTYPE_DEVELOPMENT=1")
+            CompileEnv.Defines.append("RE_BUILDTYPE_DEVELOPMENT=1")
 
         elif Target.BuildType == "Final":
-            CompileEnv.Defines.append("BUILDTYPE_FINAL=1")
+            CompileEnv.Defines.append("RE_BUILDTYPE_FINAL=1")
 
 
         # Set Debug info to true if we are using debug

@@ -669,7 +669,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             RespFileName = os.path.join(DirOutput, os.path.basename(Item) + ".rsp")
 
-            Logger.Logger(2, "Creating file: " + RespFileName)
+            Logger.Logger(2, "Creating dir: " + RespFileName)
+
+            os.makedirs(os.path.dirname(RespFileName), exist_ok=True)
 
             RespFile = open(RespFileName, "w")
 
@@ -806,7 +808,11 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         LinkFile = os.path.join(LinkEnv.LocalShadowDir, LinkName)
 
+        Logger.Logger(2, "Creating ShadowDir: " + LinkEnv.LocalShadowDir)
+
         os.makedirs(LinkEnv.LocalShadowDir, exist_ok=True)
+
+        Logger.Logger(2, "Creating file: " + LinkFile)
 
         with open(LinkFile, "w") as f:
             Logger.Logger(2, "writing: " + LinkFile)
@@ -820,17 +826,18 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         LinkScriptFile = os.path.join(LinkEnv.LocalShadowDir, "remove-sym.ldscript")
 
-        os.makedirs(LinkEnv.LocalShadowDir, exist_ok=True)
 
         if os.path.exists(LinkScriptFile):
+            Logger.Logger(2, "Removing file: " + LinkScriptFile)
             #os.remove(LinkScriptFile)
-            print(LinkScriptFile)
 
 
     def _STEP2LinkShellFiles(self, LinkEnv, Output, Com, Action, RelinkedFile):
         RelinkName = "Relink-" + os.path.basename(Output) + ".sh"
 
         RelinkFile = os.path.join(LinkEnv.LocalShadowDir, RelinkName)
+
+        Logger.Logger(2, "Creating dir: " + RelinkFile)
 
         os.makedirs(RelinkFile, exist_ok=True)
 
@@ -839,8 +846,10 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         NewCom = NewCom.replace(Output, RelinkedFile)
         NewCom = NewCom.replace("$", "\\$")
 
-        with open(LinkFile, "w") as f:
-            Logger.Logger(2, "writing: " + LinkFile)
+        Logger.Logger(2, "Creating file: " + RelinkFile)
+
+        with open(RelinkFile, "w") as f:
+            Logger.Logger(2, "writing: " + RelinkFile)
             f.write("#!/bin/sh\n")
             f.write("set -o errexit\n")
             f.write(Com + "\n")

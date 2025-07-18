@@ -1,9 +1,11 @@
 import sys
 import os
 
-sys.path.append("../Readers")
+from Readers import ModuleReader
 
-import ModuleReader
+from Internal import CompileEnvironment
+
+from Internal import FileBuilder
 
 # Build's a module
 class ModuleBuilder:
@@ -123,8 +125,8 @@ class ModuleBuilder:
                 for Item in DependModules:
                     IsExternal = isinstance(Item, ExternalBuilder)
 
-                    IsItemStatic = False
-                    if Item.Binary != None and Item.Binary.Type = "Static":
+                    IsItemStatic == False
+                    if Item.Binary != None and Item.Binary.Type == "Static":
                         IsItemStatic = True
 
                     if IsExternal == True or IsItemStatic == True:
@@ -161,13 +163,15 @@ class ModuleBuilder:
 
     #FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
-    def Compile(self, TargetReader, Toolchain, BinCompileEnv, Makefile):
+    def Compile(self, TargetReader, Toolchain, BinCompileEnv):
 
         Plat = BinCompileEnv.Plat
 
         LinkArray = []
 
-        NewCompileEnv = (Target, BinCompileEnv)
+        NewCompileEnv = CreateCompileEnv(Target, BinCompileEnv)
+
+        UsingUnity = False
 
         #TODO: Add precompile implementation here
 
@@ -179,7 +183,8 @@ class ModuleBuilder:
         SourceFile_Unity = {}
 
         CPPFiles = []
-        GenFiles = []
+        print("Well, you made it this far, yeah now we just need ModuleBuilder.Compile to set GenFiles")
+        GenFiles = [] # FIXME: bro I just realize we need this to actually contain all our imput files cause right now it will always compile no input files!
 
         OutputActionList = []
 
@@ -189,5 +194,5 @@ class ModuleBuilder:
         return LinkArray
 
 
-class ExternalBuilder(FileBuilder):
+class ExternalBuilder(ModuleBuilder):
     pass

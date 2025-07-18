@@ -1,14 +1,16 @@
 import os
-import ModuleBuilder
-import Binary
 
-sys.path.append("../Readers")
+from . import ModuleBuilder
+from . import Binary
+from . import CompileEnvironment
+from . import LinkEnvironment
+from . import FileBuilder
 
-import ModuleReader
 
-sys.path.append("../Template")
+from Readers import ModuleReader
+from Readers import TargetReader
 
-import Platform
+from Template import Platform
 
 # Builds a target, will use ModuleBuilder
 class TargetBuilder:
@@ -25,12 +27,15 @@ class TargetBuilder:
 
     Binaries = []
 
+    StartingTarget = None
+
     ModuleName_ModuleBuilder = {}
 
-    def __init__(StartingTarget, InTarget):
-        Target = InTarget
+    def __init__(InStartingTarget, InTarget=None):
+        StartingTarget = InStartingTarget
+        Target = InStartingTarget
 
-        PlatformIntermedFolder = GetIntermediateProject(Target._Platform, Target.Arch)
+        PlatformIntermedFolder = GetIntermediateProject(Target.Platform, Target.Arch)
 
         # Overwrite target file with starting target properties
         if StartingTarget.Modules != [] and StartingTarget.Modules != None:
@@ -97,12 +102,52 @@ class TargetBuilder:
         return Binaries[0].OutputDir
 
 
-    def CreateGlobalEnv(Toolchain, CompileEnv, LinkEnv):
-        pass
+    # MASSIVE TODO: add more appends stuff once we add more options to target reader
+    def AppendGlobalEnv(Toolchain, CompileEnv, LinkEnv):
+        Toolchain.SetGlobalEnv(Target)
+
+        # Append Global Compile Environment
+        CompileEnv.Defines.append(Target.Defines)
+        CompileEnv.AdditionalArgs = Target.ExtraCompileArgs
+
+        # Append Global Link Environment
+
+        LinkEnv.AdditionalArgs = Target.ExtraLinkingArgs
+
+        LinkInterTemp = os.path.join(ENGINEDIR, PlatformIntermedFolder, Target.Name, Target.BuildType)
+
+        if ISENGINEINSTALLED() or (Target._Project != None and SHOULDCOMPILEMONOLITHIC()):
+            if Target._Project != None:
+                LinkInterTemp = os.path.join(os.path.dirname(Target._Project), PlatformIntermedFolder, Target.Name, Target.BuildType)
+            #TODO: Add plugin support
+
+        LinkEnv.IntermediateDir = LinkInterTemp
+
+        LinkEnv.OutputDir = LinkEnv.IntermediateDir
+
+        LinkEnv.LocalShadowDir = LinkEnv.OutputDir
+
+        #TODO: Add custom defines here for some target settings
+
+        InPlatform = Platform.GetBuildPlatform(Target.platform)
+
+        InPlatform.SetUpEnvironment(Target, CompileEnv, LinkEnv)
+
+        InPlatform.SetUpConfigEnv(Target, CompileEnv, LinkEnv)
 
 
     def CreateProjectCompileEnv():
-        pass
+        InPlatform = Platform.GetBuildPlatform(Target.platform)
+
+        CPPPlatform = InPlatform.DefaultCPPPlatform
+
+        CompileEnv = CompileEnvironment.CompileEnvironment(CPPPlatform.name, Target.BuildType, Target.Arch)
+        LinkEnv = LinkEnvironment.LinkEnvironment(CPPPlatform.name, Target.BuildType, Target.Arch)
+
+        Toolchain = CreateToolchain(CPPPlatform)
+        AppendGlobalEnv(Toolchain, CompileEnv, LinkEnv)
+
+        return CompileEnv
 
 
     def SearchThroughDir(Dir, File):
@@ -169,7 +214,7 @@ class TargetBuilder:
 
         BinDir = os.path.join(Dir, "bin", Platform)
 
-        if ExeSubFolder =! None and ExeSubFolder != "":
+        if ExeSubFolder != None and ExeSubFolder != "":
             BinDir = os.path.join(BinDir, ExeSubFolder)
 
         # Create full binary path with file name
@@ -222,12 +267,87 @@ class TargetBuilder:
 
         Bin.Modules.append(LaunchModule)
 
+    @staticmethod
+    def CreateTargetReaderFromTargetName(TargetName, ProjectFile=None):
+
+        # if Project File is defined, search in that directory, otherwise we will search through engine directory
+        if ProjectFile != None:
+            DirToSearch = (os.path.dirname(ProjectFile))
+        else:
+            DirToSearch = ENGINEDIR
+
+        TargetSearchDir = os.path.join(DirToSearch)
+
+        RetFile = None
+        # Search through directory
+        # TODO: Unoptimized, since this will check every single file to see if it's a target file, is there an Optimized way?
+        for RootDir, SubDirList, FilesList in os.walk(TargetSearchDir):
+            for File in FilesList:
+                if File == TargetName + ".Target":
+                    RetFile = os.path.join(RootDir, File)
+
+        if RetFile == None:
+            raise ValueError("")
+
+
+        Ret = TargetReader.Target(RetFile, ProjectFile)
+
+        return Ret
 
     # Create's a TargetBuilder class based on StartingTarget
     @staticmethod
-    def Create(StartingTarget, Target, UsePrecompiled):
-        pass
+    def Create(StartingTarget, UsePrecompiled):
+        TargetReader = CreateTargetReaderFromTargetName(StartingTarget.Name, StartingTarget.Project)
 
+        #TODO: Add precompile support here
 
+        Ret = TargetBuilder(StartingTarget, TargetReader)
+
+        return Ret
+
+    # Build's the target, uses binary class to compile the files
+    #FIXME: Just like with ModuleBuilder, this is a quick hack thrown to ensure at least the basics will work for the first testing. Once complete, please add these features
+    # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
     def Build(BuildConf, WorkingSet, AreWeAssembilingBuild):
-        pass
+
+        BinOriginal = []
+
+        Plat = Platform.GetBuildPlatform(StartingTarget.Platform)
+
+        CppPlat = Platform.DefaultCPPPlatform
+
+        CompileEnv = CompileEnvironment.CompileEnvironment(CppPlat, Target.BuildType, Target.Arch)
+
+        LinkEnv = LinkEnvironment.LinkEnvironment(CompileEnv.Plat, CompileEnv.Conf, CompileEnv.Arch)
+
+        Toolchain = self.CreateToolchain(CppPlat)
+
+        FileBuilder = FileBuilder.FileBuilder
+
+        #FIXME: Add binary filter
+
+        #FIXME: Add plugin support
+
+        #FIXME: Add code here that will let exe know all modules included if using monolithic
+
+        #FIXME: Add code that tells the exe where the engine dir is and put it in compile defines
+
+        #FIXME: Add UObject support and generated code support
+
+        ExeOutputDir = GetExeDir()
+
+        OutputItems = []
+
+        # Compile each binary
+
+        for Item in Binaries:
+
+            BinOutput = Item.Build(Target, Toolchain, CompileEnv, LinkEnv, ExeOutputDir, FileBuilder)
+
+        #FIXME: Add runtime depends support
+
+        #FIXME: Add precompile Plugin support
+
+        #FIXME: Add metadata support
+
+        return FileBuilder

@@ -1,8 +1,9 @@
-import ModuleBuilder
-import CompileEnvironment
-import LinkEnvironment
-
 from pathlib import Path
+
+from . import ModuleBuilder
+from . import CompileEnvironment
+from . import LinkEnvironment
+
 from . import Logger
 
 # Class representation of a binary, can be dynamic, static, or executable. This will help us manage, compile, and link environments
@@ -24,6 +25,8 @@ class Binary:
     ExportLibs = False # If true, we will export lib
 
     Precompiled = False # If Precompiled mode is activated
+
+    AdditionalLibs = [] # Cashe of additional libraries we will link to binary
 
 
     def __init__(self, InType, InOutputFilePaths, InIntermediateDir, InLaunchModule, InExportLibs, InPrecompiled):
@@ -56,15 +59,18 @@ class Binary:
 
         CompileEnv = OutputCompileEnv
 
-        if Type == "Dynamic"
+        if Type == "Dynamic":
             CompileEnv.IsDynamic = True
 
-        if Type == "Static"
+        if Type == "Static":
             CompileEnv.IsLibrary = True
 
         return CompileEnv
 
 
+
+
+    # return's true if the path is contained in the parent
     def IsUnderDir(InPath, InParent):
         try:
             InputPath = Path(InPath).resolve(strict=False)
@@ -77,7 +83,7 @@ class Binary:
             return False
 
 
-    def SetupBinLinkEnv(self, Target, Toolchain, LinkEnv, CompileEnv, WorkingSet, ExeDir, FileBuilder):
+    def CreateLinkEnv(self, Target, Toolchain, LinkEnv, CompileEnv, WorkingSet, ExeDir, FileBuilder):
 
         NewLinkEnv = LinkEnvironment.LinkEnvironment()
 
@@ -96,7 +102,7 @@ class Binary:
             LinkFiles = []
 
             if Item.Binary == None or Item.Binary == self:
-                LinkFiles = Item.Compile(Target, Toolchain, NewCompileEnv, FileBuilder)
+                LinkFiles = Item.Compile(Target, Toolchain, NewCompileEnv, FileBuilder) # Compile Module
 
                 for LinkFilesItem in LinkFiles:
 
@@ -115,7 +121,7 @@ class Binary:
             return NewLinkEnv
 
 
-    # Create the binary, mainly involves linking. Returns output files
+    # Create the binary, mainly involves compiling and linking. Returns output files
     def Build(self, TargetReader, Toolchain, CompileEnv, LinkEnv, ExeDir, FileBuilder):
 
         if Precompiled == True and TargetReader.LinkFilesTogether == True:

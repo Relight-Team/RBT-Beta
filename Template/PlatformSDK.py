@@ -93,6 +93,8 @@ class PlatformSDK:
         if os.path.isdir(PlatformSDKRoot):
             Path = PlatformSDKRoot + "/" + InstalledSDKString
 
+            Logger.Logger(2, "Writing file: " + Path)
+
             if os.path.exists(path):
                 with open(Path, 'r') as file:
                     Version = file.readline().strip()
@@ -109,6 +111,7 @@ class PlatformSDK:
             Path = PlatformSDKRoot + "/" + LastScriptVersion
 
             if os.path.exists(path):
+                Logger.Logger(2, "Writing file: " + Path)
                 with open(Path, 'r') as file:
                     Version = file.readline().strip()
 
@@ -125,8 +128,10 @@ class PlatformSDK:
             GetSDK = PlatformSDKRoot + InstalledSDKString
 
             if os.path.exists(GetSDK):
-                os.remove(GetSDK)
+                Logger.Logger(2, "Removing file: " + GetSDK)
+                #os.remove(GetSDK)
 
+            Logger.Logger(2, "Writing file: " + GetSDK)
             with open(GetSDK, "w") as file:
                 file.write(InstallSDK + "\n")
                 file.write("AutoSDK")
@@ -141,16 +146,20 @@ class PlatformSDK:
             GetPath = self.PathToPlatformAutoSDK()
 
             if not os.path.exists(GetPath):
+                Logger.Logger(2, "Creating dir: " + GetPath)
                 os.makedirs(GetPath)
 
             VersionFile = GetSDK + "/" + self.InstalledSDKString
             if os.path.exists(VersionFile):
-                os.remove(VersionFile)
+                Logger.Logger(2, "Removing file: " + VersionFile)
+                #os.remove(VersionFile)
 
             EnvtVar = GetSDK + "/" + self.EnvironmentVar
             if os.path.exists(EnvtVar):
+                 Logger.Logger(2, "Creating dir: " + EnvtVar)
                 os.makedirs(EnvtVar)
 
+            Logger.Logger(2, "Writing file: " + VersionFile)
             with open(VersionFile, "w") as file:
                 file.write(GetSDK + "\n")
                 file.write("ManualSDK")
@@ -164,8 +173,10 @@ class PlatformSDK:
 
             VersionFile = GetPath + "/" + self.LastScriptVersion
             if os.path.exists(VersionFile):
-                os.remove(VersionFile)
+                Logger.Logger(2, "Removing file: " + VersionFile)
+                #os.remove(VersionFile)
 
+            Logger.Logger(2, "Writing file: " + VersionFile)
             with open(VersionFile, "w") as file:
                 file.write(InLastScriptVersion)
                 return True
@@ -219,6 +230,7 @@ class PlatformSDK:
         EnvVarFile = SDKRoot + "/" + self.EnvironmentVar
 
         if os.path.exists(EnvVarFile):
+            Logger.Logger(2, "Writing file: " + EnvVarFile)
             with open(EnvVarFile, 'r') as file:
 
                 AddPath = []
@@ -300,6 +312,7 @@ class PlatformSDK:
                 os.environ["PATH"] = NewPath
 
                 if NeedToWriteAutoEnvVar == True:
+                    Logger.Logger(2, "Writing file: " + EnvVarFile)
                     with open(EnvVarFile, 'a') as file2:
                         file2.write(PlatSetupEnvVar + "=1\n")
 
@@ -321,15 +334,18 @@ class PlatformSDK:
 
             EnvVarFile = PlatformSDKRoot + "/" + self.EnvironmentVar
             if os.path.exists(EnvVarFile):
-                os.remove(EnvVarFile)
+                Logger.Logger(2, "Removing file: " + EnvVarFile)
+                #os.remove(EnvVarFile)
 
             VersionFile = PlatformSDKRoot + "/" + self.LastScriptVersion
             if os.path.exists(VersionFile):
-                os.remove(VersionFile)
+                Logger.Logger(2, "Removing file: " + VersionFile)
+                #os.remove(VersionFile)
 
             SDKFilename = PlatformSDKRoot + "/" + self.InstalledSDKString
             if os.path.exists(SDKFilename):
-                os.remove(SDKFilename)
+                Logger.Logger(2, "Removing file: " + SDKFilename)
+                #os.remove(SDKFilename)
 
     # Returns "Valid" if we have the Required SDK Installed, "Invalid" otherwise
     def HasRequiredAutoSDKInstalled(self):
