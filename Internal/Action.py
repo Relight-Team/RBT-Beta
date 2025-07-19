@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 # The type of action (for debugging)
 class ActionType(Enum):
     Build = 0
@@ -15,48 +16,58 @@ class ActionType(Enum):
 # Action in RBT is way to store different build steps, these will be stored in a list, and after the list is done, we will execute each one
 # Each action could link files, compile files, etc
 
+
 class Action:
 
-    Type = ActionType # The type of action, for debugging reasons
+    Type = ActionType  # The type of action, for debugging reasons
 
-    CommandDescription = "" # Optional: The command we are going to execute, for debugging
+    CommandDescription = (
+        ""  # Optional: The command we are going to execute, for debugging
+    )
 
-    StatusDescription = "" # Optional: The file we are going to do the action on, for debugging
+    StatusDescription = (
+        ""  # Optional: The file we are going to do the action on, for debugging
+    )
 
-    PreconditionItems = [] # All dependencies our action needs before executing, will not execute if file is missing or outdated
+    PreconditionItems = (
+        []
+    )  # All dependencies our action needs before executing, will not execute if file is missing or outdated
 
-    PreconditionActions = [] # All actions that our action needs before executing
+    PreconditionActions = []  # All actions that our action needs before executing
 
-    DeleteItems = [] # All files we will delete before executing the action
+    DeleteItems = []  # All files we will delete before executing the action
 
-    OutputItems = [] # All files this action creates
+    OutputItems = []  # All files this action creates
 
-    DependencyListFile = [] # A dependency list file to check each header
+    DependencyListFile = []  # A dependency list file to check each header
 
-    CurrentDirectory = None # The directory we will produce our OutputItems
+    CurrentDirectory = None  # The directory we will produce our OutputItems
 
-    PrintDebugInfo = False # Should we print info when we create files?
+    PrintDebugInfo = False  # Should we print info when we create files?
 
-    CommandPath = None # the command file to run when we are creating our output files
+    CommandPath = None  # the command file to run when we are creating our output files
 
-    Arguments = "" # Parameters to run in the console when running the program
+    Arguments = ""  # Parameters to run in the console when running the program
 
-    DebugGroupNames = [] # For multiple compilers, this will add a group name everytime we change the target, mainly used for debugging
+    DebugGroupNames = (
+        []
+    )  # For multiple compilers, this will add a group name everytime we change the target, mainly used for debugging
 
-    CanRunRemotely = False # If this is true, then we can run this file through a remote computer (I.E. Incredibuild)
+    CanRunRemotely = False  # If this is true, then we can run this file through a remote computer (I.E. Incredibuild)
 
-    CanRunRemotelySNDBS = False # If this and CanRunRemotely is true, means that this action supports SN-DBS (all #imports must be compiled locally)
+    CanRunRemotelySNDBS = False  # If this and CanRunRemotely is true, means that this action supports SN-DBS (all #imports must be compiled locally)
 
-    UsingGCCCompiler = False # If true, we will use GCC instead, even if our compiler is set to use Clang
+    UsingGCCCompiler = False  # If true, we will use GCC instead, even if our compiler is set to use Clang
 
-    UsingPCH = False # If true, then we are using Precompiled header
+    UsingPCH = False  # If true, then we are using Precompiled header
 
-    PrintStatusDescription = False # If true, then we will print out StatusDescription when this action runs, for debugging
+    PrintStatusDescription = False  # If true, then we will print out StatusDescription when this action runs, for debugging
 
-    CreateImportLib = False # If true, then any libraries created will be considered "import library"
+    CreateImportLib = (
+        False  # If true, then any libraries created will be considered "import library"
+    )
 
-    DependCount = 0 # How much depend relies on this Action
-
+    DependCount = 0  # How much depend relies on this Action
 
     # Adds to the depend amount
     def AddDependCount(self, UsedActions):
@@ -83,6 +94,3 @@ class Action:
         else:
 
             return Action._Sign(len(B.PreconditionItems) - len(A.PreconditionItems))
-
-
-

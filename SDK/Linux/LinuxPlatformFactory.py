@@ -8,6 +8,7 @@ sys.path.append("../../Template")
 
 import PlatformFactory
 
+
 class LinuxFactory(PlatformFactory.FactorySDK):
 
     # Return's the target platform for this factory
@@ -21,4 +22,4 @@ class LinuxFactory(PlatformFactory.FactorySDK):
 
         SDK.ManageAndValidate()
 
-        #TODO: FINISH ONCE GENERATE PROJECT FILES IS FINISHED
+        # TODO: FINISH ONCE GENERATE PROJECT FILES IS FINISHED

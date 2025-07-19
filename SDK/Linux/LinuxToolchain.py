@@ -18,6 +18,7 @@ from Internal import Logger
 
 from Configuration import Directory_Manager as Dir_Manager
 
+
 class Options:
 
     UseAddressSanitizer = False
@@ -27,9 +28,14 @@ class Options:
     UseUnknownSanitizer = False
 
     def IsNone(self):
-        if self.UseAddressSanitizer == False and self.UseThreadSanitizer == False and UseUnknownSanitizer == False:
+        if (
+            self.UseAddressSanitizer == False
+            and self.UseThreadSanitizer == False
+            and UseUnknownSanitizer == False
+        ):
             return True
         return False
+
 
 class LinuxToolchain(Toolchain.ToolchainSDK):
 
@@ -49,7 +55,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
     VersionString = ""
 
-    #Cashe variables
+    # Cashe variables
     IsCrossCompiling = None
     MultiArchRoot = ""
     BasePath = ""
@@ -80,16 +86,19 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
     Option = Options
 
-    def __init__(self, InArch, InSDK, InSavePYSM=False, InOptions=None, InPlatform=None):
+    def __init__(
+        self, InArch, InSDK, InSavePYSM=False, InOptions=None, InPlatform=None
+    ):
 
         Logger.Logger(3, "Using Linux Toolchain")
 
         # If InPlatform is none, we will use Linux, otherwise we will use InPlatform
         if InPlatform == None:
-            self._RunBase(InArch, InSDK, CompileEnvironment.Platform.Linux, InSavePYSM, InOptions)
+            self._RunBase(
+                InArch, InSDK, CompileEnvironment.Platform.Linux, InSavePYSM, InOptions
+            )
         else:
             self._RunBase(InArch, InSDK, InPlatform, InSavePYSM, InOptions)
-
 
         self.MultiArchRoot = self.SDK.GetSDKLoc()
         self.BasePath = self.SDK.GetSDKArchPath(self.Arch)
@@ -97,18 +106,26 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         CanUseSystemCompiler = self.SDK.CanUseSystemCompiler()
         IsCompilerValid = False
 
-        if CanUseSystemCompiler == False and (self.BasePath == None or self.BasePath == ""):
+        if CanUseSystemCompiler == False and (
+            self.BasePath == None or self.BasePath == ""
+        ):
             raise ValueError("ERROR: LINUX_ROOT environment variable is not set!")
 
-        self.DumpSymsPath = os.path.join(Dir_Manager.Engine_Directory, "bin", "Linux", "DumpSyms")
-        self.BreakpadEncoderPath = os.path.join(Dir_Manager.Engine_Directory, "bin", "Linux", "BreakpadEncoder")
+        self.DumpSymsPath = os.path.join(
+            Dir_Manager.Engine_Directory, "bin", "Linux", "DumpSyms"
+        )
+        self.BreakpadEncoderPath = os.path.join(
+            Dir_Manager.Engine_Directory, "bin", "Linux", "BreakpadEncoder"
+        )
 
-        if (self.BasePath != None or self.BasePath != "") and (self.MultiArchRoot == None or self.MultiArchRoot == ""):
+        if (self.BasePath != None or self.BasePath != "") and (
+            self.MultiArchRoot == None or self.MultiArchRoot == ""
+        ):
             self.MultiArchRoot = self.BasePath
 
         # Validate the Compiler if we are using a system, but the compiler isn't valid
         if CanUseSystemCompiler == True and IsCompilerValid == False:
-            #self.ClangPath = os.path.join(self.BasePath, "bin", "clang++") # FIXME: Doesn't work in this prototype, using WhichClang() as temp solution
+            # self.ClangPath = os.path.join(self.BasePath, "bin", "clang++") # FIXME: Doesn't work in this prototype, using WhichClang() as temp solution
             self.ClangPath = Common.WhichClang()
             self.GCCPath = Common.WhichGCC()
             self.ArPath = Common.WhichAR()
@@ -128,20 +145,17 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             # These settings allow us to cross compile
             self.IsCrossCompiling == True
 
-            #FIXME: Make sure this is accuate once we add it!
+            # FIXME: Make sure this is accuate once we add it!
             self.IsCompilerValid = self.GetCompilerVersion()
-
 
         # Validate system Toolchain
         self._ValidateSystemToolchain()
 
-
         # Check the compiler settings
         self.SetDefaultCompilerSettings()
 
-        #TODO: Add proper detection
+        # TODO: Add proper detection
         self._LldUsed = True
-
 
     # Validate system Toolchain
     def _ValidateSystemToolchain(self):
@@ -159,9 +173,8 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             # These settings allow us to cross compile
             self.IsCrossCompiling == False
 
-            #FIXME: Make sure this is accuate once we add it!
+            # FIXME: Make sure this is accuate once we add it!
             self.IsCompilerValid = GetCompilerVersion()
-
 
     # Run's the parent init and set some values
     def _RunBase(self, InArch, InSDK, InPlatform, InSavePYSM=False, InOptions=None):
@@ -170,7 +183,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         self.SDK = InSDK
         self.SavePYSM = InSavePYSM
         self.Option = InOptions
-
 
     # Return's true if we are using clang
     def IsUsingClang(self):
@@ -188,15 +200,18 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             self.Version[tmp] = int(VersionArrayString[tmp])
             tmp += 1
 
-
     def GetEncodeCommand(self, LinkEnv, OutputFile):
         # FIXME: Add Windows Support!
 
-        OutputFileFullLoc = os.path.abspath(OutputFile) # Get full file path
+        OutputFileFullLoc = os.path.abspath(OutputFile)  # Get full file path
 
-        OutputFileWithoutExt = os.path.splitext(OutputFileFullLoc)[0] # Removes the extension
+        OutputFileWithoutExt = os.path.splitext(OutputFileFullLoc)[
+            0
+        ]  # Removes the extension
 
-        EncodeSymbolFile = os.path.join(LinkEnv.OutputDir, OutputFileWithoutExt + ".sym")
+        EncodeSymbolFile = os.path.join(
+            LinkEnv.OutputDir, OutputFileWithoutExt + ".sym"
+        )
 
         SymbolFile = os.path.join(LinkEnv.LocalShadowDir, OutputFile + ".pysm")
 
@@ -208,32 +223,75 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         if self.SavePYSM == True:
             SymbolFile = os.path.join(LinkEnv.OutputDir, OutputFileWithoutExt + ".pysm")
 
-
         # Compile dump_syms
-        Ret = '"' + self.DumpSymsPath + '" -c -o "' + OutputFileFullLoc + '" "' + os.path.abspath(SymbolFile) + '"\n'
+        Ret = (
+            '"'
+            + self.DumpSymsPath
+            + '" -c -o "'
+            + OutputFileFullLoc
+            + '" "'
+            + os.path.abspath(SymbolFile)
+            + '"\n'
+        )
 
-        #encode breakpad symbols
-        Ret += '"' + self.BreakpadEncoderPath + '" "' + os.path.abspath(SymbolFile) + '" "' + os.path.abspath(EncodeSymbolFile) + '" \n'
-
+        # encode breakpad symbols
+        Ret += (
+            '"'
+            + self.BreakpadEncoderPath
+            + '" "'
+            + os.path.abspath(SymbolFile)
+            + '" "'
+            + os.path.abspath(EncodeSymbolFile)
+            + '" \n'
+        )
 
         # Write debug information
         if LinkEnv.AddDebugInfo == True:
 
             # use objcopy on strip file
-            Ret += '"' + self.ObjectCopyPath + '" --strip-all "' + os.path.abspath(OutputFile) + '" "' + os.path.abspath(StripFile) + '"\n'
-
+            Ret += (
+                '"'
+                + self.ObjectCopyPath
+                + '" --strip-all "'
+                + os.path.abspath(OutputFile)
+                + '" "'
+                + os.path.abspath(StripFile)
+                + '"\n'
+            )
 
             # use objcopy on debug file
-            Ret += '"' + self.ObjectCopyPath + '" --only-keep-debug "' + os.path.abspath(OutputFile) + '" "' + os.path.abspath(DebugFile) + '"\n'
-
+            Ret += (
+                '"'
+                + self.ObjectCopyPath
+                + '" --only-keep-debug "'
+                + os.path.abspath(OutputFile)
+                + '" "'
+                + os.path.abspath(DebugFile)
+                + '"\n'
+            )
 
             # use objcopy to link Debug file to the Final .so file, using temp to avoid corruption
-            Ret += '"' + self.ObjectCopyPath + '" --add-gnu-debuglink="' + os.path.abspath(DebugFile) + '" "' + os.path.abspath(StripFile) + '" "' + os.path.abspath(OutputFile) + '.temp" \n'
-
+            Ret += (
+                '"'
+                + self.ObjectCopyPath
+                + '" --add-gnu-debuglink="'
+                + os.path.abspath(DebugFile)
+                + '" "'
+                + os.path.abspath(StripFile)
+                + '" "'
+                + os.path.abspath(OutputFile)
+                + '.temp" \n'
+            )
 
             # Rename the .temp to the final name
 
-            Ret += 'mv "' + os.path.abspath(OutputFile) + '.temp" "' + os.path.abspath(OutputFile) + '"\n'
+            Ret += (
+                'mv "'
+                + os.path.abspath(OutputFile)
+                + '.temp" "'
+                + os.path.abspath(OutputFile)
+                + '"\n'
+            )
 
             # Change permission to normal (this permission allows main user to read and write, but other users can only read it)
             Ret += 'chmod 644 "' + os.path.abspath(DebugFile) + '"\n'
@@ -242,15 +300,18 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             Ret += '"' + StripFile + '" "' + os.path.abspath(OutputFile) + '"'
 
-
-
         return Ret
-
 
     def GetCompilerVersion(self):
         # Check Clang
         if self.ClangPath != "":
-            App = subprocess.run([self.ClangPath, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+            App = subprocess.run(
+                [self.ClangPath, "--version"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
 
             Out = App.stdout
 
@@ -259,11 +320,17 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             if Match:
                 self.VersionString = Match.group(1)
 
-
     def SetDefaultCompilerSettings(self):
         if self.ClangPath != "":
 
-            App = subprocess.run("echo '' | " + self.ClangPath + " -E -dM -", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True, shell=True)
+            App = subprocess.run(
+                "echo '' | " + self.ClangPath + " -E -dM -",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+                shell=True,
+            )
 
             for Line in App.stdout:
                 LineStrip = Line.strip()
@@ -278,7 +345,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
     @staticmethod
     def ArchSwitch(Arch):
         if Arch.startswith("arm") or Arch.startswith("aarch64"):
-            return " -fsigned-char" # Tells the compiler to treat char as signed chars
+            return " -fsigned-char"  # Tells the compiler to treat char as signed chars
         return ""
 
     # Set defines based on the architecture
@@ -287,7 +354,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         if Arch.startswith("x86_64") or Arch.startswith("aarch64"):
             return " -D_LINUX64"
         return ""
-
 
     @staticmethod
     def UseLibCXX(Arch):
@@ -300,11 +366,14 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             if Override == "True" or Override == "true" or Override == "1":
 
                 # If Override starts with supported arch, return true
-                if Override.startswith("i686") or Override.startswith("x86_64") or Override.startswith("aarch64"):
+                if (
+                    Override.startswith("i686")
+                    or Override.startswith("x86_64")
+                    or Override.startswith("aarch64")
+                ):
                     return True
 
         return False
-
 
     # Fix the args to make it compatable
     @staticmethod
@@ -321,7 +390,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         except:
             Value = None
 
-
         if Key == None:
             return ""
 
@@ -331,13 +399,12 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 Value = Value.trim('"')
                 Value = '"' + Value + '"'
 
-            Value.replace('\"', "\\\"")
+            Value.replace('"', '\\"')
 
         if Value == None:
             return Key
         else:
             return Key + "=" + Value
-
 
     @staticmethod
     def ArgCPP():
@@ -348,7 +415,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         return " -x c++-header -std=c++14"
 
     # Whether to use llvm-ar or ar
-    #TODO: Temp solution, assumes it's system-wide, add support for non-system wide
+    # TODO: Temp solution, assumes it's system-wide, add support for non-system wide
     def ArchiveProgram():
         if LlvmArPath != "":
             return "llvm-ar"
@@ -357,10 +424,8 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         else:
             raise ValueError("Cannot create llvm-ar or ar. Both tools cannot be found")
 
-
     def ArgArchive():
         return " rcs"
-
 
     def UsingLld(self, Arch):
         if self._LldUsed == True and Arch.startswith("x86_64"):
@@ -373,15 +438,13 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 return True
         return False
 
-
     def SDKVersionCorrect():
         pass
 
-
-
     def GetResponseName(self, LinkEnv, OutputFile):
-        return os.path.join(LinkEnv.IntermediateDir, os.path.basename(OutputFile) + ".rsp")
-
+        return os.path.join(
+            LinkEnv.IntermediateDir, os.path.basename(OutputFile) + ".rsp"
+        )
 
     def ArchiveAndIndex(LinkEnv, OutputActionList):
         Archive = Action.Action
@@ -404,13 +467,14 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             Temp = os.path.abspath(File)
             ImputFiles.append('"' + Temp + '"')
 
-
         ResponsePath = self.GetResponseName(LinkEnv, OutputFile)
 
-        #FIXME: Add support for not generating project files support (Requires class that doesn't exist yet) This will create intermediate file and add it to precondition list
+        # FIXME: Add support for not generating project files support (Requires class that doesn't exist yet) This will create intermediate file and add it to precondition list
 
         if LlvmArPath == None or LlvmArPath == "":
-            Archive.Arguments += ' && "' + self.RanlibPath + '" "' + os.path.abspath(OutputFile) + '"'
+            Archive.Arguments += (
+                ' && "' + self.RanlibPath + '" "' + os.path.abspath(OutputFile) + '"'
+            )
 
         Archive.Arguments += " " + LinkEnv.AdditionalArgs
 
@@ -445,7 +509,10 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
     def _Optimize(self, CompileEnv):
         if CompileEnv.Optimize == False:
             Ret = " -O0"
-        elif self.Option.UseAddressSanitizer == True or self.Option.UseTreeadSanitizer == True:
+        elif (
+            self.Option.UseAddressSanitizer == True
+            or self.Option.UseTreeadSanitizer == True
+        ):
             Ret = " -O1 -g"
 
             if self.OptionUseAddressSanitizer == True:
@@ -455,7 +522,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             Ret = " -O2"
 
         return Ret
-
 
     def _OutputConfig(self, Config):
         Ret = ""
@@ -486,7 +552,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         return Ret
 
-
     # Global Arguments that we will use for both Compiling and Linking
     def GetGlobalArg(self, CompileEnv):
         Ret = " -c -pipe"
@@ -497,10 +562,16 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         Ret += " -Wall -Werror"
 
-        if not CompileEnv.Arch.startswith("X86_64") and CompileEnv.Arch.startswith("AARCH64"):
+        if not CompileEnv.Arch.startswith("X86_64") and CompileEnv.Arch.startswith(
+            "AARCH64"
+        ):
             Ret += " -funwind-tables"
 
-        Ret += " -Wsequence-point -Wdelete-non-virtual-dtor" + self.ArchSwitch(CompileEnv.Arch) + " -fno-math-errno"
+        Ret += (
+            " -Wsequence-point -Wdelete-non-virtual-dtor"
+            + self.ArchSwitch(CompileEnv.Arch)
+            + " -fno-math-errno"
+        )
 
         if CompileEnv.HideSymbols == True:
             Ret += " -fvisibility=hidden -fvisibility-inlines-hidden"
@@ -514,7 +585,11 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         Ret += " -Wno-unused-variable -Wno-unused-function -Wno-switch -Wno-unknown-pragmas -Wno-gnu-string-literal-operator-template -Wno-invalid-offsetof"
 
         if CompileEnv.PGOOptimize == True:
-            Ret += ' -Wno-backend-plugin -fprofile-instr-use="' + os.path.join(CompileEnv.PGODirectory, CompileEnv.PGOFilePrefix) + '"'
+            Ret += (
+                ' -Wno-backend-plugin -fprofile-instr-use="'
+                + os.path.join(CompileEnv.PGODirectory, CompileEnv.PGOFilePrefix)
+                + '"'
+            )
 
         elif CompileEnv.PGOProfile == True:
             Ret += " -fprofile-generate"
@@ -524,7 +599,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             if CompileEnv.ShadowVariableAsError == False:
                 Ret += " -Wno-error=shadow"
-
 
         if CompileEnv.UndefinedIdentifierWarnings == True:
             Ret += " -Wundef"
@@ -554,8 +628,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         return Ret
 
-
-
     def _SetPrintedDetails(self, CompileEnv):
         if self.HasPrintedDetails == False:
             self.Print(CompileEnv)
@@ -566,9 +638,10 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             self.HasPrintedDetails == True
 
-
     # Compiles the list of files together
-    def CompileFiles(self, CompileEnv, InputFilesList, DirOutput, Name, OutputActionList):
+    def CompileFiles(
+        self, CompileEnv, InputFilesList, DirOutput, Name, OutputActionList
+    ):
         Logger.Logger(1, "Name: " + Name)
         Logger.Logger(1, "Input Files List: " + str(InputFilesList))
         Logger.Logger(1, "Directory Output: " + DirOutput)
@@ -581,7 +654,10 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         if self.CanAdvanceFeatures(CompileEnv.Arch) == False:
             if CompileEnv.AllowLTCG == True or CompileEnv.PGOOptimize == True:
-                Logger.Logger(5, "LTCG and/or PGO Optimize cannot be true if we are not allowed to use advance features!")
+                Logger.Logger(
+                    5,
+                    "LTCG and/or PGO Optimize cannot be true if we are not allowed to use advance features!",
+                )
 
         if CompileEnv.PCH_Act == CompileEnvironment.PCHAction.Include:
             PCH += " -include " + CompileEnv.PCHIncludeName
@@ -607,7 +683,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             Extension = (os.path.splitext(os.path.abspath(Item))[1]).lower()
 
-            #TODO: Add support for other file extension
+            # TODO: Add support for other file extension
             if CompileEnv.PCH_Act == CompileEnvironment.PCHAction.Create:
                 NewArgs = self.ArgPCH()
 
@@ -618,7 +694,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             for F in CompileEnv.ForceIncFiles:
                 NewArgs += ' -include "' + os.path.abspath(F) + '"'
-
 
             NewAction.PreconditionItems.append(Item)
 
@@ -652,7 +727,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 NewAction.OutputItems.append(DependFile)
                 NewAction.DependencyListFile = DependFile
 
-
             NewAction.CurrentDirectory = Dir_Manager.Engine_Directory
 
             if self.ClangPath != None and self.ClangPath != "":
@@ -684,13 +758,15 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             NewAction.UsingGCCCompiler == True
 
             if CompileEnv.PCH_Act == True:
-                if CompileEnv.PCH_Act == CompileEnvironment.PCHAction.Create or CompileEnv.AllowRemotelyCompiledPCHs == True:
+                if (
+                    CompileEnv.PCH_Act == CompileEnvironment.PCHAction.Create
+                    or CompileEnv.AllowRemotelyCompiledPCHs == True
+                ):
                     CompileAction.CanRunRemotely = True
 
             OutputActionList.append(NewAction)
 
         return CPPOut
-
 
     def _LinkArgs(self, LinkEnv):
         Ret = ""
@@ -705,7 +781,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         else:
             Ret += " -Wl,--unresolved-symbols=ignore-in-shared-libs"
 
-
         if self.Option.UseAddressSanitizer == True:
             Ret += " -g -fsanitize=address"
 
@@ -715,7 +790,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         elif self.Option.UseUnknownSanitizer == True:
             Ret += " -g -fsanitize=undefined"
 
-        Ret +=  " -Wl,-rpath=${ORIGIN} -Wl,-rpath-link=${ORIGIN} -Wl,-rpath=${ORIGIN}/../../bin/Linux"
+        Ret += " -Wl,-rpath=${ORIGIN} -Wl,-rpath-link=${ORIGIN} -Wl,-rpath=${ORIGIN}/../../bin/Linux"
 
         Ret += " -Wl,--as-needed -Wl,--hash-style=gnu -Wl,--build-id"
 
@@ -723,7 +798,11 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             Ret += " -Wl,-nopie"
 
         if LinkEnv.PGOOptimize == True:
-            Ret += ' -Wno-backend-plugin -fprofile-instr-use="' + os.path.join(LinkEnv.PGODirectory, LinkEnv.PGOFilePrefix) + '"'
+            Ret += (
+                ' -Wno-backend-plugin -fprofile-instr-use="'
+                + os.path.join(LinkEnv.PGODirectory, LinkEnv.PGOFilePrefix)
+                + '"'
+            )
 
         elif LinkEnv.PGOProfile == True:
             Ret += " -fprofile-generate"
@@ -731,35 +810,32 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         if LinkEnv.AllowLTCG == True:
             Ret += " -flto"
 
-
         if self.IsCrossCompiling == True:
 
             if self.IsUsingClang == True:
 
                 Ret += " -target " + LinkEnv.Arch
 
-                #Ret += ' "--sysroot=' + BasePath + '"' # FIXME: This breaks my current code, since we are using system shit for now, once I replace those code, re-add this
+                # Ret += ' "--sysroot=' + BasePath + '"' # FIXME: This breaks my current code, since we are using system shit for now, once I replace those code, re-add this
 
-                Ret += '-B' + BasePath + '/usr/lib/'
+                Ret += "-B" + BasePath + "/usr/lib/"
 
-                Ret += '-B' + BasePath + '/usr/lib64/'
+                Ret += "-B" + BasePath + "/usr/lib64/"
 
-                Ret += '-L' + BasePath + '/usr/lib/'
+                Ret += "-L" + BasePath + "/usr/lib/"
 
-                Ret += '-L' + BasePath + '/usr/lib64/'
+                Ret += "-L" + BasePath + "/usr/lib64/"
 
         return Ret
 
-
-
     def _LinkGroups(self, LinkEnv, OutputResp, OutputAction):
 
-        OutputResp.append(' --start-group')
+        OutputResp.append(" --start-group")
 
         ExternalLibs = ""
 
         for Item in LinkEnv.AdditionalLibs:
-            Extension = os.path.splitext(Item)[1] # Get extension
+            Extension = os.path.splitext(Item)[1]  # Get extension
 
             if os.path.dirname(Item) == None or os.path.dirname(Item) == "":
                 ExternalLibs += " -l" + Item
@@ -772,12 +848,13 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 if " " in Abs:
                     Abs = '"' + Abs + '"'
 
-                if LinkEnv.IsBuildingDynamic == True and ("libcrypto" in Abs or "libssl" in Abs):
+                if LinkEnv.IsBuildingDynamic == True and (
+                    "libcrypto" in Abs or "libssl" in Abs
+                ):
                     OutputResp.append(" --whole-archive" + Item + " --no-whole-archive")
 
                 else:
                     OutputRest.append(" " + Item)
-
 
                 AllFiles = File_Manager.GetAllFilesFromDir(Item)
                 LinkEnv.PreconditionItems.append(AllFiles)
@@ -797,10 +874,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 OutputAction.PreconditionItems.append(Depend)
                 ExternalLibs += LibLink
 
-        OutputResp.append(' --end-group')
+        OutputResp.append(" --end-group")
 
         return ExternalLibs
-
 
     # TODO: Add windows support!
     def _STEP1LinkShellFiles(self, LinkEnv, Output, Com, Action):
@@ -819,18 +895,16 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             f.write("#!/bin/sh\n")
             f.write("set -o errexit\n")
             f.write(Com + "\n")
-            #f.write(self.GetEncodeCommand(LinkEnv, Output)) # FIXME: Readd this once we add Breakpad!
+            # f.write(self.GetEncodeCommand(LinkEnv, Output)) # FIXME: Readd this once we add Breakpad!
 
         Action.CommandPath = "/bin/sh"
         Action.Arguments = ' "' + LinkFile + '"'
 
         LinkScriptFile = os.path.join(LinkEnv.LocalShadowDir, "remove-sym.ldscript")
 
-
         if os.path.exists(LinkScriptFile):
             Logger.Logger(2, "Removing file: " + LinkScriptFile)
-            #os.remove(LinkScriptFile)
-
+            # os.remove(LinkScriptFile)
 
     def _STEP2LinkShellFiles(self, LinkEnv, Output, Com, Action, RelinkedFile):
         RelinkName = "Relink-" + os.path.basename(Output) + ".sh"
@@ -853,20 +927,32 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             f.write("#!/bin/sh\n")
             f.write("set -o errexit\n")
             f.write(Com + "\n")
-            f.write("TIMESTAMP='stat --format %y \"" + os.path.abspath(Output) + "\"\n")
+            f.write("TIMESTAMP='stat --format %y \"" + os.path.abspath(Output) + '"\n')
             f.write("cp " + RelinkFile + " " + os.path.abspath(Output) + "\n")
-            f.write("mv " + os.path.abspath(Output) + ".temp " + os.path.abspath(Output) + "\n")
+            f.write(
+                "mv "
+                + os.path.abspath(Output)
+                + ".temp "
+                + os.path.abspath(Output)
+                + "\n"
+            )
             f.write(self.GetEncodeCommand(LinkEnv, Output) + "\n")
             f.write('touch -d "$TIMESTAMP"' + os.path.abspath(Output))
 
         Action.CommandPath = "/bin/sh"
         Action.Arguments = '"' + RelinkFile + '"'
 
-
     def LinkFiles(self, LinkEnv, ImportLibraryOnly, OutputActionList):
 
-        if (LinkEnv.AllowLTCG == True or LinkEnv.PGOProfile == True or LinkEnv.PGOOptimize) and CanAdvanceFeatures(LinkEnv.Arch) == False:
-            Logger.Logger(5, "FATAL: AllowLTCG, PGOProfile, and/or PGOOptimize is true, but we cannot use advance features!")
+        if (
+            LinkEnv.AllowLTCG == True
+            or LinkEnv.PGOProfile == True
+            or LinkEnv.PGOOptimize
+        ) and CanAdvanceFeatures(LinkEnv.Arch) == False:
+            Logger.Logger(
+                5,
+                "FATAL: AllowLTCG, PGOProfile, and/or PGOOptimize is true, but we cannot use advance features!",
+            )
 
         if LinkEnv.IsBuildingLibrary == True or ImportLibraryOnly == True:
             return ArchiveAndIndex(LinkEnv, OutputActionList)
@@ -893,7 +979,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         NewAction.OutputItems.append(Output)
 
-        #TODO: Add description debugging support
+        # TODO: Add description debugging support
 
         Com += " -o " + os.path.abspath(Output)
 
@@ -907,18 +993,23 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         if LinkEnv.IsBuildingDynamic == True:
             Resp.append(" -soname=" + Output)
 
-        AllLib = LinkEnv.LibraryPaths # All libs combined
+        AllLib = LinkEnv.LibraryPaths  # All libs combined
 
         for Item in LinkEnv.AdditionalLibs:
 
             ItemPath = os.path.dirname(Item)
 
             # If Item contains Plugin or ThirdParty, and is not the absolute file
-            if ("Plugin" in Item or "bin/ThirdParty" in Item) and os.path.dirname(Item) != os.path.abspath(Output):
+            if ("Plugin" in Item or "bin/ThirdParty" in Item) and os.path.dirname(
+                Item
+            ) != os.path.abspath(Output):
 
                 Relative = os.path.relpath(Item, os.path.dirname(Output))
 
-                if IsCrossCompiling() == True and Dir_Manager.Engine_Directory in Relative:
+                if (
+                    IsCrossCompiling() == True
+                    and Dir_Manager.Engine_Directory in Relative
+                ):
                     Temp = Relative.replace(Dir_Manager.Engine_Directory, "")
 
                     # If we are on Linux Root Directory, we just need to move back the directory, otherwise we will include Temp
@@ -943,13 +1034,10 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 RPath.append(ItemTemp)
                 Resp.append(' -rpath="${{ORIGIN}}' + ItemTemp + '"')
 
-
         Resp.append(' -rpath-link="' + os.path.dirname(Output) + '"')
-
 
         for Item in AllLib:
             Resp.append(' -L"' + Item + '"')
-
 
         ExternalLibs = self._LinkGroups(LinkEnv, Resp, NewAction)
 
@@ -990,7 +1078,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             RelinkedFile = os.path.join(LinkEnv.LocalShadowDir, OutputFile + ".Relink")
 
-            Dummmy = os.path.join(LinkEnv.LocalShadowDir, OutputFile + ".Relink_Action_Ran")
+            Dummmy = os.path.join(
+                LinkEnv.LocalShadowDir, OutputFile + ".Relink_Action_Ran"
+            )
 
             RelinkAction.OutputItems.append(Dummy)
 
@@ -1000,16 +1090,16 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         return Output
 
-
     def PostBuilt(File, LinkEnv, ActionList):
         Output = super().PostBuilt(File, LinkEnv, ActionList)
 
         if LinkEnv.IsBuildingDynamic == True and LinkEnv.CrossedReference == True:
-            RelinkMap = os.path.join(LinkEnv.LocalShadowDir, OutputFile + ".Relink_Action_Ran")
+            RelinkMap = os.path.join(
+                LinkEnv.LocalShadowDir, OutputFile + ".Relink_Action_Ran"
+            )
             Output.append(RelinkMap)
 
         return Output
-
 
     @staticmethod
     def Print(CompileEnv):

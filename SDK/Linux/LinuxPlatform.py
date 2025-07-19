@@ -18,10 +18,9 @@ class LinuxPlatform(Platform.Platform):
 
     SDK = LinuxPlatformSDK.LinuxPlatformSDK()
 
-    def __init__(InSDK, InCEPlatform=CE.Platform.Linux, InPlatform="Linux"):
+    def __init__(self, InSDK, InCEPlatform=CE.Platform.Linux, InPlatform="Linux"):
         super().__init__(InCEPlatform, InPlatform)
-        SDK = InSDK
-
+        self.SDK = InSDK
 
     def GetDefaultArch(ProjectFile):
         Ret = Arch
@@ -33,10 +32,12 @@ class LinuxPlatform(Platform.Platform):
 
         # If abspath fails, we shall get it from command line instead
         if EngineIni == None:
-            EngineIni = "../../../../BaseBuilder.cfg" # TEMP SOLUTION
-            pass #FIXME: Get from command line, else get from BaseBuilder
+            EngineIni = "../../../../BaseBuilder.cfg"  # TEMP SOLUTION
+            pass  # FIXME: Get from command line, else get from BaseBuilder
 
-        TempConfig = ConfigManager.ReadConfig(EngineIni, "PlatformInformation", "PlatformArch")
+        TempConfig = ConfigManager.ReadConfig(
+            EngineIni, "PlatformInformation", "PlatformArch"
+        )
 
         # TODO: Shitty hack to ensure compatibility, idk if this even works, if it doesn't FIX IT!
         if "X86-64".lower() in TempConfig:
@@ -56,12 +57,10 @@ class LinuxPlatform(Platform.Platform):
 
         return Ret
 
-
     def MakeTargetValid(Target):
 
         if Target.UseAddressSanitizer == True or Target.UseThreadSanitizer == True:
             Target.Defines.append("FORCE_ANSI_ALLOCATOR=1")
-
 
     def ResetTarget(Target):
         MakeTargetValid(Target)
@@ -78,14 +77,27 @@ class LinuxPlatform(Platform.Platform):
     def IsBuildProduct(Name, TitlePrefixes, TitleSuffixes):
 
         if Name.startswith("lib"):
-            if Platform.Platform.IsBuildProductName(Name, 3, len(Name) - 3, TitlePrefixes, TitleSuffixes, ".a") or Platform.Platform(Name, 3, len(Name) - 3, TitlePrefixes, TitleSuffixes, ".so"):
+            if Platform.Platform.IsBuildProductName(
+                Name, 3, len(Name) - 3, TitlePrefixes, TitleSuffixes, ".a"
+            ) or Platform.Platform(
+                Name, 3, len(Name) - 3, TitlePrefixes, TitleSuffixes, ".so"
+            ):
                 return True
 
         else:
 
-            if Platform.Platform.IsBuildProductNameNoIndex(Name, TitlePrefixes, TitleSuffixes, "") or Platform.Platform.IsBuildProductNameNoIndex(Name, TitlePrefixes, TitleSuffixes, ".a") or Platform.Platform.IsBuildProductNameNoIndex(Name, TitlePrefixes, TitleSuffixes, ".so"):
+            if (
+                Platform.Platform.IsBuildProductNameNoIndex(
+                    Name, TitlePrefixes, TitleSuffixes, ""
+                )
+                or Platform.Platform.IsBuildProductNameNoIndex(
+                    Name, TitlePrefixes, TitleSuffixes, ".a"
+                )
+                or Platform.Platform.IsBuildProductNameNoIndex(
+                    Name, TitlePrefixes, TitleSuffixes, ".so"
+                )
+            ):
                 return True
-
 
     def GetBinExtension(InBinType):
         if BinType == "EXE":
@@ -96,7 +108,6 @@ class LinuxPlatform(Platform.Platform):
             return ".a"
         else:
             return None
-
 
     def GetDebugExtensions(Target, InBinType):
         Ret = []
@@ -109,8 +120,6 @@ class LinuxPlatform(Platform.Platform):
 
         return Ret
 
-
-
     def CheckEnvironmentConflicts(CompileEnv, LinkEnv):
 
         if CompileEnv.PGOOptimize != LinkEnv.PGOOptimize:
@@ -121,7 +130,6 @@ class LinuxPlatform(Platform.Platform):
 
         if CompileEnv.AllowLTCG != LinkEnv.AllowLTCG:
             raise ValueError("")
-
 
     def SetUpEnvironment(Target, CompileEnv, LinkEnv):
 
@@ -147,28 +155,25 @@ class LinuxPlatform(Platform.Platform):
         # For libraries
         CompileEnv.Defines.append("LINUX=1")
 
-
     def ShouldCreateDebugInfo(Target):
         if Target.BuildType == "Final":
             return False
         else:
             return True
 
-
     def CreateToolChain(InCppPlatform, Target):
         Options = LinuxToolchain.Options
 
-        if Target.UseAddressSanitizer = True:
+        if Target.UseAddressSanitizer == True:
             Options.UseAddressSanitizer = True
 
-        if Target.UseThreadSanitizer = True:
+        if Target.UseThreadSanitizer == True:
             Options.UseThreadSanitizer = True
 
-        if Target.UseUnknownSanitizer = True:
+        if Target.UseUnknownSanitizer == True:
             Options.UseUnknownSanitizer = True
 
         return LinuxToolchain.LinuxToolchain(Target.Arch, SDK, Target.SavePSYM, Options)
 
-
     def Deploy(Receipt):
-        pass # DEPLOY IS NOT SUPPORTED YET!
+        pass  # DEPLOY IS NOT SUPPORTED YET!

@@ -5,6 +5,7 @@ import subprocess
 
 sys.path.append("../")
 
+
 class FactorySDK:
 
     # Return's the target platform for this factory
@@ -13,4 +14,4 @@ class FactorySDK:
 
     # Register the Build Platform w/ Platform Class
     def RegBuildPlatform():
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class

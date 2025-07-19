@@ -4,6 +4,7 @@ import os
 
 # This handles the different types of execution of the list of actions
 
+
 class RBTThread:
 
     ExitCode = 0
@@ -17,24 +18,38 @@ class RBTThread:
 
     # These 2 functions will allow the program to print the output that should be printed from the command line
     def _ReadOutput(self, pipe):
-        for line in iter(pipe.readline, b''):
+        for line in iter(pipe.readline, b""):
             print(f"{line.decode().strip()}")
         pipe.close()
 
     def _ReadError(self, pipe):
-        for line in iter(pipe.readline, b''):
+        for line in iter(pipe.readline, b""):
             print(f"{line.decode().strip()}")
         pipe.close()
 
     # The function that will be run by the thread, this will execute the process based on the action
     def FunctionToRun(self):
-        print("Executing " + str(self.Action.CommandPath)  + " " + str(self.Action.Arguments))
+        print(
+            "Executing "
+            + str(self.Action.CommandPath)
+            + " "
+            + str(self.Action.Arguments)
+        )
 
         # Start program
         try:
             try:
-                args = [self.Action.CommandPath, self.Action.Arguments] # Combines file path and arguments
-                RunningProgram = subprocess.Popen(args, cwd=self.Action.CurrentDirectory, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                args = [
+                    self.Action.CommandPath,
+                    self.Action.Arguments,
+                ]  # Combines file path and arguments
+                RunningProgram = subprocess.Popen(
+                    args,
+                    cwd=self.Action.CurrentDirectory,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
 
                 # Run ReadOutput and ReadError
 
@@ -43,7 +58,7 @@ class RBTThread:
             except:
                 pass
 
-            RunningProgram.wait() # Wait until program stops running
+            RunningProgram.wait()  # Wait until program stops running
 
             self.ExitCode = RunningProgram.returncode
 
@@ -52,11 +67,10 @@ class RBTThread:
 
         self.Finished = True
 
-
-
     # Starts the threading
     def Start(self):
         print(self.Action.CommandPath + " " + self.Action.Arguments)
+
 
 class ExecuteBase:
 
@@ -64,7 +78,8 @@ class ExecuteBase:
         return "Base"
 
     def ExecuteActionList(self, ActionList):
-        pass # Overritten by child class
+        pass  # Overritten by child class
+
 
 # Executes actions one at a time
 class LinearExecuter(ExecuteBase):
@@ -74,7 +89,7 @@ class LinearExecuter(ExecuteBase):
 
     def ExecuteActionList(self, ActionList):
 
-        ActionThreadDict = {} # A dictionary of Action : Thread
+        ActionThreadDict = {}  # A dictionary of Action : Thread
 
         print("Compiling C++ Code...")
 
@@ -83,10 +98,10 @@ class LinearExecuter(ExecuteBase):
         Loop = True
 
         # Loop until we are done
-        while(Loop):
+        while Loop:
 
-            ExeAction = 0 # All actions that we are currently executing
-            NonExeAction = 0 # All actions that isn't executed
+            ExeAction = 0  # All actions that we are currently executing
+            NonExeAction = 0  # All actions that isn't executed
 
             # we will update ExeAction and NonExeAction every loop instance
             for i in ActionList:
@@ -110,7 +125,6 @@ class LinearExecuter(ExecuteBase):
             if NonExeAction == 0:
                 Loop = False
 
-
             for i in ActionList:
 
                 ActionThr = None
@@ -126,8 +140,12 @@ class LinearExecuter(ExecuteBase):
 
                     # if Execute Actions is less than the cpu count
                     if ExeAction < max(1, os.cpu_count()):
-                        ContainOutdatedPre = False # If any action's Precondition is outdated
-                        ContainFailedPre = False # If any action's Precondition has failed
+                        ContainOutdatedPre = (
+                            False  # If any action's Precondition is outdated
+                        )
+                        ContainFailedPre = (
+                            False  # If any action's Precondition has failed
+                        )
 
                         # Detect if any Precondition Actions is either outdated or has failed
                         for j in i.PreconditionActions:
@@ -154,17 +172,18 @@ class LinearExecuter(ExecuteBase):
                         # If it hasn't failed and isn't outdated, add action and the thread to the dictionary
                         elif ContainFailedPre == False:
 
-                            TD = RBTThread(i) # Store action to execute
+                            TD = RBTThread(i)  # Store action to execute
                             try:
-                                TD.Start() # Execute action
+                                TD.Start()  # Execute action
 
                             except:
                                 pass
 
-                            ActionThreadDict[i] = TD # Store Action with the value of the thread into the dictoonary
+                            ActionThreadDict[i] = (
+                                TD  # Store Action with the value of the thread into the dictoonary
+                            )
 
-                            ExeAction += 1 # add 1 to Executing Actions
-
+                            ExeAction += 1  # add 1 to Executing Actions
 
         Ret = True
 
@@ -178,8 +197,6 @@ class LinearExecuter(ExecuteBase):
         return Ret
 
 
-
-
 # TODO: Add support for ParallelExecuter
 # Executes multiple actions at a time
-#class ParallelExecuter(ExecuteBase)
+# class ParallelExecuter(ExecuteBase)

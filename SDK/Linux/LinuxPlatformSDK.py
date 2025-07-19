@@ -8,6 +8,7 @@ from Template import PlatformSDK
 
 from Configuration import Directory_Manager
 
+
 class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
     SDKVersionRecommended = "Clang"
@@ -18,14 +19,11 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
     VerboseLinker = False
 
-
     def GetRecommendedSDKVersion(self):
         return self.SDKVersionRecommended
 
-
     def GetTargetName(self):
         return self.TargetPlatformName
-
 
     def SDKVersionFileName(self):
         return "LinuxToolchainVersion.txt"
@@ -36,15 +34,14 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
             return True
         return False
 
-
-    #FIXME: Find a way to make this work, and test both internal and external SDK
+    # FIXME: Find a way to make this work, and test both internal and external SDK
     def GetTreeSDKRoot(self):
         pass
 
     # Return's the location of the SDK, will either retrieve it from environment variable "LINUX_ROOT_MULTIARCH", or generate one if it isn't set
     def GetSDKLoc(self):
 
-        Env = os.getenv('LINUX_ROOT_MULTIARCH')
+        Env = os.getenv("LINUX_ROOT_MULTIARCH")
 
         if Env == None or Env == "":
             Dir = self.GetTreeSDKRoot()
@@ -56,7 +53,6 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
                     Env = NewDir
 
         return Env
-
 
     # Return's the location of the SDK for an arch
     def GetSDKArchPath(self, Arch):
@@ -74,14 +70,13 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
     def IsClangValid(self, BasePath):
         FilePath = os.path.join(BasePath, "bin")
 
-        #TODO: Add Window's support
+        # TODO: Add Window's support
 
         FileName = "Clang++"
 
         File = os.path.join(FilePath, FileName)
 
         return os.path.exists(File)
-
 
     def InternalHasRequiredManualSDK(self):
 
@@ -93,7 +88,9 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
                 return True
 
         if _HostOS == "Linux":
-            if (Common.WhichClang() != None and Common.WhichClang() != "") and (Common.WhichGCC() != None and Common.WhichGCC() != ""):
+            if (Common.WhichClang() != None and Common.WhichClang() != "") and (
+                Common.WhichGCC() != None and Common.WhichGCC() != ""
+            ):
                 return True
 
         return False

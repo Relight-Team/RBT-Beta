@@ -5,29 +5,21 @@ from . import FileSystem as FS
 from . import Logger
 
 
-
-
-
 def GetVar(URL, VarName):
-    #print(URL)
-    #print(VarName)
-       with open(URL, 'r') as file:
+    with open(URL, "r") as file:
         try:
+            print(FS.InternalGetVar(URL, VarName))
             return FS.InternalGetVar(URL, VarName)
         except:
             return None
 
 
-
-
 def GetVarOptional(URL, VarName, Alt):
-    with open(URL, 'r') as file:
+    with open(URL, "r") as file:
         try:
             return FS.InternalGetVar(URL, VarName)
         except:
             return Alt
-
-
 
 
 def CheckFolder(URL):
@@ -49,14 +41,15 @@ def ArraySearch(Search, Array):
             return True
     return False
 
+
 def ChangeVar(Var, New):
     FS.ChangeVarInternal(Var, New)
-
 
 
 def PrintDebug(Text, Show):
     if Show == True:
         print(Text)
+
 
 def FindDepend(DepName, Engine_Directory, Target_Directory):
     if os.path.isdir(Target_Directory + "/Src/" + DepName):

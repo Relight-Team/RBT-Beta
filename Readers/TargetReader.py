@@ -2,24 +2,24 @@ import os
 import sys
 from enum import Enum
 
-sys.path.append("../")
+from Internal import Core as C
 
-import Internal.Core as C
 
 # Stores target-specific arguments from the command line/Config File, will overwrite any default settings
 class StartingTarget:
 
-    Name = None # The target file we are loading (Command Line: "-Target=")
+    Name = None  # The target file we are loading (Command Line: "-Target=")
 
-    Project = None # The Project file we are compiling (Command Line: "-Project=")
+    TargetDir = None  # The custom directory we will check if Project not defined (Command Line: "-TargetDir=")
 
-    Platform = None # The platform we are targeting (Command Line: "-Platform=")
+    Project = None  # The Project file we are compiling (Command Line: "-Project=")
 
-    Modules = [] # Modules to compile (Command Line: "-Module=")
+    Platform = None  # The platform we are targeting (Command Line: "-Platform=")
+
+    Modules = []  # Modules to compile (Command Line: "-Module=")
 
     def __init__(self, InPlatform):
         self.Platform = InPlatform
-
 
 
 # The main target class, stores everything store in .target file
@@ -90,9 +90,7 @@ class Target:
     # if not empty, we will put the binaries in a subfolder
     BinSubPaths = None
 
-
     Arch = ""
-
 
     # -- LINUX -- #
 
@@ -116,11 +114,9 @@ class Target:
 
         # Set public variables
 
-        Name = C.GetVar(TargetFile, "Name")
-        TargetType = C.GetVar(TargetFile, "TargetType")
-        Modules = C.GetVar(TargetFile, "Modules")
-
-
+        self.Name = C.GetVar(TargetFile, "Name")
+        self.TargetType = C.GetVar(TargetFile, "TargetType")
+        self.Modules = C.GetVar(TargetFile, "Modules")
 
         # Set LinkType if default
 

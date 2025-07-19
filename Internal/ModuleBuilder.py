@@ -7,6 +7,7 @@ from Internal import CompileEnvironment
 
 from Internal import FileBuilder
 
+
 # Build's a module
 class ModuleBuilder:
 
@@ -17,32 +18,29 @@ class ModuleBuilder:
     HeaderFiles = []
 
     IntermediateDir = ""
-    SourceDir = "" # Directory for Module/Src
+    SourceDir = ""  # Directory for Module/Src
     Binary = None
     DependModules = []
 
     def __init__(self, InModule, InIntermediateDir):
-        Module = InModule
-        IntermediateDir = InIntermediateDir
+        self.Module = InModule
+        self.IntermediateDir = InIntermediateDir
 
-
-    def GetSourceDir():
-        Temp = Module.FilePath
+    def GetSourceDir(self):
+        Temp = self.Module.FilePath
 
         return os.path.abspath(os.path.join(Temp, "Src"))
-
 
     # FIXME: Add support for excluded folders
     def GetInfoFiles(self):
 
         Ret = []
 
-        for Dirpath,_,filenames in os.walk(SourceDir):
+        for Dirpath, _, filenames in os.walk(self.SourceDir):
             for f in filenames:
                 Ret.append(os.path.abspath(os.path.join(Dirpath, f)))
 
         return Ret
-
 
     def SortLists(self):
 
@@ -52,18 +50,16 @@ class ModuleBuilder:
             Extension = os.path.splitext(Item)[1]
 
             if Extension == ".cpp".lower() or Extension == ".c".lower():
-                CompileFiles.append(Item)
+                self.CompileFiles.append(Item)
 
             elif Extension == ".h".lower() or Extension == ".hpp".lower():
-                HeaderFiles.append(Item)
+                self.HeaderFiles.append(Item)
 
-            AllFiles.append(Item)
+            self.AllFiles.append(Item)
 
-
-    #FIXME: Add this once we add UNITY System
+    # FIXME: Add this once we add UNITY System
     def CreateUnityFile():
         pass
-
 
     # Return's true if everything is ok and doesn't clash with each other
     def DetectEngineModuleConflicts(self, ModuleName):
@@ -75,9 +71,7 @@ class ModuleBuilder:
         else:
             return False
 
-
-
-    def CreateCompileEnv(Target, CompileEnv):
+    def CreateCompileEnv(self, Target, CompileEnv):
         NewCompile = CompileEnv
 
         CompileEnv.FalseUnityOverride = self.Modules.DisableUnity
@@ -86,8 +80,9 @@ class ModuleBuilder:
 
         CompileEnv.Defines.append(self.Modules.Defines)
 
-
-    def AddToCompileEnv(Binary, IncludePathsList, SysIncludePathsList, DefinesList):
+    def AddToCompileEnv(
+        self, Binary, IncludePathsList, SysIncludePathsList, DefinesList
+    ):
 
         IncludePathsList.append(self.Modules.ModuleDirectory)
 
@@ -100,8 +95,16 @@ class ModuleBuilder:
         for Item in self.Modules.Defines:
             DefinesList.append(Item)
 
-
-    def SetupLinkEnv(self, Bin, LibPathList, AddLibList, RuntimeLibList, BinaryDependList, ExeDir, VisitedDependList):
+    def SetupLinkEnv(
+        self,
+        Bin,
+        LibPathList,
+        AddLibList,
+        RuntimeLibList,
+        BinaryDependList,
+        ExeDir,
+        VisitedDependList,
+    ):
 
         VDependList.append(self)
 
@@ -130,11 +133,17 @@ class ModuleBuilder:
                         IsItemStatic = True
 
                     if IsExternal == True or IsItemStatic == True:
-                        Item.SetupLinkEnv(Bin, LibPathList, AddLibList, RuntimeLibList, BinaryDependList, ExeDir, VisitedDependList)
+                        Item.SetupLinkEnv(
+                            Bin,
+                            LibPathList,
+                            AddLibList,
+                            RuntimeLibList,
+                            BinaryDependList,
+                            ExeDir,
+                            VisitedDependList,
+                        )
 
             RuntimeLibList.append(self.Module.DynamicModulePaths)
-
-
 
     def CreateModule(self, RefChain, FuncName, FuncRefChain):
 
@@ -145,10 +154,13 @@ class ModuleBuilder:
 
         NextChain = RefChain + " -> " + Temp
 
-        CreateModuleName(Module.ModulesIncludes, RefChain, FuncName, FuncRefChain, OutputList)
+        CreateModuleName(
+            Module.ModulesIncludes, RefChain, FuncName, FuncRefChain, OutputList
+        )
 
-
-    def CreateModuleName(self, ModuleNameList, RefChain, FuncName, FuncRefChain, OutputList):
+    def CreateModuleName(
+        self, ModuleNameList, RefChain, FuncName, FuncRefChain, OutputList
+    ):
 
         if OutputList == None:
 
@@ -160,8 +172,7 @@ class ModuleBuilder:
                     self.CreateModule(RefChain, FuncName, FuncRefChain)
                     OutputList.append(Item)
 
-
-    #FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
+    # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
     def Compile(self, TargetReader, Toolchain, BinCompileEnv):
 
@@ -169,27 +180,35 @@ class ModuleBuilder:
 
         LinkArray = []
 
-        NewCompileEnv = CreateCompileEnv(Target, BinCompileEnv)
+        NewCompileEnv = self.CreateCompileEnv(Target, BinCompileEnv)
 
         UsingUnity = False
 
-        #TODO: Add precompile implementation here
+        # TODO: Add precompile implementation here
 
         Dict_SourceFiles = {}
         InputFiles = GetInfoFiles()
 
-        #TODO: Add C++20 support, also Precompiled header stuff
+        # TODO: Add C++20 support, also Precompiled header stuff
 
         SourceFile_Unity = {}
 
         CPPFiles = []
-        print("Well, you made it this far, yeah now we just need ModuleBuilder.Compile to set GenFiles")
-        GenFiles = [] # FIXME: bro I just realize we need this to actually contain all our imput files cause right now it will always compile no input files!
+        print(
+            "Well, you made it this far, yeah now we just need ModuleBuilder.Compile to set GenFiles"
+        )
+        GenFiles = (
+            []
+        )  # FIXME: bro I just realize we need this to actually contain all our imput files cause right now it will always compile no input files!
 
         OutputActionList = []
 
-        #FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
-        LinkArray.append(Toolchain.CompileMultiArchCPPs(NewCompileEnv, GenFiles, IntermediateDir, OutputActionList))
+        # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
+        LinkArray.append(
+            Toolchain.CompileMultiArchCPPs(
+                NewCompileEnv, GenFiles, self.IntermediateDir, OutputActionList
+            )
+        )
 
         return LinkArray
 

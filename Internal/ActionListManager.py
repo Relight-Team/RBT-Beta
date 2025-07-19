@@ -5,7 +5,6 @@ from . import Logger
 from functools import cmp_to_key
 
 
-
 # Sort the list (this is to help executer)
 def Sort(ActionList):
 
@@ -45,7 +44,7 @@ def GetPreconditionSingle(InAction, PreconditionListOutput):
 
     # Ensure's that there are no duplicates
     if not InAction in PreconditionListOutput:
-        PreconditionListOutput.append(InAction) # Add self to list
+        PreconditionListOutput.append(InAction)  # Add self to list
 
         # Adds all Precondition Items to list, via recursive
         for Item in InAction.PreconditionActions:
@@ -58,13 +57,16 @@ def CheckConflicts(ActionList):
 
 
 # Get's all Actions that are oudated
-def GetAllOutdatedActions(ActionList, History, OutdatedActionList, DependCashe, IgnoreOutdatedLib):
+def GetAllOutdatedActions(
+    ActionList, History, OutdatedActionList, DependCashe, IgnoreOutdatedLib
+):
     pass
 
 
 # Deletes all files that are outdated
 def DeleteOutdatedFiles(OutdatedActionList):
     pass
+
 
 # Link the actions together
 def Link(ActionList):
@@ -96,23 +98,26 @@ def Link(ActionList):
                 New = ItemAction[PreItem]
                 Item.PreconditionActions.append(New)
 
-
     # Sorts the action list
     Sort(ActionList)
 
 
 # Returns all Actions to Execute
-def GetActionToExecute(ActionList, PreconditionActionList, CppCache, IgnoreOutdatedLib, History=None):
+def GetActionToExecute(
+    ActionList, PreconditionActionList, CppCache, IgnoreOutdatedLib, History=None
+):
 
-    ActionOutdatedMap = {} # Action | Bool
+    ActionOutdatedMap = {}  # Action | Bool
 
     # By default, set everything to true
     for Item in PreconditionActionList:
         ActionOutdatedMap[Action] = True
 
-    ActionOutdatedDict = {} # Action | Bool
+    ActionOutdatedDict = {}  # Action | Bool
 
-    GetAllOutdatedActions(ActionList, History, ActionOutdatedDict, CppCashe, IgnoreOutdatedLib)
+    GetAllOutdatedActions(
+        ActionList, History, ActionOutdatedDict, CppCashe, IgnoreOutdatedLib
+    )
 
     Ret = []
 
@@ -132,7 +137,9 @@ def Execute(BuildConfig, ActionToExecuteList):
     if len(ActionToExecuteList) == 0:
         return
 
-    Executer = ActionExecute.LinearExecuter # FIXME: As a temp solution, we are just using LinearExecuter, add support for switching to multiple executers!
+    Executer = (
+        ActionExecute.LinearExecuter
+    )  # FIXME: As a temp solution, we are just using LinearExecuter, add support for switching to multiple executers!
 
     # Execute the action list, stores if successful
     Ex = Executer.ExecuteActionList(ActionToExecuteList)
@@ -140,7 +147,8 @@ def Execute(BuildConfig, ActionToExecuteList):
     # If not successful, throw an error
 
     if Ex == False:
-        raise ValueError("We have failed to run ActionToExecuteList") # TODO: Add detailed description
+        raise ValueError(
+            "We have failed to run ActionToExecuteList"
+        )  # TODO: Add detailed description
 
     # FIXME: Verify and read all file output info
-

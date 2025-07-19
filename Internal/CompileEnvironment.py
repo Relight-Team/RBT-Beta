@@ -1,35 +1,39 @@
 from enum import Enum
 
+
 class Platform(Enum):
     Linux = 0
     Windows = 1
+
 
 class PCHAction(Enum):
     Null = 0
     Include = 1
     Create = 2
 
+
 class Output:
     ObjectFiles = []
     DebugFiles = []
     PCHFile = ""
 
+
 # Configuration to compile source files into oject files
 class CompileEnvironment:
 
-    Plat = Platform # The platform we are compiling
+    Plat = Platform  # The platform we are compiling
 
-    Conf = None # What debugging mode we will use
+    Conf = None  # What debugging mode we will use
 
-    PCH_Act = PCHAction.Null # The action we will use for PCH files
+    PCH_Act = PCHAction.Null  # The action we will use for PCH files
 
-    Out = Output # All output info
+    Out = Output  # All output info
 
-    Arch = "" # The CPU architecture
+    Arch = ""  # The CPU architecture
 
-    SharedPCH = [] # The Header file we will use globally
+    SharedPCH = []  # The Header file we will use globally
 
-    PCHIncludeName = "" # The name of the header file we will precompile
+    PCHIncludeName = ""  # The name of the header file we will precompile
 
     UseSharedBuildEnv = False
 
@@ -41,7 +45,7 @@ class CompileEnvironment:
 
     BufferSecurityChecks = True
 
-    FalseUnityOverride = False # Use if it's faster to not use UNITY system, will disable UNITY even if it's on
+    FalseUnityOverride = False  # Use if it's faster to not use UNITY system, will disable UNITY even if it's on
 
     MinUnitySource = 0
 
@@ -101,9 +105,9 @@ class CompileEnvironment:
 
     ForceIncFiles = []
 
-    Defines = [] # Definitions we will use across the engine
+    Defines = []  # Definitions we will use across the engine
 
-    AdditionalArgs = "" # Any additional arguments we will use
+    AdditionalArgs = ""  # Any additional arguments we will use
 
     AdditionalFrameworks = []
 
@@ -125,7 +129,6 @@ class CompileEnvironment:
         self.UserIncPaths = []
 
         self.SysIncPaths = []
-
 
     def Dup(self, Second):
         self.Plat = Second.Plat
@@ -176,5 +179,3 @@ class CompileEnvironment:
         self.PCHFile = Second.PCHFile
         self.UsingRHT = Second.UsingRHT
         self.HideSymbols = Second.DefaultHideSymbols
-
-

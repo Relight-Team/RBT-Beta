@@ -22,21 +22,20 @@ class ToolchainSDK:
 
     # Compile the inputted C++ files
     def CompileCPPs(CompileEnv, InputFiles, OutDir, OutputActionList):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
-
-    #FIXME: This isn't complete, as a placeholder just returns CompileCPPs, please replace!
+    # FIXME: This isn't complete, as a placeholder just returns CompileCPPs, please replace!
     # CompileCPPs for multi-arch compiles
     def CompileMultiArchCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList):
         return CompileCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList)
 
     # Compiles the inputted RCF files
     def CompileRCFs(CompileEnv, InputFiles, OutDir, OutputActionList):
-        pass # TODO: Make this return new instance of CppOutput
+        pass  # TODO: Make this return new instance of CppOutput
 
     # Link files in the LinkEnvironment
     def LinkFiles(LinkEnv, LibraryImportOnly, OutputActionList):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Link every file in the LinkEnvironment
     def LinkEveryFiles(LinkEnv, BuiltLibraryImportOnly, ActionList):
@@ -57,15 +56,15 @@ class ToolchainSDK:
 
     # Setup global environment
     def SetGlobalEnv(Target):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Modify the build
     def ModifyBuild(Target, Binary, LibrariesList, BuildResList, BuildProductList):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Actions to finish the output
     def FinishOutput(Target, FileBuilder):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return's true if we should add debug information
     def ShouldAddDebug(File, BuildType):
@@ -73,7 +72,7 @@ class ToolchainSDK:
 
     # Setup the Bundle Dependencies
     def SetBundleDepend(Binary, SoftwareName):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return's the SDK Version
     def ReturnSDKVersion():

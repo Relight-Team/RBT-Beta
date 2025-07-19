@@ -8,7 +8,6 @@ def GetAllFilesFromDir(Path):
         return os.listdir(Path)
 
 
-
 def CreateIntermedFile(Path, Content):
 
     Logger.Logger(2, "Creating Intermediate file at " + Path)
@@ -27,10 +26,16 @@ def CreateIntermedFile(Path, Content):
     # Backup old data
     else:
 
-
         BackupFile = Path + ".backup"
-        #TODO: Add windows support
-        Logger.Logger(2, "Creating backup of " + Path + " called " + BackupFile + ". Writing to initial path now")
+        # TODO: Add windows support
+        Logger.Logger(
+            2,
+            "Creating backup of "
+            + Path
+            + " called "
+            + BackupFile
+            + ". Writing to initial path now",
+        )
         os.system("mv " + Path + " " + BackupFile)
 
         Fil = open(Path, "w")

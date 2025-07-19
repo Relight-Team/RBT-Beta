@@ -5,6 +5,7 @@ sys.path.append("../")
 
 import Internal.Core as C
 
+
 class BuildModule:
 
     # The name of the module
@@ -27,7 +28,6 @@ class BuildModule:
 
     # All directories we will include
     Includes = []
-
 
     SysIncludes = []
 
@@ -61,7 +61,6 @@ class BuildModule:
     # If true, we will treat it as a engine module (put module in engine dir instead of project dir)
     IsEngineModule = False
 
-
     # -- Read Only -- #
 
     # The entire file path (Dir1/Dir2/Example.Module)
@@ -69,9 +68,6 @@ class BuildModule:
 
     # The directory to the file (Dir1/Dir2/)
     ModuleDirectory = ""
-
-
-
 
     def __init__(BuildFile):
 

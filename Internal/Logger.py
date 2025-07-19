@@ -2,6 +2,7 @@ from colorama import Fore, Back, Style
 import inspect
 import os
 
+
 # Logger system, will print out debugging info based on level
 #
 # Levels:
@@ -30,22 +31,20 @@ def Logger(Level, Str):
 
     # -- Get's File Name -- #
 
-    Frame = inspect.currentframe() # Idk what the fuck this does but it's important
-    Caller = Frame.f_back # Get's the current file
-    Filepath = Caller.f_code.co_filename # Get's full file path
-    Name = os.path.basename(Filepath) # just get file name
+    Frame = inspect.currentframe()  # Idk what the fuck this does but it's important
+    Caller = Frame.f_back  # Get's the current file
+    Filepath = Caller.f_code.co_filename  # Get's full file path
+    Name = os.path.basename(Filepath)  # just get file name
 
     if Name != None and Name != "":
         FileName = Name
 
-
     # -- Get's Function Name -- #
 
-    Func = Caller.f_code.co_name # This fun little code get's the function name
+    Func = Caller.f_code.co_name  # This fun little code get's the function name
 
     if Func != "<module>":
         FuncName = Func
-
 
     # -- Get's Class Name -- #
 
@@ -53,10 +52,9 @@ def Logger(Level, Str):
     Stack = inspect.stack()
     # The caller's frame is at index 1 in the stack
     Callerframe = Stack[1]
-    if 'self' in Callerframe.frame.f_locals:
-        CallerInstance = Callerframe.frame.f_locals['self']
+    if "self" in Callerframe.frame.f_locals:
+        CallerInstance = Callerframe.frame.f_locals["self"]
         ClassName = CallerInstance.__class__.__name__
-
 
     # Ok now we are done with that we can add all this to our log
 
@@ -77,9 +75,3 @@ def Logger(Level, Str):
 
     if Level == 5:
         raise ValueError("Encountered fatal error, exiting...")
-
-
-
-
-
-

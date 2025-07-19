@@ -9,8 +9,13 @@ class TargetPlatform(Enum):
 
 
 class TargetGroupPlatform(Enum):
-    Unix = [TargetPlatform.Linux.name] # Platforms using UNIX/POSIX based system (Linux, Solaris, Unix, etc)
-    NT = [TargetPlatform.Win32.name, TargetPlatform.Win64.name] # Platforms using Microsoft's NT Kernel (Win32, Win64, Xbox, etc)
+    Unix = [
+        TargetPlatform.Linux.name
+    ]  # Platforms using UNIX/POSIX based system (Linux, Solaris, Unix, etc)
+    NT = [
+        TargetPlatform.Win32.name,
+        TargetPlatform.Win64.name,
+    ]  # Platforms using Microsoft's NT Kernel (Win32, Win64, Xbox, etc)
 
 
 def Valid(T):
@@ -38,7 +43,6 @@ def ReturnTargetGroupVar(Group):
 
         if Group.lower == Grou.lower:
             return Grou.value
-
 
 
 def StringToPlatform(Str):

@@ -1,6 +1,7 @@
 import configparser
 import os
 
+
 def ReadConfig(File, Class, Value):
     Config = configparser.ConfigParser()
 
@@ -15,5 +16,10 @@ def ReadConfig(File, Class, Value):
     try:
         Ret = Config.get(Class, Value)
     except:
-        raise ValueError("Error, unable to read value (CLASS: " + str(Class) + ", VALUE: " + str(Value))
+        raise ValueError(
+            "Error, unable to read value (CLASS: "
+            + str(Class)
+            + ", VALUE: "
+            + str(Value)
+        )
     return Ret

@@ -11,6 +11,7 @@ from Internal import Logger
 
 
 from Configuration import TargetPlatforms as TP
+from Configuration import Directory_Manager
 
 from . import PlatformFactory as PF
 
@@ -20,11 +21,16 @@ ConfigDir = EngineDir + "/Configs"
 
 _HostOS = platform.system()
 
+
 # A class that stores information on the platform
 class PlatformInfo:
 
-    Platform = ConfigM.ReadConfig(ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformName")
-    Arch = ConfigM.ReadConfig(ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformArch")
+    Platform = ConfigM.ReadConfig(
+        ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformName"
+    )
+    Arch = ConfigM.ReadConfig(
+        ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformArch"
+    )
 
     # Import the FactorySDK file based on the config
     @staticmethod
@@ -32,15 +38,68 @@ class PlatformInfo:
 
         Logger.Logger(0, "Running ImportFactory() from PlatformInfo")
 
-        if os.path.isfile(EngineDir + "/Programs/RelightBuildTool/SDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory"):
-            Logger.Logger(1, "Platform Factory found in base SDK directory: " + EngineDir + "/Programs/RelightBuildTool/SDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py")
-            return importlib.import_module(EngineDir + "/Programs/RelightBuildTool/SDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory")
+        if os.path.isfile(
+            EngineDir
+            + "/Programs/RelightBuildTool/SDK/"
+            + PlatformInfo.Platform
+            + "/"
+            + PlatformInfo.Platform
+            + "PlatformFactory"
+        ):
+            Logger.Logger(
+                1,
+                "Platform Factory found in base SDK directory: "
+                + EngineDir
+                + "/Programs/RelightBuildTool/SDK/"
+                + PlatformInfo.Platform
+                + "/"
+                + PlatformInfo.Platform
+                + "PlatformFactory.py",
+            )
+            return importlib.import_module(
+                EngineDir
+                + "/Programs/RelightBuildTool/SDK/"
+                + PlatformInfo.Platform
+                + "/"
+                + PlatformInfo.Platform
+                + "PlatformFactory"
+            )
 
-        elif os.path.isfile(EngineDir + "/Extras/CustomSDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory"):
-            Logger.Logger(1, "Platform Factory found in Custom SDK directory: " + EngineDir + "/Extras/CustomSDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py")
-            return importlib.import_module(EngineDir + "/Extras/CustomSDK/" + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory")
+        elif os.path.isfile(
+            EngineDir
+            + "/Extras/CustomSDK/"
+            + PlatformInfo.Platform
+            + "/"
+            + PlatformInfo.Platform
+            + "PlatformFactory"
+        ):
+            Logger.Logger(
+                1,
+                "Platform Factory found in Custom SDK directory: "
+                + EngineDir
+                + "/Extras/CustomSDK/"
+                + PlatformInfo.Platform
+                + "/"
+                + PlatformInfo.Platform
+                + "PlatformFactory.py",
+            )
+            return importlib.import_module(
+                EngineDir
+                + "/Extras/CustomSDK/"
+                + PlatformInfo.Platform
+                + "/"
+                + PlatformInfo.Platform
+                + "PlatformFactory"
+            )
         else:
-            Logger.Logger(5, "Couldn't find " + PlatformInfo.Platform + "/" + PlatformInfo.Platform + "PlatformFactory.py in either RelightBuildTool's SDK directory or CustomSDK directory")
+            Logger.Logger(
+                5,
+                "Couldn't find "
+                + PlatformInfo.Platform
+                + "/"
+                + PlatformInfo.Platform
+                + "PlatformFactory.py in either RelightBuildTool's SDK directory or CustomSDK directory",
+            )
 
     # Return true if the config file's platform value is valid
     @staticmethod
@@ -55,6 +114,7 @@ class PlatformInfo:
             return True
         Logger.Logger(1, "Returned False")
         return False
+
 
 class Platform:
 
@@ -80,7 +140,6 @@ class Platform:
     @staticmethod
     def RegPlatform(IncNonInstalledPlats):
 
-
         Logger.Logger(0, "Running RegPlatform(" + IncNonInstalledPlats + ")")
 
         Module = PlatformInfo.ImportFactory()
@@ -101,10 +160,14 @@ class Platform:
 
                 TempInit = T()
 
-                if IncNonInstalledPlats == True or PlatformInfo.IsValid(TempInit.TargetPlatform()) == True:
-                    Logger.Logger(1, "Registering " + TempInit.TargetPlatform() + " to Types")
+                if (
+                    IncNonInstalledPlats == True
+                    or PlatformInfo.IsValid(TempInit.TargetPlatform()) == True
+                ):
+                    Logger.Logger(
+                        1, "Registering " + TempInit.TargetPlatform() + " to Types"
+                    )
                     TempInit.RegBuildPlatform()
-
 
     # Return's the array of platform folders
     @staticmethod
@@ -151,7 +214,7 @@ class Platform:
 
     # Return's true if we have the required SDK installed on this device
     def HasRequiredSDK():
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return's all platforms that are registered
     @staticmethod
@@ -172,68 +235,87 @@ class Platform:
         return Arch
 
     # Finds all build files and directories to clean, store these files and directories in CleanFiles and CleanDirs
-    def DetectBuildFilesToClean(BaseDir, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs):
+    def DetectBuildFilesToClean(
+        BaseDir, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
+    ):
         for Item in BaseDir:
-            if os.path.isfile(os.path.join(BaseDir, Item)): # if it's a file
-                if IsBuildProduct(Item, TitlePrefixes, TitleSuffixes) or IsFileDefaultBuildProduct(Item, TitlePrefixes, TitleSuffixes):
+            if os.path.isfile(os.path.join(BaseDir, Item)):  # if it's a file
+                if IsBuildProduct(
+                    Item, TitlePrefixes, TitleSuffixes
+                ) or IsFileDefaultBuildProduct(Item, TitlePrefixes, TitleSuffixes):
                     CleanFiles.append(Item)
 
-            if os.path.isdir(os.path.join(BaseDir, Item)): #if it's a directory
+            if os.path.isdir(os.path.join(BaseDir, Item)):  # if it's a directory
                 if IsBuildProduct(Item, TitlePrefixes, TitleSuffixes):
                     CleanDirs.append(Item)
 
                 else:
-                    DetectBuildFilesToClean(Item, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs)
-
+                    DetectBuildFilesToClean(
+                        Item, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
+                    )
 
     # Find any additional files to clean, store these files and directories in CleanFiles and CleanDirs
     def DetectAdditionalBuildToClean(Target, CleanFiles, CleanDirs):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # If The Build Product Name is the RBT's default build prodcut
     @staticmethod
     def IsFileDefaultBuildProduct(Name, TitlePrefixes, TitleSuffixes):
-        if IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileTarget") or IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileModule") or IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileVersion"):
+        if (
+            IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileTarget")
+            or IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileModule")
+            or IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileVersion")
+        ):
             return True
         return False
 
     # return's true if the name is the same as RBT's build product for the target
     @staticmethod
     def IsBuildProduct(Name, TitlePrefixes, TitleSuffixes):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return's true if the name is the main RBT name format without extension
     # Example: Test-Linux-Debug.so
     @staticmethod
-    def IsBuildProductName(Name, Index, SubInt, TitlePrefixes, TitleSuffixes, Extension):
+    def IsBuildProductName(
+        Name, Index, SubInt, TitlePrefixes, TitleSuffixes, Extension
+    ):
         if SubInt > len(Extension):
-            tmp = Name[Index + SubInt - len(Extension): Index + SubInt] # Substring
+            tmp = Name[Index + SubInt - len(Extension) : Index + SubInt]  # Substring
             if tmp.lower() == Extension.lower():
 
-                return IsBuildProductName(Name, Index, SubInt - len(Extension), TitlePrefixes, TitleSuffixes)
+                return IsBuildProductName(
+                    Name, Index, SubInt - len(Extension), TitlePrefixes, TitleSuffixes
+                )
         return False
 
     # Return's true if the name is the main RBT name format without extension
     # Example: Test-Linux-Debug.so
     @staticmethod
-    def IsBuildProductNameNoExtension(Name, Index, SubInt, TitlePrefixes, TitleSuffixes):
+    def IsBuildProductNameNoExtension(
+        Name, Index, SubInt, TitlePrefixes, TitleSuffixes
+    ):
         for Prefix in TitlePrefixes:
 
             if SubInt >= len(Prefix):
-                tmp = Name[Index: Index + len(Prefix)]
+                tmp = Name[Index : Index + len(Prefix)]
                 if tmp.lower() == Prefix.lower():
                     MinIndex = Index + len(Prefix)
 
                     for Suffix in TitleSuffixes:
                         MaxIndex = Index + Count - len(Suffix)
-                        tmp = Name[MaxIndex: MaxIndex + len(Suffix)]
+                        tmp = Name[MaxIndex : MaxIndex + len(Suffix)]
 
                         if MinIndex >= MaxIndex and tmp.lower() == Suffix.lower():
-                            if MinIndex < MaxIndex and Name[MinIndex] == '-':
+                            if MinIndex < MaxIndex and Name[MinIndex] == "-":
 
                                 MinIndex += 1
 
-                                while MinIndex < MaxIndex and Name[MinIndex] != "-" and Name[MinIndex] != ".":
+                                while (
+                                    MinIndex < MaxIndex
+                                    and Name[MinIndex] != "-"
+                                    and Name[MinIndex] != "."
+                                ):
                                     MinIndex += 1
 
                             if MinIndex == MaxIndex:
@@ -245,11 +327,13 @@ class Platform:
     # Example: Test-Linux-Debug.so
     @staticmethod
     def IsBuildProductNameNoIndex(Name, TitlePrefixes, TitleSuffixes, Extension):
-        return IsBuildProductName(Name, 0, len(Name), TitlePrefixes, TitleSuffixes, Extension)
+        return IsBuildProductName(
+            Name, 0, len(Name), TitlePrefixes, TitleSuffixes, Extension
+        )
 
     # Stuff to execute after the build process has been done but before we sync the target platform (which is when we prepare and transfer build artifacts to the target platform)
     def PostBuildBeforeSync(Target):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return the bundle directory for the Link Environment
     def GetBundleDir(Target, FileOutputs):
@@ -299,7 +383,12 @@ class Platform:
         elif AllowFailure == True:
             return None
         else:
-            Logger.Logger(5, "BuildPlatform does not has key '" + str(InPlatform) + "' when running GetBuildPlatform")
+            Logger.Logger(
+                5,
+                "BuildPlatform does not has key '"
+                + str(InPlatform)
+                + "' when running GetBuildPlatform",
+            )
 
     # modify each Module in BuildPlatform
     @staticmethod
@@ -308,10 +397,9 @@ class Platform:
             Tmp = Item.value
             Tmp.ActivePlatformModuleRulesToModify(ModName, Target, Module)
 
-
     # modify each moudle in the target
     def ActivePlatformModuleRulesToModify(ModName, Target, Module):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # return's the Delimiter based on the platform
     @staticmethod
@@ -343,11 +431,11 @@ class Platform:
 
     # Set the new target to platform-specific defaults
     def ResetTarget(Target):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Validate the Target File
     def MakeTargetValid(Target):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return's if the platform requires a monolithic build (All modules into a single binary)
     @staticmethod
@@ -393,8 +481,10 @@ class Platform:
 
     # Return's true if the Project Settings are the same as the defualt settings
     @staticmethod
-    def IsProjectSettingsDefault(Platform, ProjectDir, Section, IntKeys, BoolKeys, StringKeys):
-        pass #TODO: DO ONCE FINISH CONFIG
+    def IsProjectSettingsDefault(
+        Platform, ProjectDir, Section, IntKeys, BoolKeys, StringKeys
+    ):
+        pass  # TODO: DO ONCE FINISH CONFIG
 
     # Returns if we have the following default build config settings
     def HasDefaultBuildConfig(Platform, ProjectDir):
@@ -406,11 +496,11 @@ class Platform:
 
     # Add the extra modules the platform requires, wihtout exposing information about the platform
     def AddExtraModules(Target, ModuleNames):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Setup the target environment
     def SetUpEnvironment(Target, CompileEnv, LinkEnv):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Setup the config enviornment
     def SetUpConfigEnv(Target, CompileEnv, LinkEnv):
@@ -430,7 +520,6 @@ class Platform:
         elif Target.BuildType == "Final":
             CompileEnv.Defines.append("RE_BUILDTYPE_FINAL=1")
 
-
         # Set Debug info to true if we are using debug
 
         if not Target.DisableDebugInfo and ShouldCreateDebugInfo(Target):
@@ -438,10 +527,9 @@ class Platform:
 
         LinkEnv.AddDebugInfo = CompileEnv.AddDebugInfo
 
-
     # returns metadata that is not tracked
     def GetExternalBuildMetadata(ProjectFile):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Return's true if platform is in group
     @staticmethod
@@ -454,12 +542,12 @@ class Platform:
 
     # If we should Create debug information if the config file is not set
     def ShouldCreateDebugInfo(Target):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Create the platfomr's toolchain instance
     def CreateToolChain(InCppPlatform, Target):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
 
     # Deploy the target
     def Deploy(Receipt):
-        pass # Will be overwritten with child class
+        pass  # Will be overwritten with child class
