@@ -10,12 +10,12 @@ def ReadConfig(File, Class, Value):
 
     try:
         Config.read(File)
-    except:
+    except Exception:
         raise ValueError("Error, unable to read and parse config file: " + str(File))
 
     try:
         Ret = Config.get(Class, Value)
-    except:
+    except Exception:
         raise ValueError(
             "Error, unable to read value (CLASS: "
             + str(Class)

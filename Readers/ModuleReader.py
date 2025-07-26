@@ -1,9 +1,7 @@
 import os
 import sys
 
-sys.path.append("../")
-
-import Internal.Core as C
+from Internal import Core as C
 
 
 class BuildModule:

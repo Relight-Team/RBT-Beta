@@ -22,16 +22,16 @@ class LinuxPlatform(Platform.Platform):
         super().__init__(InCEPlatform, InPlatform)
         self.SDK = InSDK
 
-    def GetDefaultArch(ProjectFile):
-        Ret = Arch
+    def GetDefaultArch(self, ProjectFile):
+        Ret = self.Arch
 
-        if ProjectFile == None:
+        if ProjectFile is None:
             EngineIni = None
         else:
             EngineIni = os.path.abspath(ProjectFile)
 
         # If abspath fails, we shall get it from command line instead
-        if EngineIni == None:
+        if EngineIni is None:
             EngineIni = "../../../../BaseBuilder.cfg"  # TEMP SOLUTION
             pass  # FIXME: Get from command line, else get from BaseBuilder
 
@@ -57,13 +57,13 @@ class LinuxPlatform(Platform.Platform):
 
         return Ret
 
-    def MakeTargetValid(Target):
+    def MakeTargetValid(self, Target):
 
-        if Target.UseAddressSanitizer == True or Target.UseThreadSanitizer == True:
+        if Target.UseAddressSanitizer is True or Target.UseThreadSanitizer is True:
             Target.Defines.append("FORCE_ANSI_ALLOCATOR=1")
 
-    def ResetTarget(Target):
-        MakeTargetValid(Target)
+    def ResetTarget(self, Target):
+        self.MakeTargetValid(Target)
 
     def NeedsArchSuffix():
         return False
@@ -100,11 +100,11 @@ class LinuxPlatform(Platform.Platform):
                 return True
 
     def GetBinExtension(InBinType):
-        if BinType == "EXE":
+        if InBinType == "EXE":
             return ""
-        elif BinType == "Dynamic":
+        elif InBinType == "Dynamic":
             return ".so"
-        elif BinType == "Static":
+        elif InBinType == "Static":
             return ".a"
         else:
             return None
@@ -115,7 +115,7 @@ class LinuxPlatform(Platform.Platform):
         if InBinType == "EXE":
             Ret = [".sym", ".debug"]
 
-            if Target.SavePSYM == True:
+            if Target.SavePSYM is True:
                 Ret.append(".pysm")
 
         return Ret
@@ -131,18 +131,18 @@ class LinuxPlatform(Platform.Platform):
         if CompileEnv.AllowLTCG != LinkEnv.AllowLTCG:
             raise ValueError("")
 
-    def SetUpEnvironment(Target, CompileEnv, LinkEnv):
+    def SetUpEnvironment(self, Target, CompileEnv, LinkEnv):
 
-        BasePath = SDK.GetSDKArchPath(Target.Arch)
+        BasePath = self.SDK.GetSDKArchPath(self.Target.Arch)
 
-        if SDK._HostOS == "Linux" and (BasePath == None or BasePath == ""):
+        if self.SDK._HostOS == "Linux" and (BasePath is None or BasePath == ""):
             CompileEnv.SysIncPaths.append("/usr/include")
 
-        if CompileEnv.PGOProfile == True or CompileEnv.PGOOptimize == True:
+        if CompileEnv.PGOProfile is True or CompileEnv.PGOOptimize is True:
             CompileEnv.AllowLTCG = True
             LinkEnv.AllowLTCG = True
 
-        CheckEnvironmentConflicts(CompileEnv, LinkEnv)
+        self.CheckEnvironmentConflicts(CompileEnv, LinkEnv)
 
         if Target.LinkType == "Monolithic":
             CompileEnv.HideSymbols = True
@@ -161,19 +161,19 @@ class LinuxPlatform(Platform.Platform):
         else:
             return True
 
-    def CreateToolChain(InCppPlatform, Target):
+    def CreateToolChain(self, InCppPlatform, Target):
         Options = LinuxToolchain.Options
 
-        if Target.UseAddressSanitizer == True:
+        if Target.UseAddressSanitizer is True:
             Options.UseAddressSanitizer = True
 
-        if Target.UseThreadSanitizer == True:
+        if Target.UseThreadSanitizer is True:
             Options.UseThreadSanitizer = True
 
-        if Target.UseUnknownSanitizer == True:
+        if Target.UseUnknownSanitizer is True:
             Options.UseUnknownSanitizer = True
 
-        return LinuxToolchain.LinuxToolchain(Target.Arch, SDK, Target.SavePSYM, Options)
+        return LinuxToolchain.LinuxToolchain(self.Target.Arch, self.SDK, self.Target.SavePSYM, Options)
 
     def Deploy(Receipt):
         pass  # DEPLOY IS NOT SUPPORTED YET!

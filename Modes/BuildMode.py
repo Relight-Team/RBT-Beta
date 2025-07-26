@@ -4,7 +4,6 @@ import os
 
 from Internal import ActionListManager
 from Internal import TargetBuilder
-from Internal import ActionListManager
 from Internal import Logger
 
 from Template import Platform
@@ -54,7 +53,7 @@ def Main(Args):
 # Build's the list of target
 def BuildProcess(StartingTargetList, WorkingSet, InOptions):
 
-    if InOptions.SkipBuild == False:
+    if InOptions.SkipBuild is False:
 
         ExecuteActionsTarget = []
 
@@ -79,7 +78,7 @@ def BuildProcess(StartingTargetList, WorkingSet, InOptions):
             BuildPlatform = Platform.Platform.GetBuildPlatform(Item.Platform)
             # TODO: Sync XGE, Distcc, and SNDBS from BuildPlatform to InOptions, should only be set true/false if all of them are that value
 
-        if len(ExecuteActions) == 0 and InOptions.NoMessages == True:
+        if len(ExecuteActions) == 0 and InOptions.NoMessages is True:
             print("All targets are up to date")  # TODO: replace this with log class
 
         else:
@@ -88,12 +87,12 @@ def BuildProcess(StartingTargetList, WorkingSet, InOptions):
 
 
 # Create's a TargetBuilder and build's it
-def CreateAndRunTargetBuilder(Options, StartingTarget, WorkingSet):
+def CreateAndRunTargetBuilder(InOptions, StartingTarget, WorkingSet):
 
     Logger.Logger(1, "Creating TargetBuilder...")
 
     Builder = TargetBuilder.TargetBuilder.Create(
-        StartingTarget, Options.Precompile
+        StartingTarget, InOptions.Precompile
     )  # This will create TargetRules as well
 
     Logger.Logger(1, "Building TargetBuilder...")
@@ -153,7 +152,7 @@ def GetPreconditionActionsFromActions(ActionList, OutputList):
 # Function that helps GetPreconditionActions
 def GetPreconditionActionsFromSingleAction(Action, OutputList):
     if any(Output in OutputList for Output in Action.OutputItems):
-        if not Action in OutputList:
+        if Action not in OutputList:
             OutputList.add(Action)
 
             for Precondition in Action.PreconditionActions:

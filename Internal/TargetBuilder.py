@@ -44,10 +44,10 @@ class TargetBuilder:
         )
 
         # Overwrite target file with starting target properties
-        if self.StartingTarget.Modules != [] and self.StartingTarget.Modules != None:
+        if self.StartingTarget.Modules != [] and self.StartingTarget.Modules is not None:
             self.Target.Modules = self.StartingTarget.Modules
 
-        if self.Target._Project != None and self.Target._Project != "":
+        if self.Target._Project is not None and self.Target._Project != "":
             self.ProjectDir = os.path.dirname(self.Target._Project)
         else:
             self.ProjectDir = Directory_Manager.Engine_Directory
@@ -84,7 +84,7 @@ class TargetBuilder:
     def GetModuleOutputDir(self, Module):
         Ret = ""
 
-        if Module.IsEngineModule == False or self.Target.IntermediateType == "Unique":
+        if Module.IsEngineModule is False or self.Target.IntermediateType == "Unique":
             Ret = os.path.basedir(self.Target._Project)
         else:
             Ret = Directory_Manager.Engine_Directory
@@ -98,7 +98,7 @@ class TargetBuilder:
             Base, self.PlatformIntermed, self.Target.Name, self.Target.BuildType
         )
 
-        if Module.ObjectName != None and Module.ObjectName != "":
+        if Module.ObjectName is not None and Module.ObjectName != "":
             Temp = Module.ObjectName
         else:
             Temp = Module.Name
@@ -107,7 +107,7 @@ class TargetBuilder:
 
     def CreateToolchain(self, Platform):
 
-        if self.Target.ToolchainOverride == None:
+        if self.Target.ToolchainOverride is None:
             PlatformClassTemp = Platform.GetBuildPlatform(Platform)
 
             return PlatformClassTemp.CreateToolChain(Platform, self.Target)
@@ -116,8 +116,16 @@ class TargetBuilder:
 
             pass  # FIXME: Add support for ToolchainOverride
 
-    def GetExeDir():
+    def GetExeDir(self):
         return self.Binaries[0].OutputDir
+
+    def IsEngineInstalled():
+        InstalledEngineFileDir = os.path.join(Directory_Manager.Engine_Directory, "Build", "Installed.txt")
+
+        if os.isfile(InstalledEngineFileDir):
+            return True
+        else:
+            return False
 
     # MASSIVE TODO: add more appends stuff once we add more options to target reader
     def AppendGlobalEnv(self, Toolchain, CompileEnv, LinkEnv):
@@ -138,10 +146,10 @@ class TargetBuilder:
             self.Target.BuildType,
         )
 
-        if ISENGINEINSTALLED() or (
-            Target._Project != None and SHOULDCOMPILEMONOLITHIC()
-        ):  # FIXME
-            if Target._Project != None:
+        if self.IsEngineInstalled() or (
+            self.Target._Project is not None and self.Target.LinkType == "Monolithic"
+        ):
+            if self.Target._Project is not None:
                 LinkInterTemp = os.path.join(
                     os.path.dirname(self.Target._Project),
                     self.PlatformIntermedFolder,
@@ -165,7 +173,7 @@ class TargetBuilder:
         InPlatform.SetUpConfigEnv(self.Target, self.CompileEnv, self.LinkEnv)
 
     def CreateProjectCompileEnv(self):
-        InPlatform = self.Platform.GetBuildPlatform(Target.platform)
+        InPlatform = self.Platform.GetBuildPlatform(self.Target.platform)
 
         CPPPlatform = InPlatform.DefaultCPPPlatform
 
@@ -197,11 +205,11 @@ class TargetBuilder:
     def FindModuleName(self, Name):
 
         # Check Project directory
-        if self.Target._Project != None:
+        if self.Target._Project is not None:
             ProjectDirSource = os.path.join(
                 os.path.dirname(self.Target._Project), "Src"
             )
-            Temp = os.path.dirname(Target._Project)
+            Temp = os.path.dirname(self.Target._Project)
         else:
             ProjectDirSource = Directory_Manager.Engine_Directory
             Temp = Directory_Manager.Engine_Directory
@@ -217,7 +225,7 @@ class TargetBuilder:
                 ModReader, os.path.join(Temp, "Intermediate")
             )
 
-            ModuleName_ModuleBuilder.append(ModReader.Name, ModuleRet)
+            self.ModuleName_ModuleBuilder.append(ModReader.Name, ModuleRet)
 
             return ModuleRet
 
@@ -235,7 +243,7 @@ class TargetBuilder:
 
         BuildPlatform = Platform.Platform.GetBuildPlatform(Platform)
 
-        if BuildPlatform.NeedsArchSuffix() == True:
+        if BuildPlatform.NeedsArchSuffix() is True:
             Ret = Ret + Arch
 
         Ret = Ret + BuildPlatform.GetBinExtension(BinType)
@@ -244,6 +252,7 @@ class TargetBuilder:
 
     @staticmethod
     def CreateBinPaths(
+        self,
         Dir,
         Name,
         Platform,
@@ -257,12 +266,12 @@ class TargetBuilder:
 
         BinDir = os.path.join(Dir, "bin", Platform)
 
-        if ExeSubFolder != None and ExeSubFolder != "":
+        if ExeSubFolder is not None and ExeSubFolder != "":
             BinDir = os.path.join(BinDir, ExeSubFolder)
 
         # Create full binary path with file name
         Bin = os.path.join(
-            BinDir, CreateBinName(Name, Platform, LinkType, Arch, BinType)
+            BinDir, self.CreateBinName(Name, Platform, LinkType, Arch, BinType)
         )
 
         BuildPlatform = Platform.Platform.GetBuildPlatform(Platform)
@@ -271,13 +280,13 @@ class TargetBuilder:
 
     def SetupBinaries(self):
 
-        if self.Target.LaunchName == None or self.Target.LaunchName == "":
+        if self.Target.LaunchName is None or self.Target.LaunchName == "":
             Logger.Logger(5, "Launch name is None or blank")
 
         LaunchModule = self.FindModuleName(self.Target.LaunchName)
 
         if (
-            self.IsUnderDir(Directory_Manager.Engine_Directory, LaunchModule) == True
+            self.IsUnderDir(Directory_Manager.Engine_Directory, LaunchModule) is True
             and self.Target.LinkType == "Monolithic"
         ):
             IntermediateDir = os.path.join(
@@ -298,14 +307,14 @@ class TargetBuilder:
             OutputDir = Directory_Manager.Engine_Directory
 
         if (
-            self.target.IsDynamicLibrary == True
+            self.target.IsDynamicLibrary is True
             and self.Target.LinkType == "Monolithic"
         ):
             CompileAsDynamic = True
         else:
             CompileAsDynamic = False
 
-        if CompileAsDynamic == True:
+        if CompileAsDynamic is True:
             Temp1 = "Dynamic"
         else:
             Temp1 = "EXE"
@@ -323,7 +332,7 @@ class TargetBuilder:
         )
 
         Bin = Binary.Binary(
-            Temp1, OutputList, IntermediateDir, LaunchModule, Target, None, None
+            Temp1, OutputList, IntermediateDir, LaunchModule, self.Target, None, None
         )  # FIXME: Haven't implemented Exports and Precompile, using none for now
 
         self.Binaries.append(Bin)
@@ -336,14 +345,14 @@ class TargetBuilder:
     def CreateTargetReaderFromTargetName(TargetName, StartingTarget, ProjectFile=None):
 
         # if Project File is defined, search in that directory, otherwise we will search through engine directory
-        if ProjectFile != None:
+        if ProjectFile is not None:
             DirToSearch = os.path.dirname(ProjectFile)
         else:
             DirToSearch = Directory_Manager.Engine_Directory
 
         # If we have -TargetDir set, then it will always overwrite everything else
 
-        if StartingTarget.TargetDir != None:
+        if StartingTarget.TargetDir is not None:
             DirToSearch = StartingTarget.TargetDir
 
         TargetSearchDir = os.path.join(DirToSearch)
@@ -358,7 +367,7 @@ class TargetBuilder:
                 if File == TargetName + ".Target":
                     RetFile = os.path.join(RootDir, File)
 
-        if RetFile == None:
+        if RetFile is None:
             Logger.Logger(5, "We could not find " + TargetName + ".Target")
 
         Logger.Logger(1, "Target file found: " + RetFile)
@@ -387,12 +396,12 @@ class TargetBuilder:
 
         BinOriginal = []
 
-        Plat = Platform.GetBuildPlatform(StartingTarget.Platform)
+        Plat = Platform.GetBuildPlatform(self.StartingTarget.Platform)
 
         CppPlat = Platform.DefaultCPPPlatform
 
         CompileEnv = CompileEnvironment.CompileEnvironment(
-            CppPlat, Target.BuildType, Target.Arch
+            CppPlat, self.Target.BuildType, self.Target.Arch
         )
 
         LinkEnv = LinkEnvironment.LinkEnvironment(
@@ -401,7 +410,7 @@ class TargetBuilder:
 
         Toolchain = self.CreateToolchain(CppPlat)
 
-        FileBuilder = FileBuilder.FileBuilder
+        InFileBuilder = FileBuilder.FileBuilder()
 
         # FIXME: Add binary filter
 
@@ -419,10 +428,10 @@ class TargetBuilder:
 
         # Compile each binary
 
-        for Item in Binaries:
+        for Item in self.Binaries:
 
             BinOutput = Item.Build(
-                Target, Toolchain, CompileEnv, LinkEnv, ExeOutputDir, FileBuilder
+                self.Target, Toolchain, CompileEnv, LinkEnv, ExeOutputDir, InFileBuilder
             )
 
         # FIXME: Add runtime depends support
@@ -431,4 +440,4 @@ class TargetBuilder:
 
         # FIXME: Add metadata support
 
-        return FileBuilder
+        return InFileBuilder

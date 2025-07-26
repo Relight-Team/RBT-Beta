@@ -1,12 +1,8 @@
 # Read values and execute code from a txt file
-UNIX = False
-
-
+# TODO: REDO THIS ENTIRELY
 def load_config_and_execute(filename):
 
-    global UNIX
-
-    config = {"UNIX": UNIX}  # Default defines
+    config = {"UNIX": False}  # Default defines
 
     with open(filename, "r") as file:
         exec(

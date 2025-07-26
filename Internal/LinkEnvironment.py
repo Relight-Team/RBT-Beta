@@ -154,11 +154,11 @@ class LinkEnvironment:
         self.AdditionalProperty = self.AdditionalProperty + Second.AdditionalProperty
         self.CrossedReference = Second.CrossedReference
 
-    def OutputFilePath():
-        if len(OutputPaths) == 1:
-            return OutputPaths[0]
+    def OutputFilePath(self):
+        if len(self.OutputPaths) == 1:
+            return self.OutputPaths[0]
         else:
             raise ValueError(
                 "OutputPaths must only have 1 item when attempting to run LinkEnvironment.OutputFilePaths(), the count we detected is "
-                + str(len(OutputPaths))
+                + str(len(self.OutputPaths))
             )

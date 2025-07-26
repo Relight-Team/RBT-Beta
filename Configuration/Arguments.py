@@ -10,10 +10,10 @@ class Args:
 
         Value = getattr(self.ParseArgs, ArgPass, None)
 
-        if Value == None or Value == "":
+        if Value is None or Value == "":
             return None
 
-        if isinstance(Value, str) and not "+" in Value:
+        if isinstance(Value, str) and "+" not in Value:
             return Value
 
         else:

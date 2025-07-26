@@ -1,12 +1,10 @@
 import os
 import sys
 
-import LinuxPlatform
-import LinuxPlatformSDK
+from . import LinuxPlatform
+from . import LinuxPlatformSDK
 
-sys.path.append("../../Template")
-
-import PlatformFactory
+from Template import PlatformFactory
 
 
 class LinuxFactory(PlatformFactory.FactorySDK):

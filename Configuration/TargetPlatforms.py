@@ -46,8 +46,8 @@ def ReturnTargetGroupVar(Group):
 
 
 def StringToPlatform(Str):
-    for I in TargetPlatform:
-        if I.name.lower == Str.lower:
-            return I.name
+    for Index in TargetPlatform:
+        if Index.name.lower == Str.lower:
+            return Index.name
 
     return ""

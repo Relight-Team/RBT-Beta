@@ -66,7 +66,7 @@ class ModuleBuilder:
 
         EngineModuleOnlyOne = []
 
-        if not ModuleName in EngineModuleOnlyOne:
+        if ModuleName not in EngineModuleOnlyOne:
             return True
         else:
             return False
@@ -103,36 +103,36 @@ class ModuleBuilder:
         RuntimeLibList,
         BinaryDependList,
         ExeDir,
-        VisitedDependList,
+        VDependList,
     ):
 
         VDependList.append(self)
 
         if self in VDependList:
 
-            if Binary != None and Binary != Bin and Binary not in BinaryDependList:
-                BinaryDependList.append(Binary)
+            if self.Binary is not None and self.Binary != Bin and self.Binary not in BinaryDependList:
+                BinaryDependList.append(self.Binary)
 
-            if Bin != None and Bin.Type == "Static":
+            if Bin is not None and Bin.Type == "Static":
                 IsStatic = True
             else:
                 IsStatic = False
 
-            if Binary != None and Binary.Type == "Static":
+            if self.Binary is not None and self.Binary.Type == "Static":
                 IsModStatic = True
             else:
                 IsModStatic = False
 
-            if IsStatic == False and IsModStatic == True:
+            if IsStatic is False and IsModStatic is True:
 
-                for Item in DependModules:
+                for Item in self.DependModules:
                     IsExternal = isinstance(Item, ExternalBuilder)
 
-                    IsItemStatic == False
-                    if Item.Binary != None and Item.Binary.Type == "Static":
+                    IsItemStatic = False
+                    if Item.Binary is not None and Item.Binary.Type == "Static":
                         IsItemStatic = True
 
-                    if IsExternal == True or IsItemStatic == True:
+                    if IsExternal is True or IsItemStatic is True:
                         Item.SetupLinkEnv(
                             Bin,
                             LibPathList,
@@ -140,34 +140,36 @@ class ModuleBuilder:
                             RuntimeLibList,
                             BinaryDependList,
                             ExeDir,
-                            VisitedDependList,
+                            VDependList,
                         )
 
             RuntimeLibList.append(self.Module.DynamicModulePaths)
 
     def CreateModule(self, RefChain, FuncName, FuncRefChain):
 
-        if Module.FilePath == None or Module.FilePath == "":
+        if self.Module.FilePath is None or self.Module.FilePath == "":
             Temp = FuncName
         else:
-            Temp = os.path.basename(Module.FilePath)
+            Temp = os.path.basename(self.Module.FilePath)
 
         NextChain = RefChain + " -> " + Temp
 
-        CreateModuleName(
-            Module.ModulesIncludes, RefChain, FuncName, FuncRefChain, OutputList
+        OutputList = []
+
+        self.CreateModuleName(
+            self.Module.ModulesIncludes, RefChain, FuncName, FuncRefChain, OutputList
         )
 
     def CreateModuleName(
         self, ModuleNameList, RefChain, FuncName, FuncRefChain, OutputList
     ):
 
-        if OutputList == None:
+        if OutputList is None:
 
             OutputList = []
 
             for Item in ModuleNameList:
-                if not Item in OutputList:
+                if Item not in OutputList:
 
                     self.CreateModule(RefChain, FuncName, FuncRefChain)
                     OutputList.append(Item)
@@ -180,14 +182,14 @@ class ModuleBuilder:
 
         LinkArray = []
 
-        NewCompileEnv = self.CreateCompileEnv(Target, BinCompileEnv)
+        NewCompileEnv = self.CreateCompileEnv(TargetReader, BinCompileEnv)
 
         UsingUnity = False
 
         # TODO: Add precompile implementation here
 
         Dict_SourceFiles = {}
-        InputFiles = GetInfoFiles()
+        InputFiles = self.GetInfoFiles()
 
         # TODO: Add C++20 support, also Precompiled header stuff
 

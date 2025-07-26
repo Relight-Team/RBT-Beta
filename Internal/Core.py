@@ -10,7 +10,7 @@ def GetVar(URL, VarName):
         try:
             print(FS.InternalGetVar(URL, VarName))
             return FS.InternalGetVar(URL, VarName)
-        except:
+        except Exception:
             return None
 
 
@@ -18,7 +18,7 @@ def GetVarOptional(URL, VarName, Alt):
     with open(URL, "r") as file:
         try:
             return FS.InternalGetVar(URL, VarName)
-        except:
+        except Exception:
             return Alt
 
 
@@ -47,7 +47,7 @@ def ChangeVar(Var, New):
 
 
 def PrintDebug(Text, Show):
-    if Show == True:
+    if Show is True:
         print(Text)
 
 

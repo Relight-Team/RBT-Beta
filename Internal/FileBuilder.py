@@ -4,3 +4,6 @@ class FileBuilder:
     ActionList = []
 
     ModuleName_To_OutputItems = {}
+
+    def __init__(self):
+        pass

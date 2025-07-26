@@ -55,14 +55,14 @@ class RBTThread:
 
                 self._ReadOutput(RunningProgram.stdout)
                 self._ReadError(RunningProgram.stderr)
-            except:
+            except Exception:
                 pass
 
             RunningProgram.wait()  # Wait until program stops running
 
             self.ExitCode = RunningProgram.returncode
 
-        except:
+        except Exception:
             pass
 
         self.Finished = True
@@ -108,13 +108,13 @@ class LinearExecuter(ExecuteBase):
                 InpThread = None
 
                 # if the action key is not in the dictionary, add 1 to NonExeAction
-                if not i in ActionThreadDict:
+                if i not in ActionThreadDict:
                     NonExeAction += 1
 
                 # else, if the thread (value of key) is not None but the thread is not finished, add 1 to both ExeAction and NonExeAction
                 else:
                     InpThread = ActionThreadDict[i]
-                    if InpThread is not None and InpThread.Finished == False:
+                    if InpThread is not None and InpThread.Finished is False:
                         ExeAction += 1
                         NonExeAction += 1
 
@@ -136,7 +136,7 @@ class LinearExecuter(ExecuteBase):
                     ActionThrFound = True
                     ActionThr = ActionThreadDict[i]
 
-                if ActionThrFound == False:
+                if ActionThrFound is False:
 
                     # if Execute Actions is less than the cpu count
                     if ExeAction < max(1, os.cpu_count()):
@@ -154,10 +154,10 @@ class LinearExecuter(ExecuteBase):
                             if j in ActionThreadDict:
                                 PreThread = ActionThreadDict[j]
 
-                                if PreThread == None:
+                                if PreThread is None:
                                     ContainFailedPre = True
 
-                                elif PreThread.Finished == False:
+                                elif PreThread.Finished is False:
                                     ContainOutdatedPre = True
 
                                 elif PreThread.ExitCode != 0:
@@ -166,17 +166,17 @@ class LinearExecuter(ExecuteBase):
                                 ContainOutdatedPre = True
 
                         # If we failed, we can add the action to dictionary, but we should leave the thread blank, since we are not ready to execute yet
-                        if ContainFailedPre == True:
+                        if ContainFailedPre is True:
                             ActionThreadDict[i] = None
 
                         # If it hasn't failed and isn't outdated, add action and the thread to the dictionary
-                        elif ContainFailedPre == False:
+                        elif ContainFailedPre is False:
 
                             TD = RBTThread(i)  # Store action to execute
                             try:
                                 TD.Start()  # Execute action
 
-                            except:
+                            except Exception:
                                 pass
 
                             ActionThreadDict[i] = (
@@ -190,7 +190,7 @@ class LinearExecuter(ExecuteBase):
         # If there's any errors in the dictionary, return false
         for Action, ThreadItem in ActionThreadDict.items():
 
-            if ThreadItem == None or ThreadItem.ExitCode != 0:
+            if ThreadItem is None or ThreadItem.ExitCode != 0:
                 Ret = False
 
         # Return's the Ret value, this will let us know if there was any errors (true if no errors, false if there was errors)

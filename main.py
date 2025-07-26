@@ -10,7 +10,7 @@ def main():
 
     # Set mode to default
 
-    if Args.GetAndParse("Mode") == None:
+    if Args.GetAndParse("Mode") is None:
         ModeToUse = "Build"
     else:
         ModeToUse = Args.GetAndParse("Mode")

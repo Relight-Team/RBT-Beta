@@ -3,6 +3,7 @@ import sys
 import os
 
 from . import Common
+from . import LinuxPlatform
 
 from Template import PlatformSDK
 
@@ -43,10 +44,10 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
         Env = os.getenv("LINUX_ROOT_MULTIARCH")
 
-        if Env == None or Env == "":
+        if Env is None or Env == "":
             Dir = self.GetTreeSDKRoot()
 
-            if Dir != None and Dir != "":
+            if Dir is not None and Dir != "":
                 NewDir = os.path.join(Dir, self.SDKVersionFileName())
 
                 if os.path.isdir(NewDir):
@@ -59,7 +60,7 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
         Env = self.GetSDKLoc()
 
         # If Environment is empty, we can get it from LINUX_ROOT
-        if Env == None or Env == "":
+        if Env is None or Env == "":
             return str(os.environ.get("LINUX_ROOT"))
 
         # Else, we will get the directory from the LINUX_ROOT_MULTIARCH's archtecture path
@@ -80,16 +81,16 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
     def InternalHasRequiredManualSDK(self):
 
-        BasePath = GetSDKArchPath(Platform.DefaultArch)
+        BasePath = self.GetSDKArchPath(LinuxPlatform.GetDefaultArch())
 
-        if not (BasePath == None or BasePath == ""):
+        if not (BasePath is None or BasePath == ""):
 
-            if IsClangValid(BasePath):
+            if self.IsClangValid(BasePath):
                 return True
 
-        if _HostOS == "Linux":
-            if (Common.WhichClang() != None and Common.WhichClang() != "") and (
-                Common.WhichGCC() != None and Common.WhichGCC() != ""
+        if self._HostOS == "Linux":
+            if (Common.WhichClang() is not None and Common.WhichClang() != "") and (
+                Common.WhichGCC() is not None and Common.WhichGCC() != ""
             ):
                 return True
 

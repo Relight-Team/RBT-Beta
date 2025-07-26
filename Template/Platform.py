@@ -161,8 +161,8 @@ class Platform:
                 TempInit = T()
 
                 if (
-                    IncNonInstalledPlats == True
-                    or PlatformInfo.IsValid(TempInit.TargetPlatform()) == True
+                    IncNonInstalledPlats is True
+                    or PlatformInfo.IsValid(TempInit.TargetPlatform()) is True
                 ):
                     Logger.Logger(
                         1, "Registering " + TempInit.TargetPlatform() + " to Types"
@@ -171,46 +171,46 @@ class Platform:
 
     # Return's the array of platform folders
     @staticmethod
-    def GetPlatformFolders():
+    def GetPlatformFolders(self):
         Logger.Logger(0, "Running GetPlatformFolders()")
-        if PlatformCachedFolder == None or PlatformCachedFolder == []:
+        if self.PlatformCachedFolder is None or self.PlatformCachedFolder == []:
             PlatFolder = []
 
             for i in TP.TargetPlatform:
-                if TP.Valid(i) == True:
+                if TP.Valid(i) is True:
                     PlatFolder.append(i)
 
             for i in TP.TargetGroupPlatform:
                 PlatFolder.append(i)
 
-            PlatformCachedFolder = PlatFolder
+            self.PlatformCachedFolder = PlatFolder
 
         Logger.Logger(1, "Running GetPlatformFolders()")
-        return PlatformCachedFolder
+        return self.PlatformCachedFolder
 
     # Return's all folders that we are going to include for this platform
-    def GetIncludeFolders():
+    def GetIncludeFolders(self):
         Logger.Logger(0, "Running GetIncludeFolders()")
-        if IncludeCachedFolder == None or IncludeCachedFolder == []:
+        if self.IncludeCachedFolder is None or self.IncludeCachedFolder == []:
             IncFolder = []
 
-            IncFolder.append(Plat)
+            IncFolder.append(self.Plat)
 
-            temp = TP.GetPlatformGroup(Plat)
+            temp = TP.GetPlatformGroup(self.Plat)
             for i in TP.ReturnTargetGroupVar(temp):
                 IncFolder.append(i)
 
-            IncludeCachedFolder = IncFolder
+            self.IncludeCachedFolder = IncFolder
 
-        return IncludeCachedFolder
+        return self.IncludeCachedFolder
 
     # Return's all folder that we are going to exclude for this platform
-    def GetExcludeFolders():
+    def GetExcludeFolders(self):
         Logger.Logger(0, "Running GetExcludeFolders()")
-        if ExcludeCachedFolder == None or ExcludeCachedFolder == []:
-            ExcludeCachedFolder = GetPlatformFolders().difference(GetIncludeFolders)
+        if self.ExcludeCachedFolder is None or self.ExcludeCachedFolder == []:
+            self.ExcludeCachedFolder = self.GetPlatformFolders().difference(self.GetIncludeFolders())
 
-        return ExcludeCachedFolder
+        return self.ExcludeCachedFolder
 
     # Return's true if we have the required SDK installed on this device
     def HasRequiredSDK():
@@ -218,10 +218,10 @@ class Platform:
 
     # Return's all platforms that are registered
     @staticmethod
-    def GetRegPlatforms():
+    def GetRegPlatforms(self):
         Logger.Logger(0, "Running GetRegPlatforms()")
         List = []
-        for Key in ReturnGroupDict():
+        for Key in self.ReturnGroupDict():
             List.append(Key)
         return List
 
@@ -236,21 +236,21 @@ class Platform:
 
     # Finds all build files and directories to clean, store these files and directories in CleanFiles and CleanDirs
     def DetectBuildFilesToClean(
-        BaseDir, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
+        self, BaseDir, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
     ):
         for Item in BaseDir:
             if os.path.isfile(os.path.join(BaseDir, Item)):  # if it's a file
-                if IsBuildProduct(
+                if self.IsBuildProduct(
                     Item, TitlePrefixes, TitleSuffixes
-                ) or IsFileDefaultBuildProduct(Item, TitlePrefixes, TitleSuffixes):
+                ) or Platform.IsFileDefaultBuildProduct(Item, TitlePrefixes, TitleSuffixes):
                     CleanFiles.append(Item)
 
             if os.path.isdir(os.path.join(BaseDir, Item)):  # if it's a directory
-                if IsBuildProduct(Item, TitlePrefixes, TitleSuffixes):
+                if self.IsBuildProduct(Item, TitlePrefixes, TitleSuffixes):
                     CleanDirs.append(Item)
 
                 else:
-                    DetectBuildFilesToClean(
+                    self.DetectBuildFilesToClean(
                         Item, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
                     )
 
@@ -262,9 +262,9 @@ class Platform:
     @staticmethod
     def IsFileDefaultBuildProduct(Name, TitlePrefixes, TitleSuffixes):
         if (
-            IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileTarget")
-            or IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileModule")
-            or IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileVersion")
+            Platform.IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileTarget")
+            or Platform.IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileModule")
+            or Platform.IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileVersion")
         ):
             return True
         return False
@@ -281,10 +281,10 @@ class Platform:
         Name, Index, SubInt, TitlePrefixes, TitleSuffixes, Extension
     ):
         if SubInt > len(Extension):
-            tmp = Name[Index + SubInt - len(Extension) : Index + SubInt]  # Substring
+            tmp = Name[Index + SubInt - len(Extension):Index + SubInt]  # Substring
             if tmp.lower() == Extension.lower():
 
-                return IsBuildProductName(
+                return Platform.IsBuildProductName(
                     Name, Index, SubInt - len(Extension), TitlePrefixes, TitleSuffixes
                 )
         return False
@@ -298,13 +298,13 @@ class Platform:
         for Prefix in TitlePrefixes:
 
             if SubInt >= len(Prefix):
-                tmp = Name[Index : Index + len(Prefix)]
+                tmp = Name[Index:Index + len(Prefix)]
                 if tmp.lower() == Prefix.lower():
                     MinIndex = Index + len(Prefix)
 
                     for Suffix in TitleSuffixes:
-                        MaxIndex = Index + Count - len(Suffix)
-                        tmp = Name[MaxIndex : MaxIndex + len(Suffix)]
+                        MaxIndex = Index + SubInt - len(Suffix)
+                        tmp = Name[MaxIndex:MaxIndex + len(Suffix)]
 
                         if MinIndex >= MaxIndex and tmp.lower() == Suffix.lower():
                             if MinIndex < MaxIndex and Name[MinIndex] == "-":
@@ -327,7 +327,7 @@ class Platform:
     # Example: Test-Linux-Debug.so
     @staticmethod
     def IsBuildProductNameNoIndex(Name, TitlePrefixes, TitleSuffixes, Extension):
-        return IsBuildProductName(
+        return Platform.IsBuildProductName(
             Name, 0, len(Name), TitlePrefixes, TitleSuffixes, Extension
         )
 
@@ -342,25 +342,23 @@ class Platform:
     # Return's true if the plaform can be used
     @staticmethod
     def CanUsePlatform(Platform):
-        for I in TP.TargetPlatform:
-            if I.name.lower == Platform.lower:
+        for Index in TP.TargetPlatform:
+            if Index.name.lower == Platform.lower:
                 return True
 
         return False
 
     #  Set Input to BuildPlatform instance
-    @staticmethod
-    def RegBuildPlatform(InBuildPlatform):
-        BuildPlatform[InBuildPlatform.name] = InBuildPlatform.value
+    def RegBuildPlatform(self, InBuildPlatform):
+        self.BuildPlatform[InBuildPlatform.name] = InBuildPlatform.value
 
     # Set PlatformGroup to the input group key with the value of input build platform
-    @staticmethod
-    def RegBuildPlatformGroup(InBuildPlatform, InBuildPlatformGroup):
+    def RegBuildPlatformGroup(self, InBuildPlatform, InBuildPlatformGroup):
         Plat = []
 
         Plat.append(InBuildPlatform)
 
-        PlatformGroup[InBuildPlatformGroup] = Plat
+        self.PlatformGroup[InBuildPlatformGroup] = Plat
 
     # Return's all groups with the given platform
     @staticmethod
@@ -377,10 +375,10 @@ class Platform:
 
     # Return's the BuildPlatform value if it exist, return's None if we allow failure, otherwise it will raise an error
     @staticmethod
-    def GetBuildPlatform(InPlatform, AllowFailure=False):
-        if InPlatform in BuildPlatform:
-            return BuildPlatform[InPlatform]
-        elif AllowFailure == True:
+    def GetBuildPlatform(self, InPlatform, AllowFailure=False):
+        if InPlatform in self.BuildPlatform:
+            return self.BuildPlatform[InPlatform]
+        elif AllowFailure is True:
             return None
         else:
             Logger.Logger(
@@ -391,9 +389,8 @@ class Platform:
             )
 
     # modify each Module in BuildPlatform
-    @staticmethod
-    def ModifyHostModuleConfig(ModName, Target, Module):
-        for Item in BuildPlatform:
+    def ModifyHostModuleConfig(self, ModName, Target, Module):
+        for Item in self.BuildPlatform:
             Tmp = Item.value
             Tmp.ActivePlatformModuleRulesToModify(ModName, Target, Module)
 
@@ -414,19 +411,19 @@ class Platform:
         return self.__class__.__name__
 
     # Return's if this platform supports XGE (Incredibuild or equivalent)
-    def CanUseXGE():
+    def CanUseXGE(self):
         return True
 
     # Return's if this platform supports multiple execution at once
-    def CanParallelExecute():
-        return CanUseXGE()
+    def CanParallelExecute(self):
+        return self.CanUseXGE()
 
     # If the platform support distributed compilation (Distcc, DMUCS, etc)
-    def CanUseDistcc():
+    def CanUseDistcc(self):
         return False
 
     # If this platform support's SN-DBS (SN System's Distributed Build Server)
-    def CanUseSNDBS():
+    def CanUseSNDBS(self):
         return False
 
     # Set the new target to platform-specific defaults
@@ -439,10 +436,10 @@ class Platform:
 
     # Return's if the platform requires a monolithic build (All modules into a single binary)
     @staticmethod
-    def RequireMonolithicBuild(InPlatform, InConfig):
-        BuildPlat = GetBuildPlatform(InPlatform, True)
+    def RequireMonolithicBuild(self, InPlatform, InConfig):
+        BuildPlat = self.GetBuildPlatform(InPlatform, True)
         if BuildPlat is not None:
-            return ShouldCompileMonolithic(InPlatform)
+            return self.ShouldCompileMonolithic(InPlatform)
 
         return False
 
@@ -455,7 +452,7 @@ class Platform:
         return None
 
     # If we should make the compile Monolithic if the config file is not set
-    def ShouldCompileMonolithic(Name, Target, Module):
+    def ShouldCompileMonolithic(self, Name, Target, Module):
         return False
 
     # Returns if we should override whether to append the arch to bin name
@@ -474,7 +471,7 @@ class Platform:
 
         Config.append("Development")
 
-        if IncludeDebug == True:
+        if IncludeDebug is True:
             Config.insert(0, "Debug")
 
         return Config
@@ -503,9 +500,9 @@ class Platform:
         pass  # Will be overwritten with child class
 
     # Setup the config enviornment
-    def SetUpConfigEnv(Target, CompileEnv, LinkEnv):
+    def SetUpConfigEnv(self, Target, CompileEnv, LinkEnv):
         # This if statement is for 3rd party only, as some of them require this define to access debug features
-        if CompileEnv.UseDebugCRT == True:
+        if CompileEnv.UseDebugCRT is True:
             CompileEnv.Defines.append("_DEBUG=1")
         else:
             CompileEnv.Defines.append("NDEBUG=1")
@@ -522,7 +519,7 @@ class Platform:
 
         # Set Debug info to true if we are using debug
 
-        if not Target.DisableDebugInfo and ShouldCreateDebugInfo(Target):
+        if not self.Target.DisableDebugInfo and self.ShouldCreateDebugInfo(self.Target):
             CompileEnv.AddDebugInfo = True
 
         LinkEnv.AddDebugInfo = CompileEnv.AddDebugInfo

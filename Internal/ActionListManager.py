@@ -43,7 +43,7 @@ def GetPrecondition(ActionList, PreconditionListOutput):
 def GetPreconditionSingle(InAction, PreconditionListOutput):
 
     # Ensure's that there are no duplicates
-    if not InAction in PreconditionListOutput:
+    if InAction not in PreconditionListOutput:
         PreconditionListOutput.append(InAction)  # Add self to list
 
         # Adds all Precondition Items to list, via recursive
@@ -94,7 +94,7 @@ def Link(ActionList):
         # For each PreconditionItems, add it the action's PreconditionActions if it's not in ItemAction list
         for PreItem in Item.PreconditionItems:
 
-            if not PreItem in ItemAction:
+            if PreItem not in ItemAction:
                 New = ItemAction[PreItem]
                 Item.PreconditionActions.append(New)
 
@@ -115,16 +115,17 @@ def GetActionToExecute(
 
     ActionOutdatedDict = {}  # Action | Bool
 
-    GetAllOutdatedActions(
-        ActionList, History, ActionOutdatedDict, CppCashe, IgnoreOutdatedLib
-    )
+    # TODO: This function call is broken, it's just a placeholder for now so we don't even need it yet
+    # GetAllOutdatedActions(
+    #    ActionList, History, ActionOutdatedDict, CppCashe, IgnoreOutdatedLib
+    # )
 
     Ret = []
 
     # Set Ret to all actions to execute, so long as it's not invalid or outdated
     for Item in ActionList:
-        if Item.CommandPath != None and Item in ActionOutdatedMap:
-            if ActionOutdatedDict[Item] == True:
+        if Item.CommandPath is not None and Item in ActionOutdatedMap:
+            if ActionOutdatedDict[Item] is True:
                 Ret.append(Item)
 
     return Ret
@@ -146,7 +147,7 @@ def Execute(BuildConfig, ActionToExecuteList):
 
     # If not successful, throw an error
 
-    if Ex == False:
+    if Ex is False:
         raise ValueError(
             "We have failed to run ActionToExecuteList"
         )  # TODO: Add detailed description

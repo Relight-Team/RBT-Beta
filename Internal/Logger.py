@@ -36,7 +36,7 @@ def Logger(Level, Str):
     Filepath = Caller.f_code.co_filename  # Get's full file path
     Name = os.path.basename(Filepath)  # just get file name
 
-    if Name != None and Name != "":
+    if Name is not None and Name != "":
         FileName = Name
 
     # -- Get's Function Name -- #

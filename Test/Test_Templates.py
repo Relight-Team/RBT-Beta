@@ -3,22 +3,21 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "../Configuration")))
-
 import Directory_Manager
 
+import PlatformSDK
 
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "../Configuration")))
 sys.path.append(Directory_Manager.RBT_Directory)
 sys.path.append(Directory_Manager.RBT_Directory + "/Template")
 
 print("TESTING: PlatformSDK Parent Class")
 print()
 
-import PlatformSDK
 
 SDK = PlatformSDK.PlatformSDK()
 
-if SDK.SupportAutoSDK() == False:
+if SDK.SupportAutoSDK() is False:
     print("PlatformSDK.SupportAutoSDK() passed!")
 else:
     raise ValueError(
@@ -28,7 +27,7 @@ else:
 
 PlatformSDK.PlatformSDK.AutoSDKEnabled()  # Should not cause errors
 
-if SDK.AutoSDKSafe() == True:
+if SDK.AutoSDKSafe() is True:
     print("PlatformSDK.AutoSDKSafe() passed!")
 else:
     raise ValueError(
@@ -114,7 +113,7 @@ print(
     + SDK.HasRequiredAutoSDKInstalled()
 )
 
-if SDK.HasSetupAutoSDK() != False:
+if SDK.HasSetupAutoSDK() is not False:
     raise ValueError(
         "PlatformSDK.HasSetupAutoSDK() Should be False, instead we got "
         + str(SDK.HasSetupAutoSDK())

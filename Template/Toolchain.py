@@ -26,8 +26,8 @@ class ToolchainSDK:
 
     # FIXME: This isn't complete, as a placeholder just returns CompileCPPs, please replace!
     # CompileCPPs for multi-arch compiles
-    def CompileMultiArchCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList):
-        return CompileCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList)
+    def CompileMultiArchCPPs(self, CompileEnv, InputFiles, OutputDir, OutputActionList):
+        return self.CompileCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList)
 
     # Compiles the inputted RCF files
     def CompileRCFs(CompileEnv, InputFiles, OutDir, OutputActionList):
@@ -38,10 +38,10 @@ class ToolchainSDK:
         pass  # Will be overwritten with child class
 
     # Link every file in the LinkEnvironment
-    def LinkEveryFiles(LinkEnv, BuiltLibraryImportOnly, ActionList):
+    def LinkEveryFiles(self, LinkEnv, BuiltLibraryImportOnly, ActionList):
         FileList = []
 
-        FileList.append(LinkFiles(LinkEnv, BuiltLibraryImportOnly, ActionList))
+        FileList.append(self.LinkFiles(LinkEnv, BuiltLibraryImportOnly, ActionList))
 
     # Return the response file name
     @staticmethod

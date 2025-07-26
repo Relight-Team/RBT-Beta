@@ -72,7 +72,7 @@ class Action:
     # Adds to the depend amount
     def AddDependCount(self, UsedActions):
 
-        if not self in UsedActions:
+        if self not in UsedActions:
             UsedActions.append(self)
             self.DependCount += 1
 
@@ -89,7 +89,7 @@ class Action:
 
         if B.PreconditionActions != B.PreconditionItems:
 
-            return _Sign(B.DependCount - A.DependCount)
+            return Action._Sign(B.DependCount - A.DependCount)
 
         else:
 

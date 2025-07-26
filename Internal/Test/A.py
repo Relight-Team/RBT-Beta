@@ -22,7 +22,7 @@ def Test():
     else:
         cls_name = None
 
-    if cls_name == None:
+    if cls_name is None:
         cls_name = "None"
 
     print("Currently running file: should be B.py: " + file_name)
