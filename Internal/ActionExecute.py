@@ -1,6 +1,10 @@
 import subprocess
 import threading
 import os
+import time
+from pathlib import Path
+
+from Internal import Logger
 
 # This handles the different types of execution of the list of actions
 
@@ -18,13 +22,13 @@ class RBTThread:
 
     # These 2 functions will allow the program to print the output that should be printed from the command line
     def _ReadOutput(self, pipe):
-        for line in iter(pipe.readline, b""):
-            print(f"{line.decode().strip()}")
+        for line in iter(pipe.readline, ""):
+            print(line.strip())
         pipe.close()
 
     def _ReadError(self, pipe):
-        for line in iter(pipe.readline, b""):
-            print(f"{line.decode().strip()}")
+        for line in iter(pipe.readline, ""):
+            print(line.strip())
         pipe.close()
 
     # The function that will be run by the thread, this will execute the process based on the action
@@ -33,7 +37,7 @@ class RBTThread:
             "Executing "
             + str(self.Action.CommandPath)
             + " "
-            + str(self.Action.Arguments)
+            + str(self.Action.Arguments) + " " + str(self.Action.PreconditionItems)
         )
 
         # Start program
@@ -60,16 +64,24 @@ class RBTThread:
 
             RunningProgram.wait()  # Wait until program stops running
 
+            print("link file exist: " + str(os.path.exists('/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Intermediate/Build/Linux/ProjectTest/Development/link-ProjectTest.sh')))
+
             self.ExitCode = RunningProgram.returncode
 
+            if self.ExitCode is not 0:
+                Logger.Logger(5, "Error while running program, Error Code: " + str(self.ExitCode) + ", Program name: " + self.Action.CommandPath + ", Program Arguments: " + self.Action.Arguments)
+
+
+
         except Exception:
-            pass
+            print("ERROR")
 
         self.Finished = True
 
     # Starts the threading
     def Start(self):
-        print(self.Action.CommandPath + " " + self.Action.Arguments)
+        athread = threading.Thread(target=self.FunctionToRun)
+        athread.start()
 
 
 class ExecuteBase:
@@ -89,6 +101,8 @@ class LinearExecuter(ExecuteBase):
 
     def ExecuteActionList(self, ActionList):
 
+        print("ActionList " + str(ActionList))
+
         ActionThreadDict = {}  # A dictionary of Action : Thread
 
         print("Compiling C++ Code...")
@@ -104,22 +118,24 @@ class LinearExecuter(ExecuteBase):
             NonExeAction = 0  # All actions that isn't executed
 
             # we will update ExeAction and NonExeAction every loop instance
-            for i in ActionList:
+            for Action in ActionList:
                 InpThread = None
 
                 # if the action key is not in the dictionary, add 1 to NonExeAction
-                if i not in ActionThreadDict:
+                print("ActionThreadDict: " + str(ActionThreadDict))
+                if ActionThreadDict.get(Action) == False:
                     NonExeAction += 1
 
                 # else, if the thread (value of key) is not None but the thread is not finished, add 1 to both ExeAction and NonExeAction
                 else:
-                    InpThread = ActionThreadDict[i]
+                    InpThread = ActionThreadDict.get(Action)
                     if InpThread is not None and InpThread.Finished is False:
                         ExeAction += 1
                         NonExeAction += 1
 
             # Update the progress
             Progress = len(ActionList) + 1 - NonExeAction
+            Logger.Logger(3, "Progress: " + str(Progress))
 
             # If we have no more actions that isn't executed, then we can stop
             if NonExeAction == 0:
@@ -175,6 +191,12 @@ class LinearExecuter(ExecuteBase):
                             TD = RBTThread(i)  # Store action to execute
                             try:
                                 TD.Start()  # Execute action
+
+                                # Force to run once at a time
+
+                                while not TD.Finished:
+                                    time.sleep(0.1)
+
 
                             except Exception:
                                 pass

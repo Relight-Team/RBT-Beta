@@ -1,0 +1,11 @@
+./Internal/TargetBuilder.py:277:38: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./Internal/TargetBuilder.py:280:38: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./Internal/TargetBuilder.py:384:5: E303 too many blank lines (3)
+./Internal/TargetBuilder.py:385:5: E301 expected 1 blank line, found 0
+./Modes/BuildMode.py:30:5: E303 too many blank lines (2)
+./Readers/TargetReader.py:67:26: E261 at least two spaces before inline comment
+./SDK/Linux/LinuxPlatform.py:16:1: E302 expected 2 blank lines, found 1
+./SDK/Linux/LinuxPlatformFactory.py:10:1: E302 expected 2 blank lines, found 1
+./SDK/Linux/LinuxPlatformSDK.py:86:71: E261 at least two spaces before inline comment
+./Template/Platform.py:40:9: E122 continuation line missing indentation or outdented
+./Template/Platform.py:59:14: E126 continuation line over-indented for hanging indent

@@ -88,7 +88,7 @@ class Binary:
             return False
 
     def CreateLinkEnv(
-        self, Target, Toolchain, LinkEnv, CompileEnv, WorkingSet, ExeDir, FileBuilder
+        self, Target, Toolchain, LinkEnv, CompileEnv, ExeDir, FileBuilder
     ):
 
         NewLinkEnv = LinkEnvironment.LinkEnvironment()
@@ -119,7 +119,7 @@ class Binary:
                 for LinkFilesItem in LinkFiles:
 
                     if LinkFilesItem not in NewLinkEnv.InputFiles:
-                        NewLinkEnv.InputFiles.append(LinkFilesItem)
+                        NewLinkEnv.InputFiles.extend(LinkFilesItem)
 
             else:
 
@@ -137,19 +137,19 @@ class Binary:
         if self.Precompiled is True and TargetReader.LinkFilesTogether is True:
             return []
 
-        BinLinkEnv = self.CreateLinkEnv()
+        BinLinkEnv = self.CreateLinkEnv(TargetReader, Toolchain, LinkEnv, CompileEnv, ExeDir, FileBuilder)
 
         if TargetReader.LinkFilesTogether is False:
             return BinLinkEnv.InputFiles
 
         OutputFiles = []
 
-        Exes = Toolchain.LinkEveryFiles(BinLinkEnv, False, FileBuilder.Actions)
+        Exes = Toolchain.LinkEveryFiles(BinLinkEnv, False, FileBuilder.ActionList)
 
         # TODO: Add ModuleNameToOutputItems FileBuilder function
 
         for Item in Exes:
-            Temp = Toolchain.PostBuilt(Item, BinLinkEnv, FileBuilder.Actions)
+            Temp = Toolchain.PostBuilt(Item, BinLinkEnv, FileBuilder.ActionList)
             OutputFiles.append(Temp)
 
         return OutputFiles

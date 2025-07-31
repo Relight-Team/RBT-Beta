@@ -8,7 +8,6 @@ from . import Logger
 def GetVar(URL, VarName):
     with open(URL, "r") as file:
         try:
-            print(FS.InternalGetVar(URL, VarName))
             return FS.InternalGetVar(URL, VarName)
         except Exception:
             return None

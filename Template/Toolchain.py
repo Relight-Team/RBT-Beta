@@ -21,13 +21,13 @@ class ToolchainSDK:
         return ""
 
     # Compile the inputted C++ files
-    def CompileCPPs(CompileEnv, InputFiles, OutDir, OutputActionList):
+    def CompileFiles(self, CompileEnv, InputFiles, OutDir, OutputActionList):
         pass  # Will be overwritten with child class
 
     # FIXME: This isn't complete, as a placeholder just returns CompileCPPs, please replace!
     # CompileCPPs for multi-arch compiles
     def CompileMultiArchCPPs(self, CompileEnv, InputFiles, OutputDir, OutputActionList):
-        return self.CompileCPPs(CompileEnv, InputFiles, OutputDir, OutputActionList)
+        return self.CompileFiles(CompileEnv, InputFiles, OutputDir, OutputActionList)
 
     # Compiles the inputted RCF files
     def CompileRCFs(CompileEnv, InputFiles, OutDir, OutputActionList):
@@ -43,19 +43,21 @@ class ToolchainSDK:
 
         FileList.append(self.LinkFiles(LinkEnv, BuiltLibraryImportOnly, ActionList))
 
+        return FileList
+
     # Return the response file name
     @staticmethod
     def ReturnFileResponseName(LinkEnv, File):
         return LE.IntermediateDir + "/" + os.path.basename(File) + ".resp"
 
     # Return's the actions to do after building
-    def PostBuilt(File, LinkEnv, ActionList):
+    def PostBuilt(self, File, LinkEnv, ActionList):
         Temp = []
 
         return Temp
 
     # Setup global environment
-    def SetGlobalEnv(Target):
+    def SetGlobalEnv(self, Target):
         pass  # Will be overwritten with child class
 
     # Modify the build

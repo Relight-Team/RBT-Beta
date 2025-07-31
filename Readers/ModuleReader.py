@@ -4,13 +4,13 @@ import sys
 from Internal import Core as C
 
 
-class BuildModule:
+class Module:
 
     # The name of the module
     Name = ""
 
     # The name of the object, mainly should be used for long module names
-    ObjectName = Name
+    ObjectName = ""
 
     # The description of the module, mainly used for documentation and debugging
     Description = ""
@@ -67,16 +67,16 @@ class BuildModule:
     # The directory to the file (Dir1/Dir2/)
     ModuleDirectory = ""
 
-    def __init__(BuildFile):
+    def __init__(self, BuildFile):
 
-        FilePath = BuildFile
+        self.FilePath = BuildFile
 
-        ModuleDirectory = os.path.dirname(FilePath)
+        self.ModuleDirectory = os.path.dirname(self.FilePath)
 
         # Set public variables
 
-        Name = C.GetVar(BuildFile, "Name")
-        Name = C.GetVar(BuildFile, "ObjectName")
-        Description = C.GetVar(BuildFile, "Description")
-        Modules = C.GetVar(BuildFile, "Modules")
-        ThirdPartyDependencies = C.GetVar(BuildFile, "ThirdPartyDependencies")
+        self.Name = C.GetVar(BuildFile, "Name")
+        self.ObjectName = C.GetVar(BuildFile, "ObjectName")
+        self.Description = C.GetVar(BuildFile, "Description")
+        self.Modules = C.GetVar(BuildFile, "Modules")
+        self.ThirdPartyDependencies = C.GetVar(BuildFile, "ThirdPartyDependencies")

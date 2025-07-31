@@ -640,9 +640,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
     # Compiles the list of files together
     def CompileFiles(
-        self, CompileEnv, InputFilesList, DirOutput, Name, OutputActionList
+        self, CompileEnv, InputFilesList, DirOutput, OutputActionList
     ):
-        Logger.Logger(1, "Name: " + Name)
+
         Logger.Logger(1, "Input Files List: " + str(InputFilesList))
         Logger.Logger(1, "Directory Output: " + DirOutput)
 
@@ -659,7 +659,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     "LTCG and/or PGO Optimize cannot be true if we are not allowed to use advance features!",
                 )
 
-        if CompileEnv.PCH_Act == CompileEnvironment.PCHAction.Include:
+        if CompileEnv.PCH_Act == CompileEnv.PCH_Act.Include:
             PCH += " -include " + CompileEnv.PCHIncludeName
 
         for Item in CompileEnv.UserIncPaths:
@@ -668,16 +668,23 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         for Item in CompileEnv.SysIncPaths:
             Args += " -I" + Item
 
-        for Item in CompileEnv.Defines:
-            Args += " -D" + self.EscapeArgs(Item)
+        if CompileEnv.Defines is not None and CompileEnv.Defines:
+            for Item in CompileEnv.Defines:
+                Args += " -D" + self.EscapeArgs(Item)
 
-        CPPOut = CompileEnvironment.Output
+        CPPOut = CompileEnv.Out.ObjectFiles
+
+        print("ObjectFiles: " + str(CompileEnv.Out.ObjectFiles))
+
+        CPPOut.extend(CompileEnv.Out.DebugFiles)
 
         for Item in InputFilesList:
 
             NewAction = Action.Action()
 
-            NewAction.PreconditionItems.append(CompileEnv.ForceIncFiles)
+            NewAction.InputFiles.append(Item) # Store all code files into InputFiles
+
+            NewAction.PreconditionItems.extend(CompileEnv.ForceIncFiles)
 
             NewArgs = ""
 
@@ -714,7 +721,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
                 Obj = os.path.join(DirOutput, os.path.basename(Item) + ".o")
 
-                CPPOut.ObjectFiles.append(Obj)
+                print(Obj)
+
+                CompileEnv.Out.ObjectFiles.append(Obj)
                 NewAction.OutputItems.append(Obj)
 
                 NewArgs += ' -o "' + os.path.abspath(Obj) + '"'
@@ -749,11 +758,15 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             RespFile = open(RespFileName, "w")
 
+            print("RespFileName: " + RespFileName)
+
             RespFile.write(AllArgs)
 
-            NewAction.PreconditionItems.append(RespFile)
+            RespFile.close()
 
-            NewAction.Arguments = '@"' + RespFileName + '"'
+            NewAction.PreconditionItems.append(RespFileName)
+
+            NewAction.Arguments = '@' + RespFileName
 
             NewAction.UsingGCCCompiler is True
 
@@ -898,7 +911,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             # f.write(self.GetEncodeCommand(LinkEnv, Output)) # FIXME: Readd this once we add Breakpad!
 
         Action.CommandPath = "/bin/sh"
-        Action.Arguments = ' "' + LinkFile + '"'
+        Action.Arguments = LinkFile
 
         LinkScriptFile = os.path.join(LinkEnv.LocalShadowDir, "remove-sym.ldscript")
 
@@ -941,6 +954,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         Action.CommandPath = "/bin/sh"
         Action.Arguments = '"' + RelinkFile + '"'
+        Action.InputFiles.append(RelinkFile)
 
     def LinkFiles(self, LinkEnv, ImportLibraryOnly, OutputActionList):
 
@@ -960,6 +974,8 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         RPath = []
 
         NewAction = Action.Action()
+
+        NewAction.InputFiles.extend(LinkEnv.InputFiles)
 
         NewAction.CurrentDirectory = Dir_Manager.Engine_Directory
 
@@ -1090,7 +1106,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         return Output
 
-    def PostBuilt(File, LinkEnv, ActionList):
+    def PostBuilt(self, File, LinkEnv, ActionList):
         Output = super().PostBuilt(File, LinkEnv, ActionList)
 
         if LinkEnv.IsBuildingDynamic is True and LinkEnv.CrossedReference is True:

@@ -1,3 +1,5 @@
+import os
+
 from . import Action
 from . import ActionExecute
 from . import Logger
@@ -58,9 +60,93 @@ def CheckConflicts(ActionList):
 
 # Get's all Actions that are oudated
 def GetAllOutdatedActions(
-    ActionList, History, OutdatedActionList, DependCashe, IgnoreOutdatedLib
+    ActionList, OutdatedActionList, IgnoreOutdatedLib
 ):
-    pass
+    for Item in ActionList:
+        AddActionOutdated(Item, OutdatedActionList, IgnoreOutdatedLib)
+
+
+
+# Set's a specified action to check if it's outdated
+def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
+    print("AddActionOutdated running " + Action.CommandPath + " " + Action.Arguments)
+
+    Outdated = False
+
+    # If Action already exist in OutdatedActionList, we will just return the same thing
+    if OutdatedActionList.get(Action) is True:
+        return OutdatedActionList[Action]
+
+
+    # if the imput file doesn't exist, and it ends with .obj or .o, then we gotta update it
+
+    for Input in Action.InputFiles:
+        if not os.path.exists(Input):
+            Outdated = True
+            if Action not in OutdatedActionList:
+                OutdatedActionList[Action] = Outdated
+
+                return Outdated
+
+
+    # If the file doesn't exist, and it isn't an object file, then we gotta compile it!
+    for Output in Action.OutputItems:
+
+        if not os.path.exists(Output):
+            Outdated = True
+
+    # If any input has been updated compared to all the output, then the entire action is outdated
+    for Input in Action.InputFiles:
+
+        SourceFileTime = os.path.getmtime(Input)
+
+
+        for Output in Action.OutputItems:
+
+            if os.path.exists(Output):
+
+                OutputFileTime = os.path.getmtime(Output)
+
+                if SourceFileTime > OutputFileTime:
+                    Outdated = True
+
+
+    # If the file does exist, but has no bytes and it isn't an object file, then we also gotta compile it!
+    # Used incase of corruption
+    for Output in Action.OutputItems:
+        if not Output.endswith(".obj") and not Output.endswith(".o"):
+
+            if os.path.exists(Output) and os.path.getsize(Output) == 0:
+                Outdated = True
+
+    if IgnoreOutdatedLib is False:
+        # Check if action is outdated for all precondition actions
+        # FIXME: This cause endless loop because the same item is in Precondition items, please fix this!
+        #for Item in Action.PreconditionActions:
+            #if AddActionOutdated(Item, OutdatedActionList, IgnoreOutdatedLib) == True:
+                #Outdated = True
+
+        # If any Precondition item has been updated compared to all the output, then the entire action is outdated
+        for Input in Action.PreconditionItems:
+
+            SourceFileTime = os.path.getmtime(Input)
+
+            for Output in Action.OutputItems:
+
+                OutputFileTime = os.path.getmtime(Output)
+
+                if SourceFileTime > OutputFileTime:
+                    Outdated = True
+
+
+    # TODO: Add Dependency file support
+
+    if Action not in OutdatedActionList:
+        OutdatedActionList[Action] = Outdated
+
+    return Outdated
+
+
 
 
 # Deletes all files that are outdated
@@ -80,6 +166,8 @@ def Link(ActionList):
 
     for Item in ActionList:
 
+        print("Item Input " + str(Item.Arguments))
+
         for Fil in Item.OutputItems:
             ItemAction[Fil] = Item
 
@@ -89,14 +177,18 @@ def Link(ActionList):
     # Set the PreconditionAction for each action
     for Item in ActionList:
         # Clear PreconditionAction in the action
-        Item.PreconditionAction = []
+        Item.PreconditionActions = []
 
         # For each PreconditionItems, add it the action's PreconditionActions if it's not in ItemAction list
         for PreItem in Item.PreconditionItems:
 
-            if PreItem not in ItemAction:
+            if PreItem in ItemAction:
                 New = ItemAction[PreItem]
                 Item.PreconditionActions.append(New)
+
+    for Item in ActionList:
+
+        print("Output Item Input " + str(Item.Arguments))
 
     # Sorts the action list
     Sort(ActionList)
@@ -104,7 +196,7 @@ def Link(ActionList):
 
 # Returns all Actions to Execute
 def GetActionToExecute(
-    ActionList, PreconditionActionList, CppCache, IgnoreOutdatedLib, History=None
+    ActionList, PreconditionActionList, CppCache, IgnoreOutdatedLib
 ):
 
     ActionOutdatedMap = {}  # Action | Bool
@@ -115,17 +207,20 @@ def GetActionToExecute(
 
     ActionOutdatedDict = {}  # Action | Bool
 
-    # TODO: This function call is broken, it's just a placeholder for now so we don't even need it yet
-    # GetAllOutdatedActions(
-    #    ActionList, History, ActionOutdatedDict, CppCashe, IgnoreOutdatedLib
-    # )
+    GetAllOutdatedActions(
+       ActionList, ActionOutdatedDict, IgnoreOutdatedLib
+    )
 
     Ret = []
 
-    # Set Ret to all actions to execute, so long as it's not invalid or outdated
+    # Set Ret to all actions to execute, so long as it's invalid or outdated
     for Item in ActionList:
-        if Item.CommandPath is not None and Item in ActionOutdatedMap:
-            if ActionOutdatedDict[Item] is True:
+        print("GetActionToExecute Item: " + str(ActionOutdatedMap))
+        if Item.CommandPath is not None and ActionOutdatedMap.get(Item, True):
+            print("Well this passed!")
+            print(ActionOutdatedDict)
+            if ActionOutdatedDict.get(Item) is True:
+                print("GetActionToExecute Item is TRUE!!!")
                 Ret.append(Item)
 
     return Ret
@@ -138,9 +233,7 @@ def Execute(BuildConfig, ActionToExecuteList):
     if len(ActionToExecuteList) == 0:
         return
 
-    Executer = (
-        ActionExecute.LinearExecuter
-    )  # FIXME: As a temp solution, we are just using LinearExecuter, add support for switching to multiple executers!
+    Executer = ActionExecute.LinearExecuter() # FIXME: As a temp solution, we are just using LinearExecuter, add support for switching to multiple executers!
 
     # Execute the action list, stores if successful
     Ex = Executer.ExecuteActionList(ActionToExecuteList)

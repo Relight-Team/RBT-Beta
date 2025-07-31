@@ -11,6 +11,7 @@ from Internal import CompileEnvironment as CE
 from Internal import ConfigManager
 from Internal import Logger
 
+from Configuration import Directory_Manager
 
 class LinuxPlatform(Platform.Platform):
 
@@ -19,7 +20,7 @@ class LinuxPlatform(Platform.Platform):
     SDK = LinuxPlatformSDK.LinuxPlatformSDK()
 
     def __init__(self, InSDK, InCEPlatform=CE.Platform.Linux, InPlatform="Linux"):
-        super().__init__(InCEPlatform, InPlatform)
+        super().__init__(InPlatform, InCEPlatform)
         self.SDK = InSDK
 
     def GetDefaultArch(self, ProjectFile):
@@ -32,7 +33,7 @@ class LinuxPlatform(Platform.Platform):
 
         # If abspath fails, we shall get it from command line instead
         if EngineIni is None:
-            EngineIni = "../../../../BaseBuilder.cfg"  # TEMP SOLUTION
+            EngineIni = os.path.join(Directory_Manager.Engine_Directory, "Configs", "BaseBuilder.cfg")
             pass  # FIXME: Get from command line, else get from BaseBuilder
 
         TempConfig = ConfigManager.ReadConfig(
@@ -65,7 +66,7 @@ class LinuxPlatform(Platform.Platform):
     def ResetTarget(self, Target):
         self.MakeTargetValid(Target)
 
-    def NeedsArchSuffix():
+    def NeedsArchSuffix(self):
         return False
 
     def CanUseXGE():
@@ -99,7 +100,7 @@ class LinuxPlatform(Platform.Platform):
             ):
                 return True
 
-    def GetBinExtension(InBinType):
+    def GetBinExtension(self, InBinType):
         if InBinType == "EXE":
             return ""
         elif InBinType == "Dynamic":
@@ -120,7 +121,7 @@ class LinuxPlatform(Platform.Platform):
 
         return Ret
 
-    def CheckEnvironmentConflicts(CompileEnv, LinkEnv):
+    def CheckEnvironmentConflicts(self, CompileEnv, LinkEnv):
 
         if CompileEnv.PGOOptimize != LinkEnv.PGOOptimize:
             raise ValueError("")
@@ -133,7 +134,7 @@ class LinuxPlatform(Platform.Platform):
 
     def SetUpEnvironment(self, Target, CompileEnv, LinkEnv):
 
-        BasePath = self.SDK.GetSDKArchPath(self.Target.Arch)
+        BasePath = self.SDK.GetSDKArchPath(Target.Arch)
 
         if self.SDK._HostOS == "Linux" and (BasePath is None or BasePath == ""):
             CompileEnv.SysIncPaths.append("/usr/include")
@@ -155,7 +156,7 @@ class LinuxPlatform(Platform.Platform):
         # For libraries
         CompileEnv.Defines.append("LINUX=1")
 
-    def ShouldCreateDebugInfo(Target):
+    def ShouldCreateDebugInfo(self, Target):
         if Target.BuildType == "Final":
             return False
         else:
@@ -173,7 +174,7 @@ class LinuxPlatform(Platform.Platform):
         if Target.UseUnknownSanitizer is True:
             Options.UseUnknownSanitizer = True
 
-        return LinuxToolchain.LinuxToolchain(self.Target.Arch, self.SDK, self.Target.SavePSYM, Options)
+        return LinuxToolchain.LinuxToolchain(Target.Arch, self.SDK, Target.SavePSYM, Options)
 
     def Deploy(Receipt):
         pass  # DEPLOY IS NOT SUPPORTED YET!

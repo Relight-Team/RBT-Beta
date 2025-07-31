@@ -11,6 +11,7 @@ from Internal import FileBuilder
 # Build's a module
 class ModuleBuilder:
 
+    # Module reader
     Module = None
 
     AllFiles = []
@@ -25,6 +26,8 @@ class ModuleBuilder:
     def __init__(self, InModule, InIntermediateDir):
         self.Module = InModule
         self.IntermediateDir = InIntermediateDir
+
+        self.SourceDir = os.path.join(self.Module.ModuleDirectory, "Src")
 
     def GetSourceDir(self):
         Temp = self.Module.FilePath
@@ -42,6 +45,7 @@ class ModuleBuilder:
 
         return Ret
 
+    # Get all input files, sort them between Compile, Header, and Generated file
     def SortLists(self):
 
         Temp = self.GetInfoFiles()
@@ -74,11 +78,13 @@ class ModuleBuilder:
     def CreateCompileEnv(self, Target, CompileEnv):
         NewCompile = CompileEnv
 
-        CompileEnv.FalseUnityOverride = self.Modules.DisableUnity
-        CompileEnv.UseRTTI |= self.Modules.RTTI
-        CompileEnv.UseAVX = self.Modules.AVX
+        NewCompile.FalseUnityOverride = self.Module.DisableUnity
+        NewCompile.UseRTTI |= self.Module.RTTI
+        NewCompile.UseAVX = self.Module.AVX
 
-        CompileEnv.Defines.append(self.Modules.Defines)
+        NewCompile.Defines.extend(self.Module.Defines)
+
+        return NewCompile
 
     def AddToCompileEnv(
         self, Binary, IncludePathsList, SysIncludePathsList, DefinesList
@@ -176,7 +182,7 @@ class ModuleBuilder:
 
     # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
-    def Compile(self, TargetReader, Toolchain, BinCompileEnv):
+    def Compile(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder):
 
         Plat = BinCompileEnv.Plat
 
@@ -195,22 +201,41 @@ class ModuleBuilder:
 
         SourceFile_Unity = {}
 
-        CPPFiles = []
-        print(
-            "Well, you made it this far, yeah now we just need ModuleBuilder.Compile to set GenFiles"
-        )
+
+        EveryFileToCompile = []
+
         GenFiles = (
             []
-        )  # FIXME: bro I just realize we need this to actually contain all our imput files cause right now it will always compile no input files!
+        )  # FIXME: bro I just realize we need this to actually contain all our input files cause right now it will always compile no input files!
+
+        self.SortLists()
+
+        EveryFileToCompile.extend(self.AllFiles)
+
+        EveryFileToCompile.extend(GenFiles)
+
+        print(self.AllFiles)
 
         OutputActionList = []
 
+        if self.Module.ObjectName == None:
+            ModName = self.Module.Name
+        else:
+            ModName = self.Module.ObjectName
+
+        Intermed = os.path.join(self.IntermediateDir, "Build", str(Plat.value), TargetReader.Name, TargetReader.BuildType, ModName)
+
         # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
         LinkArray.append(
-            Toolchain.CompileMultiArchCPPs(
-                NewCompileEnv, GenFiles, self.IntermediateDir, OutputActionList
+            InToolchain.CompileMultiArchCPPs(
+                NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
             )
         )
+
+        for Item in OutputActionList:
+            print("ITEM IN MODULEBUILDER CHECK: " + Item.Arguments)
+
+        FileBuilder.ActionList.extend(OutputActionList)
 
         return LinkArray
 

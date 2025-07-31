@@ -71,6 +71,7 @@ def Logger(Level, Str):
 
     Ret += Str + Style.RESET_ALL
 
+    print()
     print(Ret)
 
     if Level == 5:

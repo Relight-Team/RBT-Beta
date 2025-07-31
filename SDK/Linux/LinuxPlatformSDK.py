@@ -81,7 +81,9 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
     def InternalHasRequiredManualSDK(self):
 
-        BasePath = self.GetSDKArchPath(LinuxPlatform.GetDefaultArch())
+        LinuxPlat = LinuxPlatform.LinuxPlatform(self)
+
+        BasePath = self.GetSDKArchPath(LinuxPlat.GetDefaultArch(None)) # TODO: Change the "None" in the args to ProjectFile
 
         if not (BasePath is None or BasePath == ""):
 

@@ -13,13 +13,16 @@ from Internal import Logger
 from Configuration import TargetPlatforms as TP
 from Configuration import Directory_Manager
 
-from . import PlatformFactory as PF
+from Template import PlatformFactory
 
-EngineDir = "../.."
+EngineDir = Directory_Manager.Engine_Directory
 
-ConfigDir = EngineDir + "/Configs"
+ConfigDir = os.path.join(EngineDir, "Configs")
 
 _HostOS = platform.system()
+
+# For scanning CustomSDK directory
+sys.path.append(os.path.join(EngineDir, "Extras", "CustomSDK"))
 
 
 # A class that stores information on the platform
@@ -32,84 +35,74 @@ class PlatformInfo:
         ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformArch"
     )
 
+    def __init__(self):
+        Platform = ConfigM.ReadConfig(
+        ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformName"
+        )
+        Arch = ConfigM.ReadConfig(
+            ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformArch"
+        )
+
+    def OverrideWithCMD(self, InPlatform=None, InArch=None):
+        if InPlatform is not None:
+            self.Platform = InPlatform
+
+        if InArch is not None:
+            self.Arch = InArch
+
     # Import the FactorySDK file based on the config
-    @staticmethod
-    def ImportFactory():
+    def ImportFactory(self):
 
         Logger.Logger(0, "Running ImportFactory() from PlatformInfo")
 
-        if os.path.isfile(
-            EngineDir
-            + "/Programs/RelightBuildTool/SDK/"
-            + PlatformInfo.Platform
-            + "/"
-            + PlatformInfo.Platform
-            + "PlatformFactory"
-        ):
+        if os.path.isfile(os.path.join(
+             EngineDir,
+             "Programs",
+             "RelightBuildTool",
+             "SDK",
+             self.Platform,
+             self.Platform
+             + "PlatformFactory.py"
+        )):
             Logger.Logger(
                 1,
                 "Platform Factory found in base SDK directory: "
                 + EngineDir
                 + "/Programs/RelightBuildTool/SDK/"
-                + PlatformInfo.Platform
+                + self.Platform
                 + "/"
-                + PlatformInfo.Platform
+                + self.Platform
                 + "PlatformFactory.py",
             )
-            return importlib.import_module(
-                EngineDir
-                + "/Programs/RelightBuildTool/SDK/"
-                + PlatformInfo.Platform
-                + "/"
-                + PlatformInfo.Platform
-                + "PlatformFactory"
-            )
+            return importlib.import_module("SDK." + self.Platform + "." + self.Platform + "PlatformFactory")
 
-        elif os.path.isfile(
-            EngineDir
-            + "/Extras/CustomSDK/"
-            + PlatformInfo.Platform
-            + "/"
-            + PlatformInfo.Platform
-            + "PlatformFactory"
-        ):
+        elif os.path.isfile(os.path.join(EngineDir, "Extras", "CustomSDK", self.Platform, self.Platform + "PlatformFactory.py")):
             Logger.Logger(
                 1,
                 "Platform Factory found in Custom SDK directory: "
                 + EngineDir
                 + "/Extras/CustomSDK/"
-                + PlatformInfo.Platform
+                + self.Platform
                 + "/"
-                + PlatformInfo.Platform
+                + self.Platform
                 + "PlatformFactory.py",
             )
-            return importlib.import_module(
-                EngineDir
-                + "/Extras/CustomSDK/"
-                + PlatformInfo.Platform
-                + "/"
-                + PlatformInfo.Platform
-                + "PlatformFactory"
-            )
+            return importlib.import_module(self.Platform + "." + self.Platform + "PlatformFactory")
         else:
             Logger.Logger(
                 5,
                 "Couldn't find "
-                + PlatformInfo.Platform
+                + self.Platform
                 + "/"
-                + PlatformInfo.Platform
+                + self.Platform
                 + "PlatformFactory.py in either RelightBuildTool's SDK directory or CustomSDK directory",
             )
 
     # Return true if the config file's platform value is valid
-    @staticmethod
-    def IsValid(InPlatform):
+    def IsValid(self, InPlatform):
         Logger.Logger(0, "Running IsValid(" + InPlatform + ")")
-        if InPlatform == "Linux":
-            Logger.Logger(1, "Returned True")
-            return True
 
-        elif PlatformInfo.Platform == InPlatform:
+        if self.Platform == InPlatform:
             Logger.Logger(1, "Returned True")
             return True
         Logger.Logger(1, "Returned False")
@@ -133,16 +126,20 @@ class Platform:
     ExcludeCachedFolder = []
 
     def __init__(self, InPlatform, InCppPlatform):
-        Plat = InPlatform
-        DefaultCPPPlatform = InCppPlatform
+        self.Plat = InPlatform
+        self.DefaultCPPPlatform = InCppPlatform
 
     # Create PlatformFactory instance and run the class's "RegBuildPlatform" function
     @staticmethod
-    def RegPlatform(IncNonInstalledPlats):
+    def RegPlatform(Args, IncNonInstalledPlats):
 
-        Logger.Logger(0, "Running RegPlatform(" + IncNonInstalledPlats + ")")
+        Logger.Logger(0, "Running RegPlatform(" + str(IncNonInstalledPlats) + ")")
 
-        Module = PlatformInfo.ImportFactory()
+        PlatInfo = PlatformInfo()
+
+        PlatInfo.OverrideWithCMD(Args.GetAndParse("Platform"), None)
+
+        Module = PlatInfo.ImportFactory()
 
         Types = []
 
@@ -153,16 +150,14 @@ class Platform:
             if inspect.isclass(Object):
 
                 Types.append(Object)
-
         # For each instance, run the RegBuildPlatform
         for T in Types:
-            if isinstance(T, PF.FactorySDK):
-
+            if issubclass(T, PlatformFactory.FactorySDK):
                 TempInit = T()
 
                 if (
                     IncNonInstalledPlats is True
-                    or PlatformInfo.IsValid(TempInit.TargetPlatform()) is True
+                    or PlatInfo.IsValid(TempInit.TargetPlatform()) is True
                 ):
                     Logger.Logger(
                         1, "Registering " + TempInit.TargetPlatform() + " to Types"
@@ -349,16 +344,17 @@ class Platform:
         return False
 
     #  Set Input to BuildPlatform instance
-    def RegBuildPlatform(self, InBuildPlatform):
-        self.BuildPlatform[InBuildPlatform.name] = InBuildPlatform.value
+    @staticmethod
+    def RegBuildPlatform(InBuildPlatform):
+        Logger.Logger(1, "Adding platform " + str(InBuildPlatform.Plat) + " to BuildPlatform array")
+        Platform.BuildPlatform[InBuildPlatform.Plat] = InBuildPlatform
 
     # Set PlatformGroup to the input group key with the value of input build platform
-    def RegBuildPlatformGroup(self, InBuildPlatform, InBuildPlatformGroup):
-        Plat = []
-
-        Plat.append(InBuildPlatform)
-
-        self.PlatformGroup[InBuildPlatformGroup] = Plat
+    @staticmethod
+    def RegBuildPlatformGroup(InBuildPlatform, InBuildPlatformGroup):
+        if InBuildPlatformGroup not in Platform.PlatformGroup:
+            Platform.PlatformGroup[InBuildPlatformGroup] = []
+        Platform.PlatformGroup[InBuildPlatformGroup].append(InBuildPlatform)
 
     # Return's all groups with the given platform
     @staticmethod
@@ -375,9 +371,9 @@ class Platform:
 
     # Return's the BuildPlatform value if it exist, return's None if we allow failure, otherwise it will raise an error
     @staticmethod
-    def GetBuildPlatform(self, InPlatform, AllowFailure=False):
-        if InPlatform in self.BuildPlatform:
-            return self.BuildPlatform[InPlatform]
+    def GetBuildPlatform(InPlatform, AllowFailure=False):
+        if InPlatform in Platform.BuildPlatform:
+            return Platform.BuildPlatform[InPlatform]
         elif AllowFailure is True:
             return None
         else:
@@ -389,8 +385,9 @@ class Platform:
             )
 
     # modify each Module in BuildPlatform
-    def ModifyHostModuleConfig(self, ModName, Target, Module):
-        for Item in self.BuildPlatform:
+    @staticmethod
+    def ModifyHostModuleConfig(ModName, Target, Module):
+        for Item in Platform.BuildPlatform:
             Tmp = Item.value
             Tmp.ActivePlatformModuleRulesToModify(ModName, Target, Module)
 
@@ -460,7 +457,7 @@ class Platform:
         return True
 
     # Return's the array of binary output files (by default, it will only return 1 item)
-    def FinalizeBinPaths(BinName, ProjectFile, Target):
+    def FinalizeBinPaths(self, BinName, ProjectFile, Target):
         Tmp = []
         Tmp.append(BinName)
         return Tmp
@@ -519,7 +516,7 @@ class Platform:
 
         # Set Debug info to true if we are using debug
 
-        if not self.Target.DisableDebugInfo and self.ShouldCreateDebugInfo(self.Target):
+        if not Target.DisableDebugInfo and self.ShouldCreateDebugInfo(Target):
             CompileEnv.AddDebugInfo = True
 
         LinkEnv.AddDebugInfo = CompileEnv.AddDebugInfo
@@ -538,7 +535,7 @@ class Platform:
         return False
 
     # If we should Create debug information if the config file is not set
-    def ShouldCreateDebugInfo(Target):
+    def ShouldCreateDebugInfo(self, Target):
         pass  # Will be overwritten with child class
 
     # Create the platfomr's toolchain instance

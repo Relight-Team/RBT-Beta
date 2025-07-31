@@ -492,5 +492,5 @@ class PlatformSDK:
         self.Print()
 
     # Prints information about the SDK
-    def Print():
+    def Print(self):
         pass

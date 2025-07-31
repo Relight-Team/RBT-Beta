@@ -26,6 +26,7 @@ class Options:
 # The main function we are going to execute in this mode
 def Main(Args):
 
+
     # Convert Args to StartingTarget
 
     StartingTarget = TargetReader.StartingTarget(Args.GetAndParse("Platform"))
@@ -47,7 +48,13 @@ def Main(Args):
 
     Option = Options()
 
+    Logger.Logger(3, "Registering platforms...")
+
+    Platform.Platform.RegPlatform(Args, False)
+
     BuildProcess(StartingTargetList, None, Option)
+
+    Logger.Logger(3, "Build Completed!")
 
 
 # Build's the list of target
@@ -66,11 +73,13 @@ def BuildProcess(StartingTargetList, WorkingSet, InOptions):
         # If there's only one target, add it to the action to execute, otherwise we will combine them into one list of actions
         if len(StartingTargetList) == 1:
             ExecuteActions = []
-            ExecuteActions.append(ExecuteActionsTarget[0])
+            print("ExecutingActionsTarget" + str(ExecuteActionsTarget[0]))
+            ExecuteActions.extend(ExecuteActionsTarget[0])
         else:
             ExecuteActions = MergeActionList(StartingTargetList, ExecuteActionsTarget)
 
         # Link actions together
+        Logger.Logger(1, "Linking all Execution Actions...")
         ActionListManager.Link(ExecuteActions)
 
         # Ensures that each item has the same config
@@ -113,20 +122,31 @@ def MergeActionList(TargetList, ActionList):
 # Get all actions to execute
 def GetActionFromTarget(StartingTarget, BuildConfig, FileBuild):
 
+    for Item in FileBuild.ActionList:
+        print("Command: " + Item.Arguments)
+
+    Logger.Logger(1, "Getting Actions from target...")
+
+    Logger.Logger(1, "Linking main action list from TargetBuilder...")
     ActionListManager.Link(FileBuild.ActionList)  # Link the main action list
 
     # TODO: Add Hot Reload support
 
     PreconditionActions = GetPreconditionActions(StartingTarget, FileBuild)
 
+
     ActionListManager.Link(PreconditionActions)  # Link the precondition action list
 
     # TODO: add CppDependencies support
 
+    Logger.Logger(1, "Linking all Precondition actions...")
     ActionsToExecute = ActionListManager.GetActionToExecute(
-        FileBuild.ActionList, PreconditionActions, None, None, False
+        FileBuild.ActionList, PreconditionActions, None, False
     )  # TODO: This is a temp
 
+    print("ActionsToExecute: " + str(ActionsToExecute))
+    for Item in ActionsToExecute:
+        print(Item.Arguments)
     return ActionsToExecute
 
 
@@ -136,7 +156,7 @@ def GetPreconditionActions(StartingTarget, FileBuild):
 
     # TODO: Add SingleFileToCompile support!
 
-    Ret = GetPreconditionActionsFromActions(FileBuild.ActionList, Ret)
+    GetPreconditionActionsFromActions(FileBuild.ActionList, Ret)
 
     return Ret
 
@@ -151,9 +171,8 @@ def GetPreconditionActionsFromActions(ActionList, OutputList):
 
 # Function that helps GetPreconditionActions
 def GetPreconditionActionsFromSingleAction(Action, OutputList):
-    if any(Output in OutputList for Output in Action.OutputItems):
-        if Action not in OutputList:
-            OutputList.add(Action)
+    if Action not in OutputList:
+        OutputList.append(Action)
 
-            for Precondition in Action.PreconditionActions:
-                GetPreconditionActionsFromSingleAction(Precondition, OutputList)
+        for Precondition in getattr(Action, "PreconditionActions", []):
+            GetPreconditionActionsFromSingleAction(Precondition, OutputList)

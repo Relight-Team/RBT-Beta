@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class Platform(Enum):
-    Linux = 0
-    Windows = 1
+    Linux = "Linux"
+    Windows = "Windows"
 
 
 class PCHAction(Enum):
