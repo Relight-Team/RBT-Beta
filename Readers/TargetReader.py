@@ -110,7 +110,7 @@ class Target:
 
         # Set private variables
 
-        _File = TargetFile
+        self._File = TargetFile
 
         # Set public variables
 

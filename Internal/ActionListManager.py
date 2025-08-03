@@ -70,6 +70,7 @@ def GetAllOutdatedActions(
 # Set's a specified action to check if it's outdated
 def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
     print("AddActionOutdated running " + Action.CommandPath + " " + Action.Arguments)
+    print("AddActionOutdated PreconditionItems " + str(Action.PreconditionItems))
 
     Outdated = False
 
@@ -121,10 +122,9 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
 
     if IgnoreOutdatedLib is False:
         # Check if action is outdated for all precondition actions
-        # FIXME: This cause endless loop because the same item is in Precondition items, please fix this!
-        #for Item in Action.PreconditionActions:
-            #if AddActionOutdated(Item, OutdatedActionList, IgnoreOutdatedLib) == True:
-                #Outdated = True
+        for Item in Action.PreconditionActions:
+            if AddActionOutdated(Item, OutdatedActionList, IgnoreOutdatedLib) == True:
+                Outdated = True
 
         # If any Precondition item has been updated compared to all the output, then the entire action is outdated
         for Input in Action.PreconditionItems:
@@ -133,10 +133,11 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
 
             for Output in Action.OutputItems:
 
-                OutputFileTime = os.path.getmtime(Output)
+                if os.path.exists(Output):
+                    OutputFileTime = os.path.getmtime(Output)
 
-                if SourceFileTime > OutputFileTime:
-                    Outdated = True
+                    if SourceFileTime > OutputFileTime:
+                        Outdated = True
 
 
     # TODO: Add Dependency file support

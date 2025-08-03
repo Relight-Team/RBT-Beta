@@ -109,7 +109,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         if CanUseSystemCompiler is False and (
             self.BasePath is None or self.BasePath == ""
         ):
-            raise ValueError("ERROR: LINUX_ROOT environment variable is not set!")
+            Logger.Logger(5, "ERROR: LINUX_ROOT environment variable is not set!")
 
         self.DumpSymsPath = os.path.join(
             Dir_Manager.Engine_Directory, "bin", "Linux", "DumpSyms"
@@ -674,8 +674,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         CPPOut = CompileEnv.Out.ObjectFiles
 
-        print("ObjectFiles: " + str(CompileEnv.Out.ObjectFiles))
-
         CPPOut.extend(CompileEnv.Out.DebugFiles)
 
         for Item in InputFilesList:
@@ -758,13 +756,13 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             RespFile = open(RespFileName, "w")
 
-            print("RespFileName: " + RespFileName)
-
             RespFile.write(AllArgs)
 
             RespFile.close()
 
-            NewAction.PreconditionItems.append(RespFileName)
+            CompileEnv.LinkEnvPrecondition.append(RespFileName) # Put's Response name into LinkEnvPrecondition
+
+            #NewAction.PreconditionItems.append(RespFileName)
 
             NewAction.Arguments = '@' + RespFileName
 
@@ -977,6 +975,8 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         NewAction.InputFiles.extend(LinkEnv.InputFiles)
 
+        NewAction.PreconditionItems.extend(LinkEnv.LinkEnvPrecondition)
+
         NewAction.CurrentDirectory = Dir_Manager.Engine_Directory
 
         Com = ""
@@ -1003,8 +1003,11 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         for Item in LinkEnv.InputFiles:
 
-            Resp.append(os.path.abspath(Item))
-            NewAction.PreconditionItems.append(Item)
+            print("LINK ENV ITEM: " + Item)
+
+            Resp.append(os.path.abspath(Item) + " ")
+            #FIXME: THIS IS THE ISSUE THAT CAUSE ENDLESS LOOP IN ACTIONLISTMANAGER! \/
+            #NewAction.PreconditionItems.append(Item)
 
         if LinkEnv.IsBuildingDynamic is True:
             Resp.append(" -soname=" + Output)
@@ -1063,7 +1066,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         Com += ' -Wl,@"' + RespFile + '"'
 
-        NewAction.PreconditionItems.append(RespFile)
+        #NewAction.PreconditionItems.append(RespFile)
 
         Com += " -Wl,--start-group" + ExternalLibs + " -Wl,--end-group -lrt -lm"
 

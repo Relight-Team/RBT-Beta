@@ -100,6 +100,8 @@ class LinkEnvironment:
 
     CrossedReference = False  #
 
+    LinkEnvPrecondition = [] # Fixes a bug, this will put any Precondition from CompileEnv to LinkEnv
+
     def __init__(self, InPlatform=None, InConfig=None, InArch=None):
         self.Platform = InPlatform
         self.Config = InConfig

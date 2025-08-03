@@ -7,6 +7,9 @@ from Internal import CompileEnvironment
 
 from Internal import FileBuilder
 
+from Internal import Logger
+
+from Configuration import Directory_Manager
 
 # Build's a module
 class ModuleBuilder:
@@ -40,8 +43,10 @@ class ModuleBuilder:
         Ret = []
 
         for Dirpath, _, filenames in os.walk(self.SourceDir):
+            print("SEARCHING IN: " + self.SourceDir)
             for f in filenames:
                 Ret.append(os.path.abspath(os.path.join(Dirpath, f)))
+                print("APPENDING: " + os.path.join(Dirpath, f))
 
         return Ret
 
@@ -180,9 +185,85 @@ class ModuleBuilder:
                     self.CreateModule(RefChain, FuncName, FuncRefChain)
                     OutputList.append(Item)
 
+
+    def SearchThroughDir(self, Dir, SubDir):
+        for Root, SubDirList, Files in os.walk(Dir):
+            if SubDir in Files:
+                return os.path.join(Root, SubDir)
+        return None
+
+
+    def FindModuleReaderFile(self, TargetReader, ModuleName):
+
+        SearchModule = os.path.join(os.path.basename(ModuleName) + ".Build")
+
+        # First, check the project/Target directory itself
+        if TargetReader._Project is not None:
+            DirCheck = os.path.dirname(TargetReader._Project)
+            FullDir = os.path.join(DirCheck, "Src")
+        else:
+            DirCheck = os.path.dirname(TargetReader._File)
+            FullDir = DirCheck
+            print("DirCheck: " + FullDir)
+
+        # Scan if the dir exist
+
+        SubDir = self.SearchThroughDir(FullDir, SearchModule)
+
+        # If we cannot find it, then it's most likely in the Engine Directory
+        if SubDir is None:
+            DirCheck = Directory_Manager.Engine_Directory
+
+            FullDir = os.path.join(DirCheck)
+            SubDir2 = self.SearchThroughDir(FullDir, SearchModule)
+
+            # If this still fails, we shall through an error
+            if SubDir2 is None:
+                Logger.Logger(5, "We could not find Module " + SearchModule + " in either ProjectDir, TargetDir, and EngineDir, please check your modules and try again!")
+            else:
+                return SubDir2
+        else:
+            return SubDir
+
+
+    def IfListInSecondList(self, List1, List2):
+
+        Ret = all(Item in List1 for Item in List2)
+
+        return Ret
+
+    # Run the Compile function for each Modules
+    def GetAndCompileDependencies(self, InModuleBuilder, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList):
+        print("InModuleBuilder: " + str(InModuleBuilder.Module.Name))
+        print("InModuleBuilder Modules: " + str(InModuleBuilder.Module.Modules))
+
+        BinCompileEnv.UserIncPaths.append((os.path.join(os.path.dirname(self.Module.FilePath), "Src"))) # Includes module to be linked
+        print("Including: " + os.path.join(os.path.dirname(self.Module.FilePath), "Src"))
+
+
+        if InModuleBuilder.Module.Modules:
+            for Item in InModuleBuilder.Module.Modules:
+
+                FilePathName = self.FindModuleReaderFile(TargetReader, Item)
+
+                SubModuleReader = ModuleReader.Module(FilePathName)
+
+                if FilePathName not in AlreadyBuiltModulesList:
+                    AlreadyBuiltModulesList.append(FilePathName)
+
+                    NewModuleBuilder = ModuleBuilder(SubModuleReader, self.IntermediateDir)
+
+                    self.GetAndCompileDependencies(NewModuleBuilder, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+
+                    NewModuleBuilder.Compile(TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+
     # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
-    def Compile(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder):
+    def Compile(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList):
+
+        self.CompileFiles = []
+        self.HeaderFiles = []
+        self.AllFiles = []
 
         Plat = BinCompileEnv.Plat
 
@@ -192,10 +273,18 @@ class ModuleBuilder:
 
         UsingUnity = False
 
+        self.SortLists()
+
         # TODO: Add precompile implementation here
 
         Dict_SourceFiles = {}
         InputFiles = self.GetInfoFiles()
+
+        self.GetAndCompileDependencies(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+
+        # get each item in module list from this module
+        if self.Module.Modules is True and self.IfListInSecondList(AlreadyBuiltModulesList, self.Module.Modules) is True:
+            self.GetAndCompileDependencies(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
 
         # TODO: Add C++20 support, also Precompiled header stuff
 
@@ -208,13 +297,11 @@ class ModuleBuilder:
             []
         )  # FIXME: bro I just realize we need this to actually contain all our input files cause right now it will always compile no input files!
 
-        self.SortLists()
-
-        EveryFileToCompile.extend(self.AllFiles)
+        EveryFileToCompile.extend(self.CompileFiles)
 
         EveryFileToCompile.extend(GenFiles)
 
-        print(self.AllFiles)
+        print("EveryFileToCompile " + str(EveryFileToCompile))
 
         OutputActionList = []
 
@@ -224,6 +311,8 @@ class ModuleBuilder:
             ModName = self.Module.ObjectName
 
         Intermed = os.path.join(self.IntermediateDir, "Build", str(Plat.value), TargetReader.Name, TargetReader.BuildType, ModName)
+
+        print("MODNAME: " + ModName)
 
         # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
         LinkArray.append(
@@ -236,6 +325,10 @@ class ModuleBuilder:
             print("ITEM IN MODULEBUILDER CHECK: " + Item.Arguments)
 
         FileBuilder.ActionList.extend(OutputActionList)
+
+        # BUGFIX: Clear input files, so that if we are compiling multiple modules, it won't add extra to different Intermediate
+
+        self.CompileFiles = []
 
         return LinkArray
 

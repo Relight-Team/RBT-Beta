@@ -151,6 +151,8 @@ class TargetBuilder:
                 )
             # TODO: Add plugin support
 
+        CompileEnv.UserIncPaths.append(Directory_Manager.Engine_Directory)
+
         LinkEnv.IntermediateDir = LinkInterTemp
 
         LinkEnv.OutputDir = LinkEnv.IntermediateDir

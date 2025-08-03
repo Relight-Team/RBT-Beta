@@ -112,8 +112,9 @@ class Binary:
             LinkFiles = []
 
             if Item.Binary is None or Item.Binary == self:
+                NewList = []
                 LinkFiles = Item.Compile(
-                    Target, Toolchain, NewCompileEnv, FileBuilder
+                    Target, Toolchain, NewCompileEnv, FileBuilder, NewList
                 )  # Compile Module
 
                 for LinkFilesItem in LinkFiles:
@@ -128,6 +129,7 @@ class Binary:
             NewLinkEnv.OutputPaths = self.OutputFilePaths
             NewLinkEnv.IntermediateDir = self.IntermediateDir
             NewLinkEnv.OutputDir = self.OutputFilePaths[0]
+            NewLinkEnv.LinkEnvPrecondition = CompileEnv.LinkEnvPrecondition # Set's LinkEnv Precondition from the CompileEnv one
 
             return NewLinkEnv
 
