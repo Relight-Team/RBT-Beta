@@ -423,20 +423,28 @@ class PlatformSDK:
                 AutoSDKRoot = self.PathToPlatformAutoSDK()
                 CurrentSDKString = self.GetCurrentlyInstalledSDK(AutoSDKRoot)
 
-                if not self.RunAutoSDKHooks(AutoSDKRoot, CurrentSDKString, "Uninstaller"):
+                if not self.RunAutoSDKHooks(
+                    AutoSDKRoot, CurrentSDKString, "Uninstaller"
+                ):
                     self.InvalidateInstalledAutoSDK()
                     return None
 
                 self.InvalidateInstalledAutoSDK()
 
-                if not self.RunAutoSDKHooks(AutoSDKRoot, CurrentSDKString, "Installer", False):
-                    self.RunAutoSDKHooks(AutoSDKRoot, CurrentSDKString, "Uninstaller", False)
+                if not self.RunAutoSDKHooks(
+                    AutoSDKRoot, CurrentSDKString, "Installer", False
+                ):
+                    self.RunAutoSDKHooks(
+                        AutoSDKRoot, CurrentSDKString, "Uninstaller", False
+                    )
                     return None
 
                 EnvVarF = AutoSDKRoot + "/" + self.EnvironmentVar
 
                 if not os.path.exists(EnvVarF):
-                    self.RunAutoSDKHooks(AutoSDKRoot, CurrentSDKString, "Uninstaller", False)
+                    self.RunAutoSDKHooks(
+                        AutoSDKRoot, CurrentSDKString, "Uninstaller", False
+                    )
                     return None
 
                 self.SetCurrentlyInstalledSDK(self.GetRequiredSDKString())
@@ -476,7 +484,9 @@ class PlatformSDK:
             if self.HasRequiredManualSDK() == "Valid":
                 aHasRequiredManualSDK = True
 
-            if self.AutoSDKSafe() and (self.PreferAutoSDK() or not aHasRequiredManualSDK):
+            if self.AutoSDKSafe() and (
+                self.PreferAutoSDK() or not aHasRequiredManualSDK
+            ):
                 self.SetupAutoSDK()
                 SetSDK = True
 

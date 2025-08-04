@@ -78,5 +78,6 @@ class Module:
         self.Name = C.GetVar(BuildFile, "Name")
         self.ObjectName = C.GetVar(BuildFile, "ObjectName")
         self.Description = C.GetVar(BuildFile, "Description")
+        self.Type = C.GetVar(BuildFile, "Type")
         self.Modules = C.GetVar(BuildFile, "Modules")
         self.ThirdPartyDependencies = C.GetVar(BuildFile, "ThirdPartyDependencies")

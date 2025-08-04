@@ -458,7 +458,14 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         OutputFile = LinkEnv.OutputDir
         Archive.OutputItems.append(OutputFile)
 
-        Arg = ' "' + self.ArPath + '" ' + self.ArgArchive + ' "' + os.path.abspath(OutputFile)
+        Arg = (
+            ' "'
+            + self.ArPath
+            + '" '
+            + self.ArgArchive
+            + ' "'
+            + os.path.abspath(OutputFile)
+        )
         Archive.Arguments += Arg
 
         InputFiles = []
@@ -639,9 +646,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             self.HasPrintedDetails is True
 
     # Compiles the list of files together
-    def CompileFiles(
-        self, CompileEnv, InputFilesList, DirOutput, OutputActionList
-    ):
+    def CompileFiles(self, CompileEnv, InputFilesList, DirOutput, OutputActionList):
 
         Logger.Logger(1, "Input Files List: " + str(InputFilesList))
         Logger.Logger(1, "Directory Output: " + DirOutput)
@@ -680,7 +685,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             NewAction = Action.Action()
 
-            NewAction.InputFiles.append(Item) # Store all code files into InputFiles
+            NewAction.InputFiles.append(Item)  # Store all code files into InputFiles
 
             NewAction.PreconditionItems.extend(CompileEnv.ForceIncFiles)
 
@@ -718,8 +723,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     NewAction.UsingPCH = True
 
                 Obj = os.path.join(DirOutput, os.path.basename(Item) + ".o")
-
-                print(Obj)
 
                 CompileEnv.Out.ObjectFiles.append(Obj)
                 NewAction.OutputItems.append(Obj)
@@ -760,11 +763,13 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             RespFile.close()
 
-            CompileEnv.LinkEnvPrecondition.append(RespFileName) # Put's Response name into LinkEnvPrecondition
+            CompileEnv.LinkEnvPrecondition.append(
+                RespFileName
+            )  # Put's Response name into LinkEnvPrecondition
 
-            #NewAction.PreconditionItems.append(RespFileName)
+            # NewAction.PreconditionItems.append(RespFileName)
 
-            NewAction.Arguments = '@' + RespFileName
+            NewAction.Arguments = "@" + RespFileName
 
             NewAction.UsingGCCCompiler is True
 
@@ -1003,11 +1008,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         for Item in LinkEnv.InputFiles:
 
-            print("LINK ENV ITEM: " + Item)
-
             Resp.append(os.path.abspath(Item) + " ")
-            #FIXME: THIS IS THE ISSUE THAT CAUSE ENDLESS LOOP IN ACTIONLISTMANAGER! \/
-            #NewAction.PreconditionItems.append(Item)
+            # FIXME: THIS IS THE ISSUE THAT CAUSE ENDLESS LOOP IN ACTIONLISTMANAGER! \/
+            # NewAction.PreconditionItems.append(Item)
 
         if LinkEnv.IsBuildingDynamic is True:
             Resp.append(" -soname=" + Output)
@@ -1066,7 +1069,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         Com += ' -Wl,@"' + RespFile + '"'
 
-        #NewAction.PreconditionItems.append(RespFile)
+        # NewAction.PreconditionItems.append(RespFile)
 
         Com += " -Wl,--start-group" + ExternalLibs + " -Wl,--end-group -lrt -lm"
 
@@ -1097,9 +1100,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
             RelinkedFile = os.path.join(LinkEnv.LocalShadowDir, Output + ".Relink")
 
-            Dummy = os.path.join(
-                LinkEnv.LocalShadowDir, Output + ".Relink_Action_Ran"
-            )
+            Dummy = os.path.join(LinkEnv.LocalShadowDir, Output + ".Relink_Action_Ran")
 
             RelinkAction.OutputItems.append(Dummy)
 

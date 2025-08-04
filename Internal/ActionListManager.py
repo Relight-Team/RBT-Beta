@@ -59,25 +59,19 @@ def CheckConflicts(ActionList):
 
 
 # Get's all Actions that are oudated
-def GetAllOutdatedActions(
-    ActionList, OutdatedActionList, IgnoreOutdatedLib
-):
+def GetAllOutdatedActions(ActionList, OutdatedActionList, IgnoreOutdatedLib):
     for Item in ActionList:
         AddActionOutdated(Item, OutdatedActionList, IgnoreOutdatedLib)
 
 
-
 # Set's a specified action to check if it's outdated
 def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
-    print("AddActionOutdated running " + Action.CommandPath + " " + Action.Arguments)
-    print("AddActionOutdated PreconditionItems " + str(Action.PreconditionItems))
 
     Outdated = False
 
     # If Action already exist in OutdatedActionList, we will just return the same thing
     if OutdatedActionList.get(Action) is True:
         return OutdatedActionList[Action]
-
 
     # if the imput file doesn't exist, and it ends with .obj or .o, then we gotta update it
 
@@ -88,7 +82,6 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
                 OutdatedActionList[Action] = Outdated
 
                 return Outdated
-
 
     # If the file doesn't exist, and it isn't an object file, then we gotta compile it!
     for Output in Action.OutputItems:
@@ -101,7 +94,6 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
 
         SourceFileTime = os.path.getmtime(Input)
 
-
         for Output in Action.OutputItems:
 
             if os.path.exists(Output):
@@ -110,7 +102,6 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
 
                 if SourceFileTime > OutputFileTime:
                     Outdated = True
-
 
     # If the file does exist, but has no bytes and it isn't an object file, then we also gotta compile it!
     # Used incase of corruption
@@ -139,15 +130,12 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
                     if SourceFileTime > OutputFileTime:
                         Outdated = True
 
-
     # TODO: Add Dependency file support
 
     if Action not in OutdatedActionList:
         OutdatedActionList[Action] = Outdated
 
     return Outdated
-
-
 
 
 # Deletes all files that are outdated
@@ -167,8 +155,6 @@ def Link(ActionList):
 
     for Item in ActionList:
 
-        print("Item Input " + str(Item.Arguments))
-
         for Fil in Item.OutputItems:
             ItemAction[Fil] = Item
 
@@ -187,18 +173,12 @@ def Link(ActionList):
                 New = ItemAction[PreItem]
                 Item.PreconditionActions.append(New)
 
-    for Item in ActionList:
-
-        print("Output Item Input " + str(Item.Arguments))
-
     # Sorts the action list
     Sort(ActionList)
 
 
 # Returns all Actions to Execute
-def GetActionToExecute(
-    ActionList, PreconditionActionList, CppCache, IgnoreOutdatedLib
-):
+def GetActionToExecute(ActionList, PreconditionActionList, CppCache, IgnoreOutdatedLib):
 
     ActionOutdatedMap = {}  # Action | Bool
 
@@ -208,20 +188,14 @@ def GetActionToExecute(
 
     ActionOutdatedDict = {}  # Action | Bool
 
-    GetAllOutdatedActions(
-       ActionList, ActionOutdatedDict, IgnoreOutdatedLib
-    )
+    GetAllOutdatedActions(ActionList, ActionOutdatedDict, IgnoreOutdatedLib)
 
     Ret = []
 
     # Set Ret to all actions to execute, so long as it's invalid or outdated
     for Item in ActionList:
-        print("GetActionToExecute Item: " + str(ActionOutdatedMap))
         if Item.CommandPath is not None and ActionOutdatedMap.get(Item, True):
-            print("Well this passed!")
-            print(ActionOutdatedDict)
             if ActionOutdatedDict.get(Item) is True:
-                print("GetActionToExecute Item is TRUE!!!")
                 Ret.append(Item)
 
     return Ret
@@ -234,7 +208,9 @@ def Execute(BuildConfig, ActionToExecuteList):
     if len(ActionToExecuteList) == 0:
         return
 
-    Executer = ActionExecute.LinearExecuter() # FIXME: As a temp solution, we are just using LinearExecuter, add support for switching to multiple executers!
+    Executer = (
+        ActionExecute.LinearExecuter()
+    )  # FIXME: As a temp solution, we are just using LinearExecuter, add support for switching to multiple executers!
 
     # Execute the action list, stores if successful
     Ex = Executer.ExecuteActionList(ActionToExecuteList)

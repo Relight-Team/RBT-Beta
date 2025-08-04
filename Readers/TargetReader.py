@@ -64,7 +64,7 @@ class Target:
     Defines = []
 
     # If true, then we will include the module that launches the application
-    IncludeLaunch = False # Temp, change to true later!
+    IncludeLaunch = False  # Temp, change to true later!
 
     # If IncludeLaunch is true, then we will search for the name of the launcher
     LaunchName = "Launch"

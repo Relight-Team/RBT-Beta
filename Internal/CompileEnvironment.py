@@ -117,7 +117,9 @@ class CompileEnvironment:
 
     HideSymbols = False
 
-    LinkEnvPrecondition = [] # Fixes a bug, this will put any Precondition from CompileEnv to LinkEnv
+    LinkEnvPrecondition = (
+        []
+    )  # Fixes a bug, this will put any Precondition from CompileEnv to LinkEnv
 
     def __init__(self, InPlatform, InConfig, InArch):
         self.Plat = InPlatform

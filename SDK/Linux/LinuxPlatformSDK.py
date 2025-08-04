@@ -83,7 +83,9 @@ class LinuxPlatformSDK(PlatformSDK.PlatformSDK):
 
         LinuxPlat = LinuxPlatform.LinuxPlatform(self)
 
-        BasePath = self.GetSDKArchPath(LinuxPlat.GetDefaultArch(None)) # TODO: Change the "None" in the args to ProjectFile
+        BasePath = self.GetSDKArchPath(
+            LinuxPlat.GetDefaultArch(None)
+        )  # TODO: Change the "None" in the args to ProjectFile
 
         if not (BasePath is None or BasePath == ""):
 

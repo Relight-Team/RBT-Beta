@@ -11,6 +11,7 @@ from Internal import Logger
 
 from Configuration import Directory_Manager
 
+
 # Build's a module
 class ModuleBuilder:
 
@@ -43,10 +44,8 @@ class ModuleBuilder:
         Ret = []
 
         for Dirpath, _, filenames in os.walk(self.SourceDir):
-            print("SEARCHING IN: " + self.SourceDir)
             for f in filenames:
                 Ret.append(os.path.abspath(os.path.join(Dirpath, f)))
-                print("APPENDING: " + os.path.join(Dirpath, f))
 
         return Ret
 
@@ -121,7 +120,11 @@ class ModuleBuilder:
 
         if self in VDependList:
 
-            if self.Binary is not None and self.Binary != Bin and self.Binary not in BinaryDependList:
+            if (
+                self.Binary is not None
+                and self.Binary != Bin
+                and self.Binary not in BinaryDependList
+            ):
                 BinaryDependList.append(self.Binary)
 
             if Bin is not None and Bin.Type == "Static":
@@ -185,13 +188,11 @@ class ModuleBuilder:
                     self.CreateModule(RefChain, FuncName, FuncRefChain)
                     OutputList.append(Item)
 
-
     def SearchThroughDir(self, Dir, SubDir):
         for Root, SubDirList, Files in os.walk(Dir):
             if SubDir in Files:
                 return os.path.join(Root, SubDir)
         return None
-
 
     def FindModuleReaderFile(self, TargetReader, ModuleName):
 
@@ -204,7 +205,6 @@ class ModuleBuilder:
         else:
             DirCheck = os.path.dirname(TargetReader._File)
             FullDir = DirCheck
-            print("DirCheck: " + FullDir)
 
         # Scan if the dir exist
 
@@ -219,12 +219,16 @@ class ModuleBuilder:
 
             # If this still fails, we shall through an error
             if SubDir2 is None:
-                Logger.Logger(5, "We could not find Module " + SearchModule + " in either ProjectDir, TargetDir, and EngineDir, please check your modules and try again!")
+                Logger.Logger(
+                    5,
+                    "We could not find Module "
+                    + SearchModule
+                    + " in either ProjectDir, TargetDir, and EngineDir, please check your modules and try again!",
+                )
             else:
                 return SubDir2
         else:
             return SubDir
-
 
     def IfListInSecondList(self, List1, List2):
 
@@ -233,13 +237,19 @@ class ModuleBuilder:
         return Ret
 
     # Run the Compile function for each Modules
-    def GetAndCompileDependencies(self, InModuleBuilder, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList):
-        print("InModuleBuilder: " + str(InModuleBuilder.Module.Name))
-        print("InModuleBuilder Modules: " + str(InModuleBuilder.Module.Modules))
+    def GetAndCompileDependencies(
+        self,
+        InModuleBuilder,
+        TargetReader,
+        InToolchain,
+        BinCompileEnv,
+        FileBuilder,
+        AlreadyBuiltModulesList,
+    ):
 
-        BinCompileEnv.UserIncPaths.append((os.path.join(os.path.dirname(self.Module.FilePath), "Src"))) # Includes module to be linked
-        print("Including: " + os.path.join(os.path.dirname(self.Module.FilePath), "Src"))
-
+        BinCompileEnv.UserIncPaths.append(
+            (os.path.join(os.path.dirname(self.Module.FilePath), "Src"))
+        )  # Includes module to be linked
 
         if InModuleBuilder.Module.Modules:
             for Item in InModuleBuilder.Module.Modules:
@@ -251,15 +261,37 @@ class ModuleBuilder:
                 if FilePathName not in AlreadyBuiltModulesList:
                     AlreadyBuiltModulesList.append(FilePathName)
 
-                    NewModuleBuilder = ModuleBuilder(SubModuleReader, self.IntermediateDir)
+                    NewModuleBuilder = ModuleBuilder(
+                        SubModuleReader, self.IntermediateDir
+                    )
 
-                    self.GetAndCompileDependencies(NewModuleBuilder, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+                    self.GetAndCompileDependencies(
+                        NewModuleBuilder,
+                        TargetReader,
+                        InToolchain,
+                        BinCompileEnv,
+                        FileBuilder,
+                        AlreadyBuiltModulesList,
+                    )
 
-                    NewModuleBuilder.Compile(TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+                    NewModuleBuilder.Compile(
+                        TargetReader,
+                        InToolchain,
+                        BinCompileEnv,
+                        FileBuilder,
+                        AlreadyBuiltModulesList,
+                    )
 
     # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
-    def Compile(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList):
+    def Compile(
+        self,
+        TargetReader,
+        InToolchain,
+        BinCompileEnv,
+        FileBuilder,
+        AlreadyBuiltModulesList,
+    ):
 
         self.CompileFiles = []
         self.HeaderFiles = []
@@ -280,16 +312,33 @@ class ModuleBuilder:
         Dict_SourceFiles = {}
         InputFiles = self.GetInfoFiles()
 
-        self.GetAndCompileDependencies(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+        self.GetAndCompileDependencies(
+            self,
+            TargetReader,
+            InToolchain,
+            BinCompileEnv,
+            FileBuilder,
+            AlreadyBuiltModulesList,
+        )
 
         # get each item in module list from this module
-        if self.Module.Modules is True and self.IfListInSecondList(AlreadyBuiltModulesList, self.Module.Modules) is True:
-            self.GetAndCompileDependencies(self, TargetReader, InToolchain, BinCompileEnv, FileBuilder, AlreadyBuiltModulesList)
+        if (
+            self.Module.Modules is True
+            and self.IfListInSecondList(AlreadyBuiltModulesList, self.Module.Modules)
+            is True
+        ):
+            self.GetAndCompileDependencies(
+                self,
+                TargetReader,
+                InToolchain,
+                BinCompileEnv,
+                FileBuilder,
+                AlreadyBuiltModulesList,
+            )
 
         # TODO: Add C++20 support, also Precompiled header stuff
 
         SourceFile_Unity = {}
-
 
         EveryFileToCompile = []
 
@@ -301,8 +350,6 @@ class ModuleBuilder:
 
         EveryFileToCompile.extend(GenFiles)
 
-        print("EveryFileToCompile " + str(EveryFileToCompile))
-
         OutputActionList = []
 
         if self.Module.ObjectName == None:
@@ -310,9 +357,14 @@ class ModuleBuilder:
         else:
             ModName = self.Module.ObjectName
 
-        Intermed = os.path.join(self.IntermediateDir, "Build", str(Plat.value), TargetReader.Name, TargetReader.BuildType, ModName)
-
-        print("MODNAME: " + ModName)
+        Intermed = os.path.join(
+            self.IntermediateDir,
+            "Build",
+            str(Plat.value),
+            TargetReader.Name,
+            TargetReader.BuildType,
+            ModName,
+        )
 
         # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
         LinkArray.append(
@@ -320,9 +372,6 @@ class ModuleBuilder:
                 NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
             )
         )
-
-        for Item in OutputActionList:
-            print("ITEM IN MODULEBUILDER CHECK: " + Item.Arguments)
 
         FileBuilder.ActionList.extend(OutputActionList)
 

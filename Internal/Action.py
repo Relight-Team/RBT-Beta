@@ -69,7 +69,9 @@ class Action:
 
     DependCount = 0  # How much depend relies on this Action
 
-    InputFiles = [] # Files that this action is using, this will be used to determined if compiled data is outdated compared to new data
+    InputFiles = (
+        []
+    )  # Files that this action is using, this will be used to determined if compiled data is outdated compared to new data
 
     # Adds to the depend amount
     def AddDependCount(self, UsedActions):
@@ -97,12 +99,14 @@ class Action:
 
             return Action._Sign(len(B.PreconditionItems) - len(A.PreconditionItems))
 
-
-
     # These fix bugs
     def __eq__(self, Other):
         if isinstance(Other, Action):
-            if self.CommandPath == Other.CommandPath and self.Arguments == Other.Arguments and self.CurrentDirectory == Other.CurrentDirectory:
+            if (
+                self.CommandPath == Other.CommandPath
+                and self.Arguments == Other.Arguments
+                and self.CurrentDirectory == Other.CurrentDirectory
+            ):
                 return True
         return False
 

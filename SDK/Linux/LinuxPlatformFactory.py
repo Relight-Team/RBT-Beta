@@ -7,6 +7,7 @@ from . import LinuxPlatformSDK
 from Template import PlatformFactory
 from Template import Platform
 
+
 class LinuxFactory(PlatformFactory.FactorySDK):
 
     # Return's the target platform for this factory

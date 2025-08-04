@@ -33,12 +33,6 @@ class RBTThread:
 
     # The function that will be run by the thread, this will execute the process based on the action
     def FunctionToRun(self):
-        print(
-            "Executing "
-            + str(self.Action.CommandPath)
-            + " "
-            + str(self.Action.Arguments) + " " + str(self.Action.PreconditionItems)
-        )
 
         # Start program
         try:
@@ -56,7 +50,6 @@ class RBTThread:
                 )
 
                 # Run ReadOutput and ReadError
-
                 self._ReadOutput(RunningProgram.stdout)
                 self._ReadError(RunningProgram.stderr)
             except Exception:
@@ -64,14 +57,18 @@ class RBTThread:
 
             RunningProgram.wait()  # Wait until program stops running
 
-            print("link file exist: " + str(os.path.exists('/home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/Intermediate/Build/Linux/ProjectTest/Development/link-ProjectTest.sh')))
-
             self.ExitCode = RunningProgram.returncode
 
             if self.ExitCode is not 0:
-                Logger.Logger(5, "Error while running program, Error Code: " + str(self.ExitCode) + ", Program name: " + self.Action.CommandPath + ", Program Arguments: " + self.Action.Arguments)
-
-
+                Logger.Logger(
+                    5,
+                    "Error while running program, Error Code: "
+                    + str(self.ExitCode)
+                    + ", Program name: "
+                    + self.Action.CommandPath
+                    + ", Program Arguments: "
+                    + self.Action.Arguments,
+                )
 
         except Exception:
             print("ERROR")
@@ -101,11 +98,8 @@ class LinearExecuter(ExecuteBase):
 
     def ExecuteActionList(self, ActionList):
 
-        print("ActionList " + str(ActionList))
-
         ActionThreadDict = {}  # A dictionary of Action : Thread
-
-        print("Compiling C++ Code...")
+        Logger.Logger(3, "Compiling C++ Code...")
 
         Progress = 0
 
@@ -122,7 +116,6 @@ class LinearExecuter(ExecuteBase):
                 InpThread = None
 
                 # if the action key is not in the dictionary, add 1 to NonExeAction
-                print("ActionThreadDict: " + str(ActionThreadDict))
                 if ActionThreadDict.get(Action) == False:
                     NonExeAction += 1
 
@@ -197,7 +190,6 @@ class LinearExecuter(ExecuteBase):
                                 while not TD.Finished:
                                     time.sleep(0.1)
 
-
                             except Exception:
                                 pass
 
@@ -214,6 +206,8 @@ class LinearExecuter(ExecuteBase):
 
             if ThreadItem is None or ThreadItem.ExitCode != 0:
                 Ret = False
+
+        print()
 
         # Return's the Ret value, this will let us know if there was any errors (true if no errors, false if there was errors)
         return Ret

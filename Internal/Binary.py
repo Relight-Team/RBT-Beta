@@ -129,7 +129,9 @@ class Binary:
             NewLinkEnv.OutputPaths = self.OutputFilePaths
             NewLinkEnv.IntermediateDir = self.IntermediateDir
             NewLinkEnv.OutputDir = self.OutputFilePaths[0]
-            NewLinkEnv.LinkEnvPrecondition = CompileEnv.LinkEnvPrecondition # Set's LinkEnv Precondition from the CompileEnv one
+            NewLinkEnv.LinkEnvPrecondition = (
+                CompileEnv.LinkEnvPrecondition
+            )  # Set's LinkEnv Precondition from the CompileEnv one
 
             return NewLinkEnv
 
@@ -139,7 +141,9 @@ class Binary:
         if self.Precompiled is True and TargetReader.LinkFilesTogether is True:
             return []
 
-        BinLinkEnv = self.CreateLinkEnv(TargetReader, Toolchain, LinkEnv, CompileEnv, ExeDir, FileBuilder)
+        BinLinkEnv = self.CreateLinkEnv(
+            TargetReader, Toolchain, LinkEnv, CompileEnv, ExeDir, FileBuilder
+        )
 
         if TargetReader.LinkFilesTogether is False:
             return BinLinkEnv.InputFiles

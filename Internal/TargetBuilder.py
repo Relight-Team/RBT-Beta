@@ -44,7 +44,10 @@ class TargetBuilder:
         )
 
         # Overwrite target file with starting target properties
-        if self.StartingTarget.Modules != [] and self.StartingTarget.Modules is not None:
+        if (
+            self.StartingTarget.Modules != []
+            and self.StartingTarget.Modules is not None
+        ):
             self.Target.Modules = self.StartingTarget.Modules
 
         if self.Target._Project is not None and self.Target._Project != "":
@@ -113,7 +116,9 @@ class TargetBuilder:
         return self.Binaries[0].OutputDir
 
     def IsEngineInstalled(self):
-        InstalledEngineFileDir = os.path.join(Directory_Manager.Engine_Directory, "Build", "Installed.txt")
+        InstalledEngineFileDir = os.path.join(
+            Directory_Manager.Engine_Directory, "Build", "Installed.txt"
+        )
 
         if os.path.isfile(InstalledEngineFileDir):
             return True
@@ -191,7 +196,9 @@ class TargetBuilder:
         return None
 
     def IsUnderDir(self, Dir, File):
-        Logger.Logger(1, "Checking if " + str(File) + " is under " + str(Dir) + ", please wait...")
+        Logger.Logger(
+            1, "Checking if " + str(File) + " is under " + str(Dir) + ", please wait..."
+        )
         for Root, _, Files in os.walk(Dir):
             if File in Files:
                 return True
@@ -266,7 +273,8 @@ class TargetBuilder:
 
         # Create full binary path with file name
         Bin = os.path.join(
-            BinDir, TargetBuilder.CreateBinName(Name, InPlatform, LinkType, Arch, BinType)
+            BinDir,
+            TargetBuilder.CreateBinName(Name, InPlatform, LinkType, Arch, BinType),
         )
 
         BuildPlatform = Platform.Platform.GetBuildPlatform(InPlatform)
@@ -275,7 +283,9 @@ class TargetBuilder:
 
     def SetupBinaries(self):
 
-        if self.Target.IncludeLaunch == True and (self.Target.LaunchName is None or self.Target.LaunchName == ""):
+        if self.Target.IncludeLaunch == True and (
+            self.Target.LaunchName is None or self.Target.LaunchName == ""
+        ):
             Logger.Logger(5, "Launch name is None or blank")
 
         if self.Target.IncludeLaunch == True:
@@ -285,7 +295,10 @@ class TargetBuilder:
             LaunchModule = self.FindModuleName(self.Target.Modules[0])
 
         if (
-            self.IsUnderDir(Directory_Manager.Engine_Directory, LaunchModule.Module.FilePath) is True
+            self.IsUnderDir(
+                Directory_Manager.Engine_Directory, LaunchModule.Module.FilePath
+            )
+            is True
             and self.Target.LinkType == "Monolithic"
         ):
             IntermediateDir = os.path.join(
@@ -327,7 +340,7 @@ class TargetBuilder:
             self.Target.Arch,
             self.Target.BinSubPaths,
             self.Target._Project,
-            self.Target
+            self.Target,
         )
 
         Bin = Binary.Binary(
@@ -378,8 +391,6 @@ class TargetBuilder:
     def SetupPreBuild(self):
         self.SetupBinaries()
 
-
-
     # Create's a TargetBuilder class based on StartingTarget
     @staticmethod
     def Create(StartingTarget, UsePrecompiled):
@@ -415,7 +426,6 @@ class TargetBuilder:
         LinkEnv = LinkEnvironment.LinkEnvironment(
             CompileEnv.Plat, CompileEnv.Conf, CompileEnv.Arch
         )
-
 
         Toolchain = self.CreateToolchain(CppPlat.value)
 

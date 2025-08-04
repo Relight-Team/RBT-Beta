@@ -37,7 +37,7 @@ class PlatformInfo:
 
     def __init__(self):
         Platform = ConfigM.ReadConfig(
-        ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformName"
+            ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformName"
         )
         Arch = ConfigM.ReadConfig(
             ConfigDir + "/BaseBuilder.cfg", "PlatformInformation", "PlatformArch"
@@ -55,15 +55,16 @@ class PlatformInfo:
 
         Logger.Logger(0, "Running ImportFactory() from PlatformInfo")
 
-        if os.path.isfile(os.path.join(
-             EngineDir,
-             "Programs",
-             "RelightBuildTool",
-             "SDK",
-             self.Platform,
-             self.Platform
-             + "PlatformFactory.py"
-        )):
+        if os.path.isfile(
+            os.path.join(
+                EngineDir,
+                "Programs",
+                "RelightBuildTool",
+                "SDK",
+                self.Platform,
+                self.Platform + "PlatformFactory.py",
+            )
+        ):
             Logger.Logger(
                 1,
                 "Platform Factory found in base SDK directory: "
@@ -74,9 +75,19 @@ class PlatformInfo:
                 + self.Platform
                 + "PlatformFactory.py",
             )
-            return importlib.import_module("SDK." + self.Platform + "." + self.Platform + "PlatformFactory")
+            return importlib.import_module(
+                "SDK." + self.Platform + "." + self.Platform + "PlatformFactory"
+            )
 
-        elif os.path.isfile(os.path.join(EngineDir, "Extras", "CustomSDK", self.Platform, self.Platform + "PlatformFactory.py")):
+        elif os.path.isfile(
+            os.path.join(
+                EngineDir,
+                "Extras",
+                "CustomSDK",
+                self.Platform,
+                self.Platform + "PlatformFactory.py",
+            )
+        ):
             Logger.Logger(
                 1,
                 "Platform Factory found in Custom SDK directory: "
@@ -87,7 +98,9 @@ class PlatformInfo:
                 + self.Platform
                 + "PlatformFactory.py",
             )
-            return importlib.import_module(self.Platform + "." + self.Platform + "PlatformFactory")
+            return importlib.import_module(
+                self.Platform + "." + self.Platform + "PlatformFactory"
+            )
         else:
             Logger.Logger(
                 5,
@@ -203,7 +216,9 @@ class Platform:
     def GetExcludeFolders(self):
         Logger.Logger(0, "Running GetExcludeFolders()")
         if self.ExcludeCachedFolder is None or self.ExcludeCachedFolder == []:
-            self.ExcludeCachedFolder = self.GetPlatformFolders().difference(self.GetIncludeFolders())
+            self.ExcludeCachedFolder = self.GetPlatformFolders().difference(
+                self.GetIncludeFolders()
+            )
 
         return self.ExcludeCachedFolder
 
@@ -237,7 +252,9 @@ class Platform:
             if os.path.isfile(os.path.join(BaseDir, Item)):  # if it's a file
                 if self.IsBuildProduct(
                     Item, TitlePrefixes, TitleSuffixes
-                ) or Platform.IsFileDefaultBuildProduct(Item, TitlePrefixes, TitleSuffixes):
+                ) or Platform.IsFileDefaultBuildProduct(
+                    Item, TitlePrefixes, TitleSuffixes
+                ):
                     CleanFiles.append(Item)
 
             if os.path.isdir(os.path.join(BaseDir, Item)):  # if it's a directory
@@ -257,9 +274,15 @@ class Platform:
     @staticmethod
     def IsFileDefaultBuildProduct(Name, TitlePrefixes, TitleSuffixes):
         if (
-            Platform.IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileTarget")
-            or Platform.IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileModule")
-            or Platform.IsBuildProductName(Name, TitlePrefixes, TitleSuffixes, ".CompileVersion")
+            Platform.IsBuildProductName(
+                Name, TitlePrefixes, TitleSuffixes, ".CompileTarget"
+            )
+            or Platform.IsBuildProductName(
+                Name, TitlePrefixes, TitleSuffixes, ".CompileModule"
+            )
+            or Platform.IsBuildProductName(
+                Name, TitlePrefixes, TitleSuffixes, ".CompileVersion"
+            )
         ):
             return True
         return False
@@ -276,7 +299,7 @@ class Platform:
         Name, Index, SubInt, TitlePrefixes, TitleSuffixes, Extension
     ):
         if SubInt > len(Extension):
-            tmp = Name[Index + SubInt - len(Extension):Index + SubInt]  # Substring
+            tmp = Name[Index + SubInt - len(Extension) : Index + SubInt]  # Substring
             if tmp.lower() == Extension.lower():
 
                 return Platform.IsBuildProductName(
@@ -293,13 +316,13 @@ class Platform:
         for Prefix in TitlePrefixes:
 
             if SubInt >= len(Prefix):
-                tmp = Name[Index:Index + len(Prefix)]
+                tmp = Name[Index : Index + len(Prefix)]
                 if tmp.lower() == Prefix.lower():
                     MinIndex = Index + len(Prefix)
 
                     for Suffix in TitleSuffixes:
                         MaxIndex = Index + SubInt - len(Suffix)
-                        tmp = Name[MaxIndex:MaxIndex + len(Suffix)]
+                        tmp = Name[MaxIndex : MaxIndex + len(Suffix)]
 
                         if MinIndex >= MaxIndex and tmp.lower() == Suffix.lower():
                             if MinIndex < MaxIndex and Name[MinIndex] == "-":
@@ -346,7 +369,10 @@ class Platform:
     #  Set Input to BuildPlatform instance
     @staticmethod
     def RegBuildPlatform(InBuildPlatform):
-        Logger.Logger(1, "Adding platform " + str(InBuildPlatform.Plat) + " to BuildPlatform array")
+        Logger.Logger(
+            1,
+            "Adding platform " + str(InBuildPlatform.Plat) + " to BuildPlatform array",
+        )
         Platform.BuildPlatform[InBuildPlatform.Plat] = InBuildPlatform
 
     # Set PlatformGroup to the input group key with the value of input build platform

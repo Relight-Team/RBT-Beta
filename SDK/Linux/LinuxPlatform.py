@@ -13,6 +13,7 @@ from Internal import Logger
 
 from Configuration import Directory_Manager
 
+
 class LinuxPlatform(Platform.Platform):
 
     Arch = ""
@@ -33,7 +34,9 @@ class LinuxPlatform(Platform.Platform):
 
         # If abspath fails, we shall get it from command line instead
         if EngineIni is None:
-            EngineIni = os.path.join(Directory_Manager.Engine_Directory, "Configs", "BaseBuilder.cfg")
+            EngineIni = os.path.join(
+                Directory_Manager.Engine_Directory, "Configs", "BaseBuilder.cfg"
+            )
             pass  # FIXME: Get from command line, else get from BaseBuilder
 
         TempConfig = ConfigManager.ReadConfig(
@@ -54,7 +57,7 @@ class LinuxPlatform(Platform.Platform):
             Ret = "i686-unknown-linux-gnu"
 
         else:
-            print("Using default arch")
+            Logger.Logger(4, "Specified Arch not set, Using default arch")
 
         return Ret
 
@@ -174,7 +177,9 @@ class LinuxPlatform(Platform.Platform):
         if Target.UseUnknownSanitizer is True:
             Options.UseUnknownSanitizer = True
 
-        return LinuxToolchain.LinuxToolchain(Target.Arch, self.SDK, Target.SavePSYM, Options)
+        return LinuxToolchain.LinuxToolchain(
+            Target.Arch, self.SDK, Target.SavePSYM, Options
+        )
 
     def Deploy(Receipt):
         pass  # DEPLOY IS NOT SUPPORTED YET!

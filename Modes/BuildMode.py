@@ -26,7 +26,6 @@ class Options:
 # The main function we are going to execute in this mode
 def Main(Args):
 
-
     # Convert Args to StartingTarget
 
     StartingTarget = TargetReader.StartingTarget(Args.GetAndParse("Platform"))
@@ -73,7 +72,6 @@ def BuildProcess(StartingTargetList, WorkingSet, InOptions):
         # If there's only one target, add it to the action to execute, otherwise we will combine them into one list of actions
         if len(StartingTargetList) == 1:
             ExecuteActions = []
-            print("ExecutingActionsTarget" + str(ExecuteActionsTarget[0]))
             ExecuteActions.extend(ExecuteActionsTarget[0])
         else:
             ExecuteActions = MergeActionList(StartingTargetList, ExecuteActionsTarget)
@@ -88,7 +86,7 @@ def BuildProcess(StartingTargetList, WorkingSet, InOptions):
             # TODO: Sync XGE, Distcc, and SNDBS from BuildPlatform to InOptions, should only be set true/false if all of them are that value
 
         if len(ExecuteActions) == 0 and InOptions.NoMessages is True:
-            print("All targets are up to date")  # TODO: replace this with log class
+            Logger.Logger(3, "All targets are up to date")
 
         else:
             # Execute Actions
@@ -122,9 +120,6 @@ def MergeActionList(TargetList, ActionList):
 # Get all actions to execute
 def GetActionFromTarget(StartingTarget, BuildConfig, FileBuild):
 
-    for Item in FileBuild.ActionList:
-        print("Command: " + Item.Arguments)
-
     Logger.Logger(1, "Getting Actions from target...")
 
     Logger.Logger(1, "Linking main action list from TargetBuilder...")
@@ -133,7 +128,6 @@ def GetActionFromTarget(StartingTarget, BuildConfig, FileBuild):
     # TODO: Add Hot Reload support
 
     PreconditionActions = GetPreconditionActions(StartingTarget, FileBuild)
-
 
     ActionListManager.Link(PreconditionActions)  # Link the precondition action list
 
@@ -144,7 +138,6 @@ def GetActionFromTarget(StartingTarget, BuildConfig, FileBuild):
         FileBuild.ActionList, PreconditionActions, None, False
     )  # TODO: This is a temp
 
-    print("ActionsToExecute: " + str(ActionsToExecute))
     for Item in ActionsToExecute:
         print(Item.Arguments)
     return ActionsToExecute
