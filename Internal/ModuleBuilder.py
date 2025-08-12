@@ -26,18 +26,28 @@ class ModuleBuilder:
     SourceDir = ""  # Directory for Module/Src
     Binary = None
     DependModules = []
+    TargetReader = None
+    StartingTarget = None
 
-    def __init__(self, InModule, InIntermediateDir):
+    def __init__(self, InModule, InIntermediateDir, TargetReader, StartingTarget):
         self.Module = InModule
         self.IntermediateDir = InIntermediateDir
+        self.TargetReader = TargetReader
+        self.StartingTarget = StartingTarget
+
+        # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
+        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType is not "Unique":
+            self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate")
 
         self.SourceDir = os.path.join(self.Module.ModuleDirectory, "Src")
 
+    # Get the module's Source Directory
     def GetSourceDir(self):
         Temp = self.Module.FilePath
 
         return os.path.abspath(os.path.join(Temp, "Src"))
 
+    # Returns an array of every file in the Source Directory
     # FIXME: Add support for excluded folders
     def GetInfoFiles(self):
 
@@ -79,6 +89,7 @@ class ModuleBuilder:
         else:
             return False
 
+    # Return's a new Compile Environment, set's up new compile environment based on Module settings
     def CreateCompileEnv(self, Target, CompileEnv):
         NewCompile = CompileEnv
 
@@ -88,8 +99,13 @@ class ModuleBuilder:
 
         NewCompile.Defines.extend(self.Module.Defines)
 
+        NewCompile.AdditionalLibs.extend(self.Module.AdditionalLibs)
+
+        NewCompile.UserIncPaths.extend(self.Module.Includes)
+
         return NewCompile
 
+    # Append Compile Environment based on Function Arguments
     def AddToCompileEnv(
         self, Binary, IncludePathsList, SysIncludePathsList, DefinesList
     ):
@@ -105,6 +121,7 @@ class ModuleBuilder:
         for Item in self.Modules.Defines:
             DefinesList.append(Item)
 
+    # Append DynamicModulePaths to RuntimeLibList
     def SetupLinkEnv(
         self,
         Bin,
@@ -159,6 +176,7 @@ class ModuleBuilder:
 
             RuntimeLibList.append(self.Module.DynamicModulePaths)
 
+    # Create a module
     def CreateModule(self, RefChain, FuncName, FuncRefChain):
 
         if self.Module.FilePath is None or self.Module.FilePath == "":
@@ -174,6 +192,7 @@ class ModuleBuilder:
             self.Module.ModulesIncludes, RefChain, FuncName, FuncRefChain, OutputList
         )
 
+    # Create a module
     def CreateModuleName(
         self, ModuleNameList, RefChain, FuncName, FuncRefChain, OutputList
     ):
@@ -188,12 +207,14 @@ class ModuleBuilder:
                     self.CreateModule(RefChain, FuncName, FuncRefChain)
                     OutputList.append(Item)
 
+    # Returns the full file path if file exist in directory, return's none otherwise
     def SearchThroughDir(self, Dir, SubDir):
         for Root, SubDirList, Files in os.walk(Dir):
             if SubDir in Files:
                 return os.path.join(Root, SubDir)
         return None
 
+    # Finds the .Build file
     def FindModuleReaderFile(self, TargetReader, ModuleName):
 
         SearchModule = os.path.join(os.path.basename(ModuleName) + ".Build")
@@ -203,7 +224,7 @@ class ModuleBuilder:
             DirCheck = os.path.dirname(TargetReader._Project)
             FullDir = os.path.join(DirCheck, "Src")
         else:
-            DirCheck = os.path.dirname(TargetReader._File)
+            DirCheck = os.path.dirname(TargetReader.FilePath)
             FullDir = DirCheck
 
         # Scan if the dir exist
@@ -256,13 +277,13 @@ class ModuleBuilder:
 
                 FilePathName = self.FindModuleReaderFile(TargetReader, Item)
 
-                SubModuleReader = ModuleReader.Module(FilePathName)
+                SubModuleReader = ModuleReader.Module(FilePathName, self.StartingTarget)
 
                 if FilePathName not in AlreadyBuiltModulesList:
                     AlreadyBuiltModulesList.append(FilePathName)
 
                     NewModuleBuilder = ModuleBuilder(
-                        SubModuleReader, self.IntermediateDir
+                        SubModuleReader, self.IntermediateDir, self.TargetReader, self.StartingTarget
                     )
 
                     self.GetAndCompileDependencies(
@@ -282,6 +303,7 @@ class ModuleBuilder:
                         AlreadyBuiltModulesList,
                     )
 
+    # Compile's the Module
     # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
     def Compile(
@@ -306,6 +328,26 @@ class ModuleBuilder:
         UsingUnity = False
 
         self.SortLists()
+
+        # Compile 3rd party modules
+
+        Logger.Logger(1, "Start Collecting Third Party dependencies for " + self.Module.Name)
+        for ThirdParty in self.Module.ThirdParty:
+            Logger.Logger(3, "Searching for third party module: " + ThirdParty)
+            ThirdPartyFile = self.FindModuleReaderFile(TargetReader, ThirdParty)
+            Logger.Logger(1, "File found: " + ThirdPartyFile)
+
+            ThirdPartyReader = ModuleReader.Module(ThirdPartyFile, self.StartingTarget)
+
+            ThirdPartyBuilder = ExternalBuilder(ThirdPartyReader, self.IntermediateDir, TargetReader)
+
+            AdditionalLibs = ThirdPartyBuilder.Compile()
+
+            LinkArray.extend(AdditionalLibs)
+
+            NewCompileEnv.AdditionalLibs.extend(AdditionalLibs)
+            NewCompileEnv.UserIncPaths.extend(ThirdPartyReader.Includes)
+            NewCompileEnv.SysIncPaths.extend(ThirdPartyReader.SysIncludes)
 
         # TODO: Add precompile implementation here
 
@@ -352,22 +394,31 @@ class ModuleBuilder:
 
         OutputActionList = []
 
-        if self.Module.ObjectName == None:
+        if self.Module.ObjectName == None or self.Module.ObjectName == "":
             ModName = self.Module.Name
         else:
             ModName = self.Module.ObjectName
+
+        # If module doesn't have name, result in error
+
+        if ModName == None:
+            Logger.Logger(5, "Module Name and/or Module Short Name is None, we cannot continue! Module Name: (" + str(self.Module.Name) + "), Module Short Name: (" + str(self.Module.ObjectName)) + ")"
+
+        if ModName == "":
+            Logger.Logger(5, "Module Name and/or Module Short Name is empty, we cannot continue! Module Name: (" + str(self.Module.Name) + "), Module Short Name: (" + str(self.Module.ObjectName)) + ")"
 
         Intermed = os.path.join(
             self.IntermediateDir,
             "Build",
             str(Plat.value),
+            TargetReader.Arch,
             TargetReader.Name,
             TargetReader.BuildType,
             ModName,
         )
 
         # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
-        LinkArray.append(
+        LinkArray.extend(
             InToolchain.CompileMultiArchCPPs(
                 NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
             )
@@ -383,4 +434,40 @@ class ModuleBuilder:
 
 
 class ExternalBuilder(ModuleBuilder):
-    pass
+
+    # Module reader
+    Module = None
+
+    AllFiles = []
+    CompileFiles = []
+    HeaderFiles = []
+
+    IntermediateDir = ""
+    SourceDir = ""  # Directory for Module/Src
+    TargetReader = None
+
+    def __init__(self, InModule, InIntermediateDir, TargetReader):
+        self.Module = InModule
+        self.IntermediateDir = os.path.join(InIntermediateDir, "ThirdParty")
+        self.TargetReader = TargetReader
+
+        # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
+        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType is not "Unique":
+            self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate", "ThirdParty")
+
+        self.SourceDir = os.path.dirname(self.Module.FilePath)
+
+
+    def Compile(
+        self
+    ):
+
+
+        # Run 3rd party script
+        for Command in self.Module.CommandToRun:
+            os.system(Command)
+
+        return self.Module.AdditionalLibs
+
+
+

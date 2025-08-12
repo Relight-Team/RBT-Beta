@@ -31,95 +31,98 @@ class CompileEnvironment:
 
     Arch = ""  # The CPU architecture
 
-    SharedPCH = []  # The Header file we will use globally
+    SharedPCH = []  # The Precompiled Header file we will use globally
 
     PCHIncludeName = ""  # The name of the header file we will precompile
 
-    UseSharedBuildEnv = False
+    UseSharedBuildEnv = False # Create shared environment
 
-    UseAVX = False
+    UseAVX = False # If we should use Advanced Vector Extensions
 
-    UseRTTI = False
+    UseRTTI = False # If we should use Run-Time Type Information
 
-    UseInlining = False
+    UseInlining = False # If we should use function inlining
 
-    BufferSecurityChecks = True
+    BufferSecurityChecks = True # If we should use buffer security checks
 
     FalseUnityOverride = False  # Use if it's faster to not use UNITY system, will disable UNITY even if it's on
 
-    MinUnitySource = 0
+    MinUnitySource = 0 # The amount of files needed to enable Unity
 
-    MinPCHSource = 0
+    MinPCHSource = 0 # The amount of files needed before we use Precompiled Header
 
-    BuildLocallySNDBS = False
+    BuildLocallySNDBS = False # Build Locally when using SN-DBS
 
-    ExceptionHandling = False
+    ExceptionHandling = False # If we should do Exception Handling
 
-    ShadowVariableWarnings = True
+    ShadowVariableWarnings = True # If we should give warnings about Shadow Variables
 
-    ShadowVariableAsError = False
+    ShadowVariableAsError = False # If we shall give an error if there's a shadow variable
 
-    UndefinedIdentifierWarnings = True
+    UndefinedIdentifierWarnings = True # IF we should give warnings about Undefined Identifiers
 
-    UndefinedIdentifierAsError = False
+    UndefinedIdentifierAsError = False # If we shall give an error if there's an Undefined Identifiers
 
-    Optimize = False
+    Optimize = False # If true, we will optimize the binary
 
-    OptimizeSize = False
+    OptimizeSize = False # If true, we will optimize for smallest possible size
 
-    AddDebugInfo = True
+    AddDebugInfo = True # If we should create Debug information
 
-    IsLibrary = False
+    IsLibrary = False # If we are compiling static library (.a/.lib)
 
-    IsDynamic = False
+    IsDynamic = False # If we are compiling dynamically (.so/.dll)
 
-    UseStaticCRT = False
+    UseStaticCRT = False # If we should compile using statically-linked CRT
 
-    UseDebugCRT = False
+    UseDebugCRT = False # If we should use Debug CRT
 
-    ExcludeFramePointers = True
+    ExcludeFramePointers = True # If true, we shall not include frame pointers
 
-    incrementalLinking = True
+    IncrementalLinking = True # If true, we shall only link files that are updated
 
-    AllowLTCG = False
+    AllowLTCG = False # If we should use link time code generation
 
-    PGOProfile = False
+    PGOProfile = False # If we should use Profile Guided Optimization Instrumentation
 
-    PGOOptimize = False
+    PGOOptimize = False # If we should optimize using Profile Guided Optimization
 
-    PGODirectory = ""
+    PGODirectory = "" # Directory where PGO is stored
 
-    PGOFilePrefix = ""
+    PGOFilePrefix = "" # Filename where PGO is stored
 
-    PrintTimingInfo = False
+    PrintTimingInfo = False # If true, we will log timing info from the compiler we are using
 
-    GenerateDependFile = True
+    GenerateDependFile = True # If true, we shall Put Dependencies file along with output build products
 
-    AllowRemotelyCompiledPCHs = False
+    AllowRemotelyCompiledPCHs = False # If true, we shall let XGE compile PCH files externally, instead of locally
 
-    UserIncPaths = []
+    UserIncPaths = [] # Included paths
 
-    SysIncPaths = []
+    SysIncPaths = [] # Included System paths, will supress warnings
 
-    CheckSysHeaderForChanges = False
+    CheckSysHeaderForChanges = False # If headers in SysIncPaths are modified, then the action is outdated
 
-    ForceIncFiles = []
+    ForceIncFiles = [] # Paths to include no matter what
 
     Defines = []  # Definitions we will use across the engine
 
     AdditionalArgs = ""  # Any additional arguments we will use
 
-    AdditionalFrameworks = []
+    AdditionalFrameworks = [] # Any additional Frameworks we will use
 
-    PCHFile = ""
+    PCHFile = None # The Precompiled Header file
 
-    UsingRHT = False
+    UsingRHT = False # If we are using Relight Header Tool
 
-    HideSymbols = False
+    HideSymbols = False # If we should hide Symbols by default
 
     LinkEnvPrecondition = (
         []
     )  # Fixes a bug, this will put any Precondition from CompileEnv to LinkEnv
+
+    # Quick HACK Here just to sync with LinkEnv
+    AdditionalLibs = []
 
     def __init__(self, InPlatform, InConfig, InArch):
         self.Plat = InPlatform
@@ -183,3 +186,4 @@ class CompileEnvironment:
         self.PCHFile = Second.PCHFile
         self.UsingRHT = Second.UsingRHT
         self.HideSymbols = Second.DefaultHideSymbols
+        self.LinkEnvPrecondition = Second.LinkEnvPrecondition

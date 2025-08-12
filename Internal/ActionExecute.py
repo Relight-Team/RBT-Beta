@@ -7,8 +7,6 @@ from pathlib import Path
 from Internal import Logger
 
 # This handles the different types of execution of the list of actions
-
-
 class RBTThread:
 
     ExitCode = 0
@@ -33,6 +31,8 @@ class RBTThread:
 
     # The function that will be run by the thread, this will execute the process based on the action
     def FunctionToRun(self):
+
+        print(self.Action.Arguments)
 
         # Start program
         try:
@@ -96,6 +96,7 @@ class LinearExecuter(ExecuteBase):
     def Name(self):
         return "Linear"
 
+    # Execute each action from the action list
     def ExecuteActionList(self, ActionList):
 
         ActionThreadDict = {}  # A dictionary of Action : Thread

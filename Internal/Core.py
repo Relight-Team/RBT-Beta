@@ -5,18 +5,18 @@ from . import FileSystem as FS
 from . import Logger
 
 
-def GetVar(URL, VarName):
+def GetVar(URL, VarName, Alt=None):
     with open(URL, "r") as file:
         try:
-            return FS.InternalGetVar(URL, VarName)
+            return FS.InternalGetVar(URL, VarName, Alt)
         except Exception:
-            return None
+            return Alt
 
 
 def GetVarOptional(URL, VarName, Alt):
     with open(URL, "r") as file:
         try:
-            return FS.InternalGetVar(URL, VarName)
+            return FS.InternalGetVar(URL, VarName, Alt)
         except Exception:
             return Alt
 
@@ -41,8 +41,8 @@ def ArraySearch(Search, Array):
     return False
 
 
-def ChangeVar(Var, New):
-    FS.ChangeVarInternal(Var, New)
+def ChangeVar(StartingTarget, Reader):
+    FS.ChangeVarInternal(StartingTarget, Reader)
 
 
 def PrintDebug(Text, Show):

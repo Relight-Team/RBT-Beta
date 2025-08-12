@@ -87,6 +87,8 @@ class Binary:
         except Exception:
             return False
 
+    # Create's a link environment, we will compile each module associated with the binary
+    # and put it in the InputFiles
     def CreateLinkEnv(
         self, Target, Toolchain, LinkEnv, CompileEnv, ExeDir, FileBuilder
     ):
@@ -101,6 +103,8 @@ class Binary:
 
         NewCompileEnv = self.ReturnBinCompileEnv(CompileEnv)
 
+        NewLinkEnv.AdditionalLibs.extend(CompileEnv.AdditionalLibs)
+
         if (
             Target._Project is not None
             and self.IsUnderDir(os.path.dirname(Target._Project), self.IntermediateDir)
@@ -111,16 +115,24 @@ class Binary:
         for Item in self.Modules:
             LinkFiles = []
 
+            NewLinkEnv.AdditionalLibs.extend(Item.Module.AdditionalLibs)
+
+            # Compile Modules
             if Item.Binary is None or Item.Binary == self:
                 NewList = []
+
+                # Compile via ModuleBuilder
                 LinkFiles = Item.Compile(
                     Target, Toolchain, NewCompileEnv, FileBuilder, NewList
                 )  # Compile Module
 
+                NewLinkEnv.AdditionalLibs.extend(NewCompileEnv.AdditionalLibs)
+
                 for LinkFilesItem in LinkFiles:
 
                     if LinkFilesItem not in NewLinkEnv.InputFiles:
-                        NewLinkEnv.InputFiles.extend(LinkFilesItem)
+                        # Extend InputFiles in LinkEnv to LinkFiles
+                        NewLinkEnv.InputFiles.append(LinkFilesItem)
 
             else:
 

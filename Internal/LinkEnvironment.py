@@ -80,13 +80,13 @@ class LinkEnvironment:
         False  # If true, we will attempt ASLR (address space layout randomization)
     )
 
-    UseFastPDBLinking = False  #
+    UseFastPDBLinking = False  # If we should use Fast PDB when linking
 
-    PrintTimingInfo = False  #
+    PrintTimingInfo = False  # Print Timing info when linking
 
     InputFiles = []  # A list of files that will be linked
 
-    InputLibs = []  #
+    InputLibs = []  # # Libraries we will link
 
     DefaultResFiles = []  #
 
@@ -94,9 +94,9 @@ class LinkEnvironment:
 
     IncFunctions = []  #
 
-    DefineFiles = []  #
+    DefineFiles = []  # Files that contains definitions
 
-    AdditionalProperty = []  #
+    AdditionalProperty = []  # Additional Properties
 
     CrossedReference = False  #
 

@@ -39,6 +39,8 @@ class TargetBuilder:
         self.StartingTarget = InStartingTarget
         self.Target = InTarget
 
+        print("Arch = " + str(self.Target.Arch))
+
         self.PlatformIntermedFolder = TargetBuilder.GetIntermediateProject(
             self.StartingTarget.Platform, self.Target.Arch
         )
@@ -76,30 +78,6 @@ class TargetBuilder:
     @staticmethod
     def GetIntermediateProject(Platform, Arch):
         return os.path.join("Intermediate", "Build", Platform, Arch)
-
-    def GetModuleOutputDir(self, Module):
-        Ret = ""
-
-        if Module.IsEngineModule is False or self.Target.IntermediateType == "Unique":
-            Ret = os.path.basedir(self.Target._Project)
-        else:
-            Ret = Directory_Manager.Engine_Directory
-
-        return Ret
-
-    def GetIntermediateModule(self, Module):
-        Base = self.GetModuleOutputDir(Module)
-
-        IntermedTemp = os.path.join(
-            Base, self.PlatformIntermed, self.Target.Name, self.Target.BuildType
-        )
-
-        if Module.ObjectName is not None and Module.ObjectName != "":
-            Temp = Module.ObjectName
-        else:
-            Temp = Module.Name
-
-        return os.path.join(IntermedTemp, Temp)
 
     def CreateToolchain(self, InPlatform):
 
@@ -220,12 +198,12 @@ class TargetBuilder:
 
         if ModuleFile is not None:
             FullModuleFile = os.path.join(ModuleFile, Name + ".Build")
-            ModReader = ModuleReader.Module(FullModuleFile)
+            ModReader = ModuleReader.Module(FullModuleFile, self.StartingTarget)
 
             # TODO: Add generated code stuff here
 
             ModuleRet = ModuleBuilder.ModuleBuilder(
-                ModReader, os.path.join(ProjectDirSource, "Intermediate")
+                ModReader, os.path.join(ProjectDirSource, "Intermediate"), self.Target, self.StartingTarget
             )
 
             self.ModuleName_ModuleBuilder[ModReader.Name] = ModuleRet
@@ -301,6 +279,7 @@ class TargetBuilder:
             is True
             and self.Target.LinkType == "Monolithic"
         ):
+            #GetIntermediateModule()
             IntermediateDir = os.path.join(
                 Directory_Manager.Engine_Directory,
                 self.PlatformIntermedFolder,
@@ -384,7 +363,7 @@ class TargetBuilder:
 
         Logger.Logger(1, "Target file found: " + RetFile)
 
-        Ret = TargetReader.Target(RetFile, ProjectFile)
+        Ret = TargetReader.Target(RetFile, StartingTarget, ProjectFile)
 
         return Ret
 

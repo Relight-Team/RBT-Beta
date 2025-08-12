@@ -79,7 +79,7 @@ class Target:
     ToolchainOverride = None
 
     # The file of the target
-    _File = None
+    FilePath = None
 
     # The project file if it exists
     _Project = None
@@ -90,7 +90,7 @@ class Target:
     # if not empty, we will put the binaries in a subfolder
     BinSubPaths = None
 
-    Arch = ""
+    Arch = "X86"
 
     # -- LINUX -- #
 
@@ -106,17 +106,41 @@ class Target:
     # If true, we will save portable symbol file
     SavePSYM = False
 
-    def __init__(self, TargetFile, ProjectFile=None):
+    def __init__(self, TargetFile, StartingTarget, ProjectFile=None):
 
         # Set private variables
 
-        self._File = TargetFile
+        self.FilePath = TargetFile
+
+        C.ChangeVar(StartingTarget, self)
 
         # Set public variables
+        self.Name = C.GetVar(TargetFile, "Name", self.Name)
+        self.TargetType = C.GetVar(TargetFile, "TargetType", self.TargetType)
+        self.BuildType = C.GetVar(TargetFile, "BuildType", self.BuildType)
+        self.LinkType = C.GetVar(TargetFile, "LinkType", self.LinkType)
+        self.IntermediateType = C.GetVar(TargetFile, "IntermediateType", self.IntermediateType)
+        self.Modules = C.GetVar(TargetFile, "Modules", self.Modules)
+        self.DisableDebugInfo = C.GetVar(TargetFile, "DisableDebugInfo", self.DisableDebugInfo)
+        self.IsDynamicLibrary = C.GetVar(TargetFile, "IsDynamicLibrary", self.IsDynamicLibrary)
+        self.CompileEditor = C.GetVar(TargetFile, "CompileEditor", self.CompileEditor)
+        self.UseCompiledEngine = C.GetVar(TargetFile, "UseCompiledEngine", self.UseCompiledEngine)
+        self.Unity = C.GetVar(TargetFile, "Unity", self.Unity)
+        self.Defines = C.GetVar(TargetFile, "Defines", self.Defines)
+        self.IncludeLaunch = C.GetVar(TargetFile, "IncludeLaunch", self.IncludeLaunch)
+        self.LaunchName = C.GetVar(TargetFile, "LaunchName", self.LaunchName)
+        self.ExtraCompileArgs = C.GetVar(TargetFile, "ExtraCompileArgs", self.ExtraCompileArgs)
+        self.ExtraLinkingArgs = C.GetVar(TargetFile, "ExtraLinkingArgs", self.ExtraLinkingArgs)
+        self.ToolchainOverride = C.GetVar(TargetFile, "ToolchainOverride", self.ToolchainOverride)
+        self.LinkFilesTogether = C.GetVar(TargetFile, "LinkFilesTogether", self.LinkFilesTogether)
+        self.BinSubPaths = C.GetVar(TargetFile, "BinSubPaths", self.BinSubPaths)
+        self.Arch = C.GetVar(TargetFile, "Arch", self.Arch)
 
-        self.Name = C.GetVar(TargetFile, "Name")
-        self.TargetType = C.GetVar(TargetFile, "TargetType")
-        self.Modules = C.GetVar(TargetFile, "Modules")
+        # Linux-specific flags
+        self.UseAddressSanitizer = C.GetVar(TargetFile, "UseAddressSanitizer", self.UseAddressSanitizer)
+        self.UseThreadSanitizer = C.GetVar(TargetFile, "UseThreadSanitizer", self.UseThreadSanitizer)
+        self.UseUnknownSanitizer = C.GetVar(TargetFile, "UseUnknownSanitizer", self.UseUnknownSanitizer)
+        self.SavePSYM = C.GetVar(TargetFile, "SavePSYM", self.SavePSYM)
 
         # Set LinkType if default
 

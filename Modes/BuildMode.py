@@ -154,7 +154,7 @@ def GetPreconditionActions(StartingTarget, FileBuild):
     return Ret
 
 
-# Function that helps GetPreconditionActions
+# Function that helps GetPreconditionActions    print("asdfadfadf " + StartingTarget.Name)
 def GetPreconditionActionsFromActions(ActionList, OutputList):
     Ret = []
 

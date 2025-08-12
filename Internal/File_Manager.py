@@ -1,13 +1,13 @@
 import os
 from . import Logger
 
-
+# Get every file from dirctory
 def GetAllFilesFromDir(Path):
 
     if os.path.isdir(Path):
         return os.listdir(Path)
 
-
+# Create an intermediate file and add content into that file
 def CreateIntermedFile(Path, Content):
 
     Logger.Logger(2, "Creating Intermediate file at " + Path)

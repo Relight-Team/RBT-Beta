@@ -56,7 +56,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
     VersionString = ""
 
     # Cashe variables
-    IsCrossCompiling = None
+    IsCrossCompiling = False
     MultiArchRoot = ""
     BasePath = ""
     ClangPath = ""
@@ -671,11 +671,19 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             Args += " -I" + Item
 
         for Item in CompileEnv.SysIncPaths:
-            Args += " -I" + Item
+            Args += " -isystem" + Item
 
         if CompileEnv.Defines is not None and CompileEnv.Defines:
             for Item in CompileEnv.Defines:
                 Args += " -D" + self.EscapeArgs(Item)
+
+        if CompileEnv.BufferSecurityChecks is True:
+            # Best equivalent for BufferSecurityChecks
+            Args += " -fstack-protector-strong"
+            Args += " -D" + "_FORTIFY_SOURCE=2"
+
+
+        Args += self._Optimize(CompileEnv)
 
         CPPOut = CompileEnv.Out.ObjectFiles
 
@@ -873,7 +881,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     OutputResp.append(" " + Item)
 
                 AllFiles = File_Manager.GetAllFilesFromDir(Item)
-                LinkEnv.PreconditionItems.append(AllFiles)
+                #OutputAction.PreconditionItems.append(AllFiles)
 
             else:
 
@@ -1008,6 +1016,8 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         for Item in LinkEnv.InputFiles:
 
+            #print(LinkEnv.InputFiles)
+
             Resp.append(os.path.abspath(Item) + " ")
             # FIXME: THIS IS THE ISSUE THAT CAUSE ENDLESS LOOP IN ACTIONLISTMANAGER! \/
             # NewAction.PreconditionItems.append(Item)
@@ -1019,6 +1029,8 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         for Item in LinkEnv.AdditionalLibs:
 
+            print("AdditionalLibs " + str(LinkEnv.AdditionalLibs))
+
             ItemPath = os.path.dirname(Item)
 
             # If Item contains Plugin or ThirdParty, and is not the absolute file
@@ -1029,7 +1041,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 Relative = os.path.relpath(Item, os.path.dirname(Output))
 
                 if (
-                    self.IsCrossCompiling() is True
+                    self.IsCrossCompiling is True
                     and Dir_Manager.Engine_Directory in Relative
                 ):
                     Temp = Relative.replace(Dir_Manager.Engine_Directory, "")
@@ -1064,6 +1076,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         ExternalLibs = self._LinkGroups(LinkEnv, Resp, NewAction)
 
         RespFile = self.GetResponseName(LinkEnv, Output)
+
 
         File_Manager.CreateIntermedFile(RespFile, Resp)
 

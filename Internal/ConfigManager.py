@@ -2,6 +2,7 @@ import configparser
 import os
 
 
+# Read the config file, get's the value
 def ReadConfig(File, Class, Value):
     Config = configparser.ConfigParser()
 

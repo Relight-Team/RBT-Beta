@@ -27,6 +27,7 @@ class Module:
     # All directories we will include
     Includes = []
 
+    # includes that act like system (might be used by some 3rd party
     SysIncludes = []
 
     # Defines for this specific module
@@ -67,17 +68,39 @@ class Module:
     # The directory to the file (Dir1/Dir2/)
     ModuleDirectory = ""
 
-    def __init__(self, BuildFile):
+    # -- Third Party -- #
+
+    AdditionalLibs = [] # Additional Libraries to append
+
+    CommandToRun = [] # The command to run for third party
+
+    def __init__(self, BuildFile, StartingTarget):
 
         self.FilePath = BuildFile
 
         self.ModuleDirectory = os.path.dirname(self.FilePath)
 
+        C.ChangeVar(StartingTarget, self)
+
         # Set public variables
 
-        self.Name = C.GetVar(BuildFile, "Name")
-        self.ObjectName = C.GetVar(BuildFile, "ObjectName")
-        self.Description = C.GetVar(BuildFile, "Description")
-        self.Type = C.GetVar(BuildFile, "Type")
-        self.Modules = C.GetVar(BuildFile, "Modules")
-        self.ThirdPartyDependencies = C.GetVar(BuildFile, "ThirdPartyDependencies")
+        self.Name = C.GetVar(BuildFile, "Name", self.Name)
+        self.ObjectName = C.GetVar(BuildFile, "ObjectName", self.ObjectName)
+        self.Description = C.GetVar(BuildFile, "Description", self.Description)
+        self.Type = C.GetVar(BuildFile, "Type", self.Type)
+        self.Modules = C.GetVar(BuildFile, "Modules", self.Modules)
+        self.ModulesIncludes = C.GetVar(BuildFile, "ModulesIncludes", self.ModulesIncludes)
+        self.Includes = C.GetVar(BuildFile, "Includes", self.Includes)
+        self.SysIncludes = C.GetVar(BuildFile, "SysIncludes", self.SysIncludes)
+        self.Defines = C.GetVar(BuildFile, "Defines", self.Defines)
+        self.DynamicModulePaths = C.GetVar(BuildFile, "DynamicModulePaths", self.DynamicModulePaths)
+        self.Static3rdParty = C.GetVar(BuildFile, "Static3rdParty", self.Static3rdParty)
+        self.ThirdParty = C.GetVar(BuildFile, "ThirdParty", self.ThirdParty)
+        self.Optimization = C.GetVar(BuildFile, "Optimization", self.Optimization)
+        self.DisableUnity = C.GetVar(BuildFile, "DisableUnity", self.DisableUnity)
+        self.RTTI = C.GetVar(BuildFile, "RTTI", self.RTTI)
+        self.AVX = C.GetVar(BuildFile, "AVX", self.AVX)
+        self.AutoIncludeModules = C.GetVar(BuildFile, "AutoIncludeModules", self.AutoIncludeModules)
+        self.IsEngineModule = C.GetVar(BuildFile, "IsEngineModule", self.IsEngineModule)
+        self.AdditionalLibs = C.GetVar(BuildFile, "AdditionalLibs", self.AdditionalLibs)
+        self.CommandToRun = C.GetVar(BuildFile, "CommandToRun", self.CommandToRun)
