@@ -892,8 +892,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 Name = os.path.splitext(Item)[0]
 
                 # removes the lib text if it exists
-                print("Name Before lib: " + Name)
-
                 NameDir = os.path.dirname(Name)
                 NameBase = os.path.basename(Name)
 
@@ -903,7 +901,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 Name = os.path.join(NameDir, NameBase)
 
                 OutputAction.PreconditionItems.append(Depend)
-                print("Name At End: " + Name)
                 ExternalLibs += " "+ Name + ".so"
 
         OutputResp.append(" --end-group")
@@ -1139,7 +1136,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     DynamicOutputDir = OutputToCopy
 
                 # Copy and paste dynamic library into
-                print("COMMAND: cp " + Item + " " + os.path.join(DynamicOutputDir, ItemNoDir + ".0"))
+                Logger.Logger(2, "Copying " + str(ItemNoDir) + "To name " + str(ItemNoDir + ".0") + "Under output directory " + str(os.path.basename(DynamicOutputDir)))
                 os.system("cp " + Item + " " + os.path.join(DynamicOutputDir, ItemNoDir + ".0"))
 
         return Output
