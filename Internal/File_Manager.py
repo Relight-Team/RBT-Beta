@@ -6,6 +6,10 @@ def GetAllFilesFromDir(Path):
 
     if os.path.isdir(Path):
         return os.listdir(Path)
+    elif os.path.isfile(Path):
+        return Path  # Return the file name only
+    else:
+        return []
 
 # Create an intermediate file and add content into that file
 def CreateIntermedFile(Path, Content):

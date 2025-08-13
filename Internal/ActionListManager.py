@@ -120,15 +120,16 @@ def AddActionOutdated(Action, OutdatedActionList, IgnoreOutdatedLib):
         # If any Precondition item has been updated compared to all the output, then the entire action is outdated
         for Input in Action.PreconditionItems:
 
-            SourceFileTime = os.path.getmtime(Input)
+            if os.path.exists(Input):
+                SourceFileTime = os.path.getmtime(Input)
 
-            for Output in Action.OutputItems:
+                for Output in Action.OutputItems:
 
-                if os.path.exists(Output):
-                    OutputFileTime = os.path.getmtime(Output)
+                    if os.path.exists(Output):
+                        OutputFileTime = os.path.getmtime(Output)
 
-                    if SourceFileTime > OutputFileTime:
-                        Outdated = True
+                        if SourceFileTime > OutputFileTime:
+                            Outdated = True
 
     # TODO: Add Dependency file support
 

@@ -814,7 +814,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         elif self.Option.UseUnknownSanitizer is True:
             Ret += " -g -fsanitize=undefined"
 
-        Ret += " -Wl,-rpath=${ORIGIN} -Wl,-rpath-link=${ORIGIN} -Wl,-rpath=${ORIGIN}/../../bin/Linux"
+        Ret += ' -Wl,-rpath="${ORIGIN}" -Wl,-rpath-link="${ORIGIN}"'
+
+        Ret += " -Wl,-rpath='${ORIGIN}/../../bin/Linux' -Wl,-rpath='${ORIGIN}/ThirdParty'"
 
         Ret += " -Wl,--as-needed -Wl,--hash-style=gnu -Wl,--build-id"
 
@@ -890,13 +892,19 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 Name = os.path.splitext(Item)[0]
 
                 # removes the lib text if it exists
-                if "lib" in Name:
-                    Name = Name[:3]
+                print("Name Before lib: " + Name)
 
-                LibLink = " -l" + Name
+                NameDir = os.path.dirname(Name)
+                NameBase = os.path.basename(Name)
+
+                if "lib" in NameBase:
+                    Name = Name[3:]
+
+                Name = os.path.join(NameDir, NameBase)
 
                 OutputAction.PreconditionItems.append(Depend)
-                ExternalLibs += LibLink
+                print("Name At End: " + Name)
+                ExternalLibs += " "+ Name + ".so"
 
         OutputResp.append(" --end-group")
 
@@ -1029,8 +1037,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         for Item in LinkEnv.AdditionalLibs:
 
-            print("AdditionalLibs " + str(LinkEnv.AdditionalLibs))
-
             ItemPath = os.path.dirname(Item)
 
             # If Item contains Plugin or ThirdParty, and is not the absolute file
@@ -1094,9 +1100,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         Com += LinkEnv.AdditionalArgs
 
         # Fix bugs if we accidently use windows shit
-        Com = Com.replace("{", "'{")
-        Com = Com.replace("}", "}'")
-        Com = Com.replace("$'{", "'${")
+        #Com = Com.replace("{", "'{")
+        #Com = Com.replace("}", "}'")
+        #Com = Com.replace("$'{", "'${")
 
         self._STEP1LinkShellFiles(LinkEnv, Output, Com, NewAction)
 
@@ -1120,6 +1126,21 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             self._STEP2LinkShellFiles(LinkEnv, Output, Com, RelinkAction, RelinkedFile)
 
             OutputActionList.append(RelinkAction)
+
+        # Put all dynamic modules, copy them into ThirdParty. QUICK HACK
+        for Item in LinkEnv.AdditionalLibs:
+            ItemNoDir = os.path.basename(Item)
+            OutputToCopy = os.path.dirname(LinkEnv.OutputPaths[0])
+            if Item.endswith(".so"):
+                if "ThirdParty" in Item:
+                    DynamicOutputDir = os.path.join(OutputToCopy, "ThirdParty")
+                    os.makedirs(os.path.join(OutputToCopy, "ThirdParty"), exist_ok=True)
+                else:
+                    DynamicOutputDir = OutputToCopy
+
+                # Copy and paste dynamic library into
+                print("COMMAND: cp " + Item + " " + os.path.join(DynamicOutputDir, ItemNoDir + ".0"))
+                os.system("cp " + Item + " " + os.path.join(DynamicOutputDir, ItemNoDir + ".0"))
 
         return Output
 
