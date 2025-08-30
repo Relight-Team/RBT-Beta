@@ -90,7 +90,17 @@ class Target:
     # if not empty, we will put the binaries in a subfolder
     BinSubPaths = None
 
+    # The arch to compile
     Arch = "X86"
+
+    # if true, we will copy all header files to the intermediate folder. This will be used mostly for precompiled engine binaries
+    CopyIncToIntermediate = False
+
+    # If true, then any engine module will use precompiled binaries. Musch faster for those who are not modifying Engine Code
+    Precompiled = True
+
+    # If true, we will skip building Third party dependencies and assume the Third Party is already compiled
+    AlwaysCompileThirdParty = False
 
     # -- LINUX -- #
 
@@ -135,6 +145,9 @@ class Target:
         self.LinkFilesTogether = C.GetVar(TargetFile, "LinkFilesTogether", self.LinkFilesTogether)
         self.BinSubPaths = C.GetVar(TargetFile, "BinSubPaths", self.BinSubPaths)
         self.Arch = C.GetVar(TargetFile, "Arch", self.Arch)
+        self.CopyIncToIntermediate = C.GetVar(TargetFile, "CopyIncToIntermediate", self.CopyIncToIntermediate)
+        self.Precompiled = C.GetVar(TargetFile, "Precompiled", self.Precompiled)
+        self.AlwaysCompileThirdParty = C.GetVar(TargetFile, "AlwaysCompileThirdParty", self.AlwaysCompileThirdParty)
 
         # Linux-specific flags
         self.UseAddressSanitizer = C.GetVar(TargetFile, "UseAddressSanitizer", self.UseAddressSanitizer)

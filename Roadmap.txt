@@ -1,0 +1,41 @@
+== Alpha 3 ==
+
+- UNITY System
+
+== Alpha 4 ==
+
+- Config sync
+
+== Beta 1 ==
+
+- Cleaner support
+
+- Python dependencies checker
+
+== Beta 2 ==
+
+- ProjectFiles support
+
+== Beta 3 ==
+
+- Test Mode
+
+== 1.0 ==
+
+- Code cleanup
+
+- Start development on Relight Engine Again
+
+== Soon after 1.0 ==
+
+- Windows support
+
+== Far in future ==
+
+- Shader support
+
+- Cooker
+
+- Generated Files
+
+- Header Tool

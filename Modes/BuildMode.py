@@ -138,8 +138,6 @@ def GetActionFromTarget(StartingTarget, BuildConfig, FileBuild):
         FileBuild.ActionList, PreconditionActions, None, False
     )  # TODO: This is a temp
 
-    for Item in ActionsToExecute:
-        print(Item.Arguments)
     return ActionsToExecute
 
 

@@ -145,7 +145,7 @@ class Binary:
                 CompileEnv.LinkEnvPrecondition
             )  # Set's LinkEnv Precondition from the CompileEnv one
 
-            return NewLinkEnv
+        return NewLinkEnv
 
     # Create the binary, mainly involves compiling and linking. Returns output files
     def Build(self, TargetReader, Toolchain, CompileEnv, LinkEnv, ExeDir, FileBuilder):

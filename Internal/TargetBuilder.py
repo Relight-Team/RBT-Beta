@@ -39,7 +39,7 @@ class TargetBuilder:
         self.StartingTarget = InStartingTarget
         self.Target = InTarget
 
-        print("Arch = " + str(self.Target.Arch))
+        Logger.Logger(3, "Arch we are using (based on target file): " + str(self.Target.Arch))
 
         self.PlatformIntermedFolder = TargetBuilder.GetIntermediateProject(
             self.StartingTarget.Platform, self.Target.Arch
@@ -110,6 +110,7 @@ class TargetBuilder:
         # Append Global Compile Environment
         CompileEnv.Defines.extend(self.Target.Defines)
         CompileEnv.AdditionalArgs = self.Target.ExtraCompileArgs
+        CompileEnv.CopyIncToIntermediate = self.Target.CopyIncToIntermediate
 
         # Append Global Link Environment
 
@@ -151,7 +152,7 @@ class TargetBuilder:
         InPlatform.SetUpConfigEnv(self.Target, CompileEnv, LinkEnv)
 
     def CreateProjectCompileEnv(self):
-        InPlatform = self.Platform.GetBuildPlatform(self.Target.platform)
+        InPlatform = Platform.Platform.GetBuildPlatform(self.StartingTarget.Platform)
 
         CPPPlatform = InPlatform.DefaultCPPPlatform
 
@@ -168,8 +169,9 @@ class TargetBuilder:
         return CompileEnv
 
     def SearchThroughDir(self, Dir, TargetDir):
+        BlacklistFolders = ["Intermediate", "bin"]
         for Root, SubDirList, Files in os.walk(Dir):
-            if TargetDir in SubDirList:
+            if TargetDir in SubDirList and all(BlacklistItem not in Root for BlacklistItem in BlacklistFolders):
                 return os.path.join(Root, TargetDir)
         return None
 
@@ -185,16 +187,21 @@ class TargetBuilder:
     # TODO: Add support for generated code!
     def FindModuleName(self, Name):
 
+        Logger.Logger(1, "Looking For Module Name: " + Name)
+
         # Check Project directory
         if self.Target._Project is not None:
             ProjectDirSource = os.path.join(
                 os.path.dirname(self.Target._Project), "Src"
             )
-            Temp = os.path.dirname(self.Target._Project)
+            #Temp = os.path.dirname(self.Target._Project)
         else:
             ProjectDirSource = Directory_Manager.Engine_Directory
 
         ModuleFile = self.SearchThroughDir(ProjectDirSource, Name)
+
+        if ModuleFile is None:
+            Logger.Logger(5, "We could not find Module " + Name + " because ModuleFile is none, Skipping...")
 
         if ModuleFile is not None:
             FullModuleFile = os.path.join(ModuleFile, Name + ".Build")
@@ -209,6 +216,8 @@ class TargetBuilder:
             self.ModuleName_ModuleBuilder[ModReader.Name] = ModuleRet
 
             return ModuleRet
+
+        Logger.Logger(5, "We could not find module name " + Name + ", Skipping...")
 
         return None
 
@@ -244,7 +253,9 @@ class TargetBuilder:
         TargetFile,
     ):
 
-        BinDir = os.path.join(Dir, "bin", InPlatform)
+        BinDir = os.path.join(Dir, "bin", Name, InPlatform, Arch, self.Target.BuildType)
+
+        os.makedirs(BinDir, exist_ok=True)
 
         if ExeSubFolder is not None and ExeSubFolder != "":
             BinDir = os.path.join(BinDir, ExeSubFolder)
@@ -269,6 +280,7 @@ class TargetBuilder:
         if self.Target.IncludeLaunch == True:
             LaunchModule = self.FindModuleName(self.Target.LaunchName)
         else:
+            #Logger.Logger(4, "LaunchModule is turned off, the main function MUST be the first on the Module List!")
             # If we don't have Launch Module, just use the first module
             LaunchModule = self.FindModuleName(self.Target.Modules[0])
 
@@ -306,16 +318,16 @@ class TargetBuilder:
             CompileAsDynamic = False
 
         if CompileAsDynamic is True:
-            Temp1 = "Dynamic"
+            DynamicType = "Dynamic"
         else:
-            Temp1 = "EXE"
+            DynamicType = "EXE"
 
         OutputList = self.CreateBinPaths(
             OutputDir,
             self.Target.Name,
             self.StartingTarget.Platform,
             self.Target.LinkType,
-            Temp1,
+            DynamicType,
             self.Target.Arch,
             self.Target.BinSubPaths,
             self.Target._Project,
@@ -323,14 +335,14 @@ class TargetBuilder:
         )
 
         Bin = Binary.Binary(
-            Temp1, OutputList, IntermediateDir, LaunchModule, None, None
+            DynamicType, OutputList, IntermediateDir, LaunchModule, None, None
         )  # FIXME: Haven't implemented Exports and Precompile, using none for now
 
         self.Binaries.append(Bin)
 
         LaunchModule.Binary = Bin
 
-        Bin.Modules.append(LaunchModule)
+        #Bin.Modules.append(LaunchModule)
 
     @staticmethod
     def CreateTargetReaderFromTargetName(TargetName, StartingTarget, ProjectFile=None):
@@ -367,8 +379,39 @@ class TargetBuilder:
 
         return Ret
 
+
+    # Set's up the binary for creating a dynamic lib
+    def CreateModuleDynamicLib(self, ModuleBuilder):
+        pass
+
+
+    # Set's up all modules in the target list
+    def SetupTargetModules(self):
+
+        IndexToLook = 0
+
+        # If the condition is set to make the Launch module in the modules list, we will skip the first entry
+        if self.Target.IncludeLaunch is False:
+            IndexToLook = 1
+
+        while IndexToLook < len(self.Target.Modules):
+            Mod = self.FindModuleName(self.Target.Modules[IndexToLook])
+
+            if Mod.Binary is None:
+                if self.Target.LinkType == "Monolithic":
+                    Mod.Binary = self.Binaries[0] # Sync the Module binary to the first binary list (usually the Launch module
+                    Mod.Binary.AddModule(Mod) # Append the binary's Modules list
+                else:
+                    Mod.Binary = self.CreateModuleDynamicLib(Mod)
+                    self.Binaries.append(Mod.Binary)
+
+            IndexToLook += 1
+
+
+    # Functions to run before we prepare to build the Target
     def SetupPreBuild(self):
         self.SetupBinaries()
+        self.SetupTargetModules()
 
     # Create's a TargetBuilder class based on StartingTarget
     @staticmethod
@@ -409,6 +452,8 @@ class TargetBuilder:
         Toolchain = self.CreateToolchain(CppPlat.value)
 
         self.AppendGlobalEnv(Toolchain, CompileEnv, LinkEnv)
+
+        #NewCompileEnv = self.CreateProjectCompileEnv()
 
         InFileBuilder = FileBuilder.FileBuilder()
 

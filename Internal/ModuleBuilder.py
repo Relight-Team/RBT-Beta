@@ -36,7 +36,7 @@ class ModuleBuilder:
         self.StartingTarget = StartingTarget
 
         # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
-        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType is not "Unique":
+        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType != "Unique":
             self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate")
 
         self.SourceDir = os.path.join(self.Module.ModuleDirectory, "Src")
@@ -303,6 +303,35 @@ class ModuleBuilder:
                         AlreadyBuiltModulesList,
                     )
 
+
+
+    def CopyIncToIntermed(self, Plat, TargetReader, ModName):
+
+        IncludeIntermediatePath = os.path.join(
+            self.IntermediateDir,
+            "Build",
+            str(Plat.value),
+            TargetReader.Arch,
+            TargetReader.Name,
+            "Inc",
+            ModName,
+        )
+
+        for HeaderFileSource in self.HeaderFiles:
+            RelPath = os.path.relpath(HeaderFileSource, self.SourceDir)
+
+            Directory = os.path.dirname(RelPath)
+
+            if Directory is not None and Directory != "":
+                os.makedirs(os.path.join(IncludeIntermediatePath, Directory), exist_ok=True)
+            else:
+                os.makedirs(IncludeIntermediatePath, exist_ok=True)
+
+            if not os.path.exists(os.path.join(IncludeIntermediatePath, RelPath)):
+                print("cp " + HeaderFileSource + " " + os.path.join(IncludeIntermediatePath, RelPath))
+                os.system("cp " + HeaderFileSource + " " + os.path.join(IncludeIntermediatePath, RelPath))
+
+
     # Compile's the Module
     # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
@@ -417,12 +446,65 @@ class ModuleBuilder:
             ModName,
         )
 
+        if NewCompileEnv.CopyIncToIntermediate is True:
+            self.CopyIncToIntermed(Plat, TargetReader, ModName)
+
         # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
-        LinkArray.extend(
-            InToolchain.CompileMultiArchCPPs(
+
+        # QUICK HACK: If we are using shared module and the module is shared, then change the intermediate to engine
+        if self.Module.IsEngineModule is True and TargetReader.IntermediateType == "Shared":
+            Intermed = os.path.join(
+                Directory_Manager.Engine_Directory,
+                "Intermediate",
+                "Build",
+                str(Plat.value),
+                TargetReader.Arch,
+                TargetReader.Name,
+                TargetReader.BuildType,
+                ModName,
+            )
+
+            self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate")
+
+
+        # If we are not using precompiled, then just compile everything
+        if TargetReader.Precompiled is False:
+            LinkArray.extend(
+                InToolchain.CompileMultiArchCPPs(
                 NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
             )
         )
+
+        # if it is an engine module and it's precompiled
+        else:
+
+            if self.Module.IsEngineModule is True:
+                PrecompiledList = [] # All object files in the precompiled directory
+
+                for Root, SubFolderList, Files in os.walk(Intermed):
+                    for File in Files:
+                        if File.endswith(".o") or File.endswith(".obj"):
+                            PrecompiledList.append(os.path.join(Root, File))
+
+                # If precompiled list is empty, warn user
+
+                if not PrecompiledList:
+                    Logger.Logger(4, "Warning: Precompiled engine code not found, continuing, but errors might occur!")
+
+                LinkArray.extend(PrecompiledList)
+
+                IncPath = os.path.join(self.IntermediateDir, "Build", str(Plat.value), TargetReader.Arch, TargetReader.Name, "Inc", ModName)
+
+                NewCompileEnv.UserIncPaths.append(IncPath)
+
+            # If the module is not an engine, compile it as normal
+            else:
+                LinkArray.extend(
+                InToolchain.CompileMultiArchCPPs(
+                NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+            )
+        )
+
 
         FileBuilder.ActionList.extend(OutputActionList)
 
@@ -452,7 +534,7 @@ class ExternalBuilder(ModuleBuilder):
         self.TargetReader = TargetReader
 
         # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
-        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType is not "Unique":
+        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType != "Unique":
             self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate", "ThirdParty")
 
         self.SourceDir = os.path.dirname(self.Module.FilePath)
@@ -462,6 +544,9 @@ class ExternalBuilder(ModuleBuilder):
         self
     ):
 
+        # If AlwaysCompileThirdParty is false, we don't need to compile
+        if self.TargetReader.AlwaysCompileThirdParty is False:
+            return self.Module.AdditionalLibs
 
         # Run 3rd party script
         for Command in self.Module.CommandToRun:

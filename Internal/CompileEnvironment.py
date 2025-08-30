@@ -121,6 +121,8 @@ class CompileEnvironment:
         []
     )  # Fixes a bug, this will put any Precondition from CompileEnv to LinkEnv
 
+    CopyIncToIntermediate = False
+
     # Quick HACK Here just to sync with LinkEnv
     AdditionalLibs = []
 
