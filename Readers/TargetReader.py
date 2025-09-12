@@ -102,6 +102,9 @@ class Target:
     # If true, we will skip building Third party dependencies and assume the Third Party is already compiled
     AlwaysCompileThirdParty = False
 
+    # The amount of source files needed to use Unity files, requires Unity to be true. Leave 0 to always use Unity
+    UnityMinSourceFiles = 0
+
     # -- LINUX -- #
 
     # If we should use Address Sanitizer
@@ -148,6 +151,7 @@ class Target:
         self.CopyIncToIntermediate = C.GetVar(TargetFile, "CopyIncToIntermediate", self.CopyIncToIntermediate)
         self.Precompiled = C.GetVar(TargetFile, "Precompiled", self.Precompiled)
         self.AlwaysCompileThirdParty = C.GetVar(TargetFile, "AlwaysCompileThirdParty", self.AlwaysCompileThirdParty)
+        self.UnityMinSourceFiles = C.GetVar(TargetFile, "UnityMinSourceFiles", self.UnityMinSourceFiles)
 
         # Linux-specific flags
         self.UseAddressSanitizer = C.GetVar(TargetFile, "UseAddressSanitizer", self.UseAddressSanitizer)

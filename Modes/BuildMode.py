@@ -6,7 +6,7 @@ from Internal import ActionListManager
 from Internal import TargetBuilder
 from Internal import Logger
 
-from Template import Platform
+from BaseSDK import Platform
 
 from Readers import TargetReader
 

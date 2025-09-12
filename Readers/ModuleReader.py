@@ -60,6 +60,9 @@ class Module:
     # If true, we will treat it as a engine module (put module in engine dir instead of project dir)
     IsEngineModule = False
 
+    # The amount of source files needed to use Unity files, will override Target. Leave number negative to disable override, requires Unity to be true in target
+    ModuleUnityMinSourceFiles = -1
+
     # -- Read Only -- #
 
     # The entire file path (Dir1/Dir2/Example.Module)
@@ -102,5 +105,6 @@ class Module:
         self.AVX = C.GetVar(BuildFile, "AVX", self.AVX)
         self.AutoIncludeModules = C.GetVar(BuildFile, "AutoIncludeModules", self.AutoIncludeModules)
         self.IsEngineModule = C.GetVar(BuildFile, "IsEngineModule", self.IsEngineModule)
+        self.ModuleUnityMinSourceFiles = C.GetVar(BuildFile, "ModuleUnityMinSourceFiles", self.ModuleUnityMinSourceFiles)
         self.AdditionalLibs = C.GetVar(BuildFile, "AdditionalLibs", self.AdditionalLibs)
         self.CommandToRun = C.GetVar(BuildFile, "CommandToRun", self.CommandToRun)

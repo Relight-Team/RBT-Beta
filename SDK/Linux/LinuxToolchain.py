@@ -8,7 +8,7 @@ import platform
 from . import LinuxPlatformSDK
 from . import Common
 
-from Template import Toolchain
+from BaseSDK import Toolchain
 
 
 from Internal import CompileEnvironment

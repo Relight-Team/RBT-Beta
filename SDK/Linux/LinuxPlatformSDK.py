@@ -5,7 +5,7 @@ import os
 from . import Common
 from . import LinuxPlatform
 
-from Template import PlatformSDK
+from BaseSDK import PlatformSDK
 
 from Configuration import Directory_Manager
 

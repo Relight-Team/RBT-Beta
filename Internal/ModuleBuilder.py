@@ -9,6 +9,8 @@ from Internal import FileBuilder
 
 from Internal import Logger
 
+from Internal import Unity
+
 from Configuration import Directory_Manager
 
 
@@ -415,7 +417,40 @@ class ModuleBuilder:
 
         GenFiles = (
             []
-        )  # FIXME: bro I just realize we need this to actually contain all our input files cause right now it will always compile no input files!
+        )
+
+        # Check if we should be using Unity
+        UsingUnity = False
+
+        CppFilesForUnity = []
+
+        SourceFileCount = 0
+
+        MaxFileCount = 0
+
+        # Check if we should use the max file count from module or target
+        if self.Module.ModuleUnityMinSourceFiles < 0:
+            MaxFileCount = self.Module.ModuleUnityMinSourceFiles
+        else:
+            MaxFileCount = TargetReader.UnityMinSourceFiles
+
+        # Collect each file in sourcedir, if it's a cpp file, add it to CppFilesForUnity and count that file
+        if TargetReader.Unity is True:
+            for Root, Subdirlist, FileList in os.walk(self.SourceDir):
+                for File in FileList:
+                    if File.endswith(".cpp"):
+                        CppFilesForUnity.append(os.path.join(Root, File))
+                        SourceFileCount += 1
+
+        # if the cpp file count is or over the max file, and the module allows us, then we can use unity
+        if SourceFileCount >= MaxFileCount:
+            if self.Module.DisableUnity is False:
+                Logger.Logger(3, "Using UNITY System")
+                UsingUnity = True
+
+
+
+
 
         EveryFileToCompile.extend(self.CompileFiles)
 
@@ -449,7 +484,7 @@ class ModuleBuilder:
         if NewCompileEnv.CopyIncToIntermediate is True:
             self.CopyIncToIntermed(Plat, TargetReader, ModName)
 
-        # FIXME: Replace this in an else statement for Unity files. Replace NewCompileEnv with Generated File Compile Environment
+
 
         # QUICK HACK: If we are using shared module and the module is shared, then change the intermediate to engine
         if self.Module.IsEngineModule is True and TargetReader.IntermediateType == "Shared":
@@ -469,11 +504,15 @@ class ModuleBuilder:
 
         # If we are not using precompiled, then just compile everything
         if TargetReader.Precompiled is False:
-            LinkArray.extend(
-                InToolchain.CompileMultiArchCPPs(
-                NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+            if UsingUnity is True:
+                LinkArray.extend(Unity.Unity.UniteCPPFiles(CppFilesForUnity, NewCompileEnv, InToolchain, Intermed, OutputActionList, ModName))
+
+            else:
+                LinkArray.extend(
+                    InToolchain.CompileMultiArchCPPs(
+                    NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+                )
             )
-        )
 
         # if it is an engine module and it's precompiled
         else:
@@ -499,11 +538,14 @@ class ModuleBuilder:
 
             # If the module is not an engine, compile it as normal
             else:
-                LinkArray.extend(
-                InToolchain.CompileMultiArchCPPs(
-                NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+                if UsingUnity is True:
+                    LinkArray.extend(Unity.Unity.UniteCPPFiles(CppFilesForUnity, NewCompileEnv, InToolchain, Intermed, OutputActionList, ModName))
+                else:
+                    LinkArray.extend(
+                        InToolchain.CompileMultiArchCPPs(
+                        NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+                )
             )
-        )
 
 
         FileBuilder.ActionList.extend(OutputActionList)

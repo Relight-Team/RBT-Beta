@@ -13,7 +13,7 @@ from Internal import Logger
 from Configuration import TargetPlatforms as TP
 from Configuration import Directory_Manager
 
-from Template import PlatformFactory
+from BaseSDK import PlatformFactory
 
 EngineDir = Directory_Manager.Engine_Directory
 

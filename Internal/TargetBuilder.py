@@ -11,7 +11,7 @@ from . import Logger
 from Readers import ModuleReader
 from Readers import TargetReader
 
-from Template import Platform
+from BaseSDK import Platform
 
 from Configuration import Directory_Manager
 

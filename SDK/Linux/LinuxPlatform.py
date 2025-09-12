@@ -5,7 +5,7 @@ from . import LinuxPlatformSDK
 from . import LinuxToolchain
 from . import Common
 
-from Template import Platform
+from BaseSDK import Platform
 
 from Internal import CompileEnvironment as CE
 from Internal import ConfigManager

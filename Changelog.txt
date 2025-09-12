@@ -1,18 +1,12 @@
 == New Features ==
 
-1. Precompile support
+1. Unity support
 
-2. Include files can now be copied to Intermediate directory
-
-3. You can now choose if Third Party Dependencies should always be compiled or not
 
 == Changes ==
 
-1. Change binary output, now more detailed (Old: bin/[platform]/bin.exe) (New: bin/[TargetName]/[Platform]/[Arch]/[LinkType]/bin.exe)
+1. Changed folder from Template to BaseSDK
 
 
 == Bug fixes ==
 
-1. Fixed a bug where TargetBuilder only builds the first module
-
-2. Fixed a bug where the first module is included twice

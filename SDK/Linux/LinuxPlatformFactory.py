@@ -4,8 +4,8 @@ import sys
 from . import LinuxPlatform
 from . import LinuxPlatformSDK
 
-from Template import PlatformFactory
-from Template import Platform
+from BaseSDK import PlatformFactory
+from BaseSDK import Platform
 
 
 class LinuxFactory(PlatformFactory.FactorySDK):
