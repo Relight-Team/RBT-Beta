@@ -40,6 +40,12 @@ def Main(Args):
 
     StartingTarget.TargetDir = Args.GetAndParse("TargetDir")
 
+    StartingTarget.GonnaCook = Args.GetAndParse("Cook")
+
+    StartingTarget.Arch = Args.GetAndParse("Arch")
+
+    StartingTarget.BuildType = Args.GetAndParse("BuildType")
+
     print("Building " + str(StartingTarget.Name))
 
     StartingTargetList = []

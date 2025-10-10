@@ -30,12 +30,14 @@ class ModuleBuilder:
     DependModules = []
     TargetReader = None
     StartingTarget = None
+    BuildType = None
 
-    def __init__(self, InModule, InIntermediateDir, TargetReader, StartingTarget):
+    def __init__(self, InModule, InIntermediateDir, TargetReader, StartingTarget, BuildType):
         self.Module = InModule
         self.IntermediateDir = InIntermediateDir
         self.TargetReader = TargetReader
         self.StartingTarget = StartingTarget
+        self.BuildType = BuildType
 
         # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
         if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType != "Unique":
@@ -285,7 +287,7 @@ class ModuleBuilder:
                     AlreadyBuiltModulesList.append(FilePathName)
 
                     NewModuleBuilder = ModuleBuilder(
-                        SubModuleReader, self.IntermediateDir, self.TargetReader, self.StartingTarget
+                        SubModuleReader, self.IntermediateDir, self.TargetReader, self.StartingTarget, self.BuildType
                     )
 
                     self.GetAndCompileDependencies(
@@ -444,12 +446,9 @@ class ModuleBuilder:
 
         # if the cpp file count is or over the max file, and the module allows us, then we can use unity
         if SourceFileCount >= MaxFileCount:
-            if self.Module.DisableUnity is False:
+            if self.Module.DisableUnity is False and TargetReader.Unity is True:
                 Logger.Logger(3, "Using UNITY System")
                 UsingUnity = True
-
-
-
 
 
         EveryFileToCompile.extend(self.CompileFiles)
@@ -477,7 +476,7 @@ class ModuleBuilder:
             str(Plat.value),
             TargetReader.Arch,
             TargetReader.Name,
-            TargetReader.BuildType,
+            self.BuildType,
             ModName,
         )
 
@@ -495,7 +494,7 @@ class ModuleBuilder:
                 str(Plat.value),
                 TargetReader.Arch,
                 TargetReader.Name,
-                TargetReader.BuildType,
+                self.BuildType,
                 ModName,
             )
 

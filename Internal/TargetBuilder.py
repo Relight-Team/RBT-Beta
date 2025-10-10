@@ -35,14 +35,32 @@ class TargetBuilder:
 
     ModuleName_ModuleBuilder = {}
 
+    ArchToUse = None
+
+    BuildType = None
+
     def __init__(self, InStartingTarget, InTarget=None):
         self.StartingTarget = InStartingTarget
         self.Target = InTarget
 
-        Logger.Logger(3, "Arch we are using (based on target file): " + str(self.Target.Arch))
+
+        # If arch set in command argument, we will use that, otherwise we will use target arch
+        if self.StartingTarget.Arch is not None:
+            Logger.Logger(3, "Arch we are using (based on command line): " + str(self.StartingTarget.Arch))
+            self.ArchToUse = self.StartingTarget.Arch
+        else:
+            Logger.Logger(3, "Arch we are using (based on target file): " + str(self.Target.Arch))
+            self.ArchToUse = self.Target.Arch
+
+        if self.StartingTarget.BuildType is not None:
+            Logger.Logger(3, "Using BuildType: " + self.StartingTarget.BuildType)
+            self.BuildType = self.StartingTarget.BuildType
+        else:
+            Logger.Logger(4, "BuildType not defined in command line, using target's definition: " + self.Target.BuildType)
+            self.BuildType = self.Target.BuildType
 
         self.PlatformIntermedFolder = TargetBuilder.GetIntermediateProject(
-            self.StartingTarget.Platform, self.Target.Arch
+            self.StartingTarget.Platform, self.ArchToUse
         )
 
         # Overwrite target file with starting target properties
@@ -61,7 +79,7 @@ class TargetBuilder:
             self.ProjectDir,
             self.PlatformIntermedFolder,
             self.Target.Name,
-            self.Target.BuildType,
+            self.BuildType,
         )
 
         if self.Target.IntermediateType == "Unique":
@@ -72,7 +90,7 @@ class TargetBuilder:
                 Directory_Manager.Engine_Directory,
                 self.PlatformIntermed,
                 self.Target.Name,
-                self.Target.BuildType,
+                self.BuildType,
             )
 
     @staticmethod
@@ -120,7 +138,7 @@ class TargetBuilder:
             Directory_Manager.Engine_Directory,
             self.PlatformIntermedFolder,
             self.Target.Name,
-            self.Target.BuildType,
+            self.BuildType,
         )
 
         if self.IsEngineInstalled() or (
@@ -131,7 +149,7 @@ class TargetBuilder:
                     os.path.dirname(self.Target._Project),
                     self.PlatformIntermedFolder,
                     self.Target.Name,
-                    self.Target.BuildType,
+                    self.BuildType,
                 )
             # TODO: Add plugin support
 
@@ -149,7 +167,7 @@ class TargetBuilder:
 
         InPlatform.SetUpEnvironment(self.Target, CompileEnv, LinkEnv)
 
-        InPlatform.SetUpConfigEnv(self.Target, CompileEnv, LinkEnv)
+        InPlatform.SetUpConfigEnv(self.Target, self.BuildType, CompileEnv, LinkEnv)
 
     def CreateProjectCompileEnv(self):
         InPlatform = Platform.Platform.GetBuildPlatform(self.StartingTarget.Platform)
@@ -157,10 +175,10 @@ class TargetBuilder:
         CPPPlatform = InPlatform.DefaultCPPPlatform
 
         CompileEnv = CompileEnvironment.CompileEnvironment(
-            CPPPlatform.name, self.Target.BuildType, self.Target.Arch
+            CPPPlatform.name, self.BuildType, self.ArchToUse
         )
         LinkEnv = LinkEnvironment.LinkEnvironment(
-            CPPPlatform.name, self.Target.BuildType, self.Target.Arch
+            CPPPlatform.name, self.BuildType, self.ArchToUse
         )
 
         Toolchain = self.CreateToolchain(CPPPlatform)
@@ -210,7 +228,7 @@ class TargetBuilder:
             # TODO: Add generated code stuff here
 
             ModuleRet = ModuleBuilder.ModuleBuilder(
-                ModReader, os.path.join(ProjectDirSource, "Intermediate"), self.Target, self.StartingTarget
+                ModReader, os.path.join(ProjectDirSource, "Intermediate"), self.Target, self.StartingTarget, self.BuildType
             )
 
             self.ModuleName_ModuleBuilder[ModReader.Name] = ModuleRet
@@ -253,7 +271,7 @@ class TargetBuilder:
         TargetFile,
     ):
 
-        BinDir = os.path.join(Dir, "bin", Name, InPlatform, Arch, self.Target.BuildType)
+        BinDir = os.path.join(Dir, "bin", Name, InPlatform, Arch, self.BuildType)
 
         os.makedirs(BinDir, exist_ok=True)
 
@@ -328,7 +346,7 @@ class TargetBuilder:
             self.StartingTarget.Platform,
             self.Target.LinkType,
             DynamicType,
-            self.Target.Arch,
+            self.ArchToUse,
             self.Target.BinSubPaths,
             self.Target._Project,
             self.Target,
@@ -413,6 +431,19 @@ class TargetBuilder:
         self.SetupBinaries()
         self.SetupTargetModules()
 
+
+    # If arg set, we will run RelightCookerTool with correct params
+    def StartCooker(self):
+        Logger.Logger(3, "RBT Initialize CookerTool")
+        RCT = os.path.join(Directory_Manager.Program_Directory, "RelightCookerTool", "main.py")
+
+        ProjectFile = ""
+
+        if self.Target._Project is not None:
+            ProjectFile = str(os.path.basename(self.Target._Project))
+
+        os.system("python " + RCT + " -Project=" + ProjectFile + " -Target=" + self.Target.Name + " -SourceDir=" + str(os.path.dirname(self.Target.FilePath)) + " -Platform=" + self.StartingTarget.Platform + " -OutputDir=" + os.path.dirname(self.GetExeDir()))
+
     # Create's a TargetBuilder class based on StartingTarget
     @staticmethod
     def Create(StartingTarget, UsePrecompiled):
@@ -433,6 +464,11 @@ class TargetBuilder:
     # UNITY system, C++20 support, Precompiled headers, HeaderTool, Live Coding, Includes Header option
     def Build(self, BuildConf, WorkingSet, AreWeAssembilingBuild):
 
+        # If we want to bake, do it here
+
+        if self.StartingTarget.GonnaCook is True:
+            self.StartCooker()
+
         BinOriginal = []
 
         Plat = Platform.Platform.GetBuildPlatform(self.StartingTarget.Platform)
@@ -440,10 +476,10 @@ class TargetBuilder:
         CppPlat = Plat.DefaultCPPPlatform
 
         CompileEnv = CompileEnvironment.CompileEnvironment(
-            CppPlat, self.Target.BuildType, self.Target.Arch
+            CppPlat, self.BuildType, self.ArchToUse
         )
 
-        # Set
+        # Set Linkenv
 
         LinkEnv = LinkEnvironment.LinkEnvironment(
             CompileEnv.Plat, CompileEnv.Conf, CompileEnv.Arch

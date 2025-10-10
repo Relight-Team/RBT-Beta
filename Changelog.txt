@@ -1,12 +1,26 @@
 == New Features ==
 
-1. Unity support
+1. Cleaner mode, you can now clean a project and contents in it!
+
+2. You can now disable the logger if needed via console commands
+
+3. all logs will be written to log.txt, this can be disabled via console commands
+
+4. Added Test mode, it will test arguments and ensure everything is working properly
 
 
 == Changes ==
 
-1. Changed folder from Template to BaseSDK
+1. Arch can now be overwritten in the command line -Arch
 
+2. Added BuildType to command line, this will overwrite Target's definition
+
+3. Due to bug issues, we will remove arrays in command line for build processes, fix or replace later!
+
+4. Added what command lines goes to what mode in the -h command
+
+5. Added mode to beginning info dump
 
 == Bug fixes ==
 
+1. Changed from 'X86' to 'x86' in default arch

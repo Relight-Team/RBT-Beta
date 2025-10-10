@@ -17,7 +17,7 @@ from BaseSDK import PlatformFactory
 
 EngineDir = Directory_Manager.Engine_Directory
 
-ConfigDir = os.path.join(EngineDir, "Configs")
+ConfigDir = os.path.join(EngineDir, "Config")
 
 _HostOS = platform.system()
 
@@ -523,7 +523,7 @@ class Platform:
         pass  # Will be overwritten with child class
 
     # Setup the config enviornment
-    def SetUpConfigEnv(self, Target, CompileEnv, LinkEnv):
+    def SetUpConfigEnv(self, Target, BuildType, CompileEnv, LinkEnv):
         # This if statement is for 3rd party only, as some of them require this define to access debug features
         if CompileEnv.UseDebugCRT is True:
             CompileEnv.Defines.append("_DEBUG=1")
@@ -531,18 +531,18 @@ class Platform:
             CompileEnv.Defines.append("NDEBUG=1")
 
         # Set Define based on why type of build it is
-        if Target.BuildType == "Debug":
+        if BuildType == "Debug":
             CompileEnv.Defines.append("RE_BUILDTYPE_DEBUG=1")
 
-        elif Target.BuildType == "Development":
+        elif BuildType == "Development":
             CompileEnv.Defines.append("RE_BUILDTYPE_DEVELOPMENT=1")
 
-        elif Target.BuildType == "Final":
+        elif BuildType == "Final":
             CompileEnv.Defines.append("RE_BUILDTYPE_FINAL=1")
 
         # Set Debug info to true if we are using debug
 
-        if not Target.DisableDebugInfo and self.ShouldCreateDebugInfo(Target):
+        if not Target.DisableDebugInfo and self.ShouldCreateDebugInfo(BuildType):
             CompileEnv.AddDebugInfo = True
 
         LinkEnv.AddDebugInfo = CompileEnv.AddDebugInfo
@@ -561,7 +561,7 @@ class Platform:
         return False
 
     # If we should Create debug information if the config file is not set
-    def ShouldCreateDebugInfo(self, Target):
+    def ShouldCreateDebugInfo(self, BuildType):
         pass  # Will be overwritten with child class
 
     # Create the platfomr's toolchain instance

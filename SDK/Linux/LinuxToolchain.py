@@ -94,6 +94,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         # If InPlatform is none, we will use Linux, otherwise we will use InPlatform
         if InPlatform is None:
+            print("InPlatform: " + str(InPlatform))
             self._RunBase(
                 InArch, InSDK, CompileEnvironment.Platform.Linux, InSavePYSM, InOptions
             )

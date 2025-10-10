@@ -1,0 +1,8 @@
+{TestMode.py}{ClassNone}{Main} [LOG: 3] Checking if arguemnts are valid
+
+{TestMode.py}{ClassNone}{Main} [WARNING] Arch is not set
+
+{TargetBuilder.py}{ClassNone}{CreateTargetReaderFromTargetName} [LOG: 1] Searching For Target File at: /home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/.Internal/ProjectTest3/
+
+{TargetBuilder.py}{ClassNone}{CreateTargetReaderFromTargetName} [LOG: 1] Target file found: /home/ethanboi/Desktop/Git/Ethanboilol/Relight-Engine/.Internal/ProjectTest3/PT_Test.Target
+

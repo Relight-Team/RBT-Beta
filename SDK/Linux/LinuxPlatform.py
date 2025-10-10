@@ -35,7 +35,7 @@ class LinuxPlatform(Platform.Platform):
         # If abspath fails, we shall get it from command line instead
         if EngineIni is None:
             EngineIni = os.path.join(
-                Directory_Manager.Engine_Directory, "Configs", "BaseBuilder.cfg"
+                Directory_Manager.Engine_Directory, "Config", "BaseBuilder.cfg"
             )
             pass  # FIXME: Get from command line, else get from BaseBuilder
 
@@ -159,8 +159,8 @@ class LinuxPlatform(Platform.Platform):
         # For libraries
         CompileEnv.Defines.append("LINUX=1")
 
-    def ShouldCreateDebugInfo(self, Target):
-        if Target.BuildType == "Final":
+    def ShouldCreateDebugInfo(self, BuildType):
+        if BuildType == "Final":
             return False
         else:
             return True

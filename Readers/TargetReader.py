@@ -16,7 +16,14 @@ class StartingTarget:
 
     Platform = None  # The platform we are targeting (Command Line: "-Platform=")
 
+    Arch = None # The Arch we are targeting (Command Line: "-Arch="), overwrites target
+
+    # The Build type, determines what debugging tools we should include, can be either Debug, Development, and Final. Overwrites target
+    BuildType = None
+
     Modules = []  # Modules to compile (Command Line: "-Module=")
+
+    GonnaCook = False # If true, then we will cook assets (Command Line: "-Cook")
 
     def __init__(self, InPlatform):
         self.Platform = InPlatform
@@ -64,7 +71,7 @@ class Target:
     Defines = []
 
     # If true, then we will include the module that launches the application
-    IncludeLaunch = False  # Temp, change to true later!
+    IncludeLaunch = False  # FIXME: Temp, change to true later!
 
     # If IncludeLaunch is true, then we will search for the name of the launcher
     LaunchName = "Launch"
@@ -91,7 +98,7 @@ class Target:
     BinSubPaths = None
 
     # The arch to compile
-    Arch = "X86"
+    Arch = "x86"
 
     # if true, we will copy all header files to the intermediate folder. This will be used mostly for precompiled engine binaries
     CopyIncToIntermediate = False
