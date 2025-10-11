@@ -16,14 +16,14 @@ class StartingTarget:
 
     Platform = None  # The platform we are targeting (Command Line: "-Platform=")
 
-    Arch = None # The Arch we are targeting (Command Line: "-Arch="), overwrites target
+    Arch = None  # The Arch we are targeting (Command Line: "-Arch="), overwrites target
 
     # The Build type, determines what debugging tools we should include, can be either Debug, Development, and Final. Overwrites target
     BuildType = None
 
     Modules = []  # Modules to compile (Command Line: "-Module=")
 
-    GonnaCook = False # If true, then we will cook assets (Command Line: "-Cook")
+    GonnaCook = False  # If true, then we will cook assets (Command Line: "-Cook")
 
     def __init__(self, InPlatform):
         self.Platform = InPlatform
@@ -139,31 +139,59 @@ class Target:
         self.TargetType = C.GetVar(TargetFile, "TargetType", self.TargetType)
         self.BuildType = C.GetVar(TargetFile, "BuildType", self.BuildType)
         self.LinkType = C.GetVar(TargetFile, "LinkType", self.LinkType)
-        self.IntermediateType = C.GetVar(TargetFile, "IntermediateType", self.IntermediateType)
+        self.IntermediateType = C.GetVar(
+            TargetFile, "IntermediateType", self.IntermediateType
+        )
         self.Modules = C.GetVar(TargetFile, "Modules", self.Modules)
-        self.DisableDebugInfo = C.GetVar(TargetFile, "DisableDebugInfo", self.DisableDebugInfo)
-        self.IsDynamicLibrary = C.GetVar(TargetFile, "IsDynamicLibrary", self.IsDynamicLibrary)
+        self.DisableDebugInfo = C.GetVar(
+            TargetFile, "DisableDebugInfo", self.DisableDebugInfo
+        )
+        self.IsDynamicLibrary = C.GetVar(
+            TargetFile, "IsDynamicLibrary", self.IsDynamicLibrary
+        )
         self.CompileEditor = C.GetVar(TargetFile, "CompileEditor", self.CompileEditor)
-        self.UseCompiledEngine = C.GetVar(TargetFile, "UseCompiledEngine", self.UseCompiledEngine)
+        self.UseCompiledEngine = C.GetVar(
+            TargetFile, "UseCompiledEngine", self.UseCompiledEngine
+        )
         self.Unity = C.GetVar(TargetFile, "Unity", self.Unity)
         self.Defines = C.GetVar(TargetFile, "Defines", self.Defines)
         self.IncludeLaunch = C.GetVar(TargetFile, "IncludeLaunch", self.IncludeLaunch)
         self.LaunchName = C.GetVar(TargetFile, "LaunchName", self.LaunchName)
-        self.ExtraCompileArgs = C.GetVar(TargetFile, "ExtraCompileArgs", self.ExtraCompileArgs)
-        self.ExtraLinkingArgs = C.GetVar(TargetFile, "ExtraLinkingArgs", self.ExtraLinkingArgs)
-        self.ToolchainOverride = C.GetVar(TargetFile, "ToolchainOverride", self.ToolchainOverride)
-        self.LinkFilesTogether = C.GetVar(TargetFile, "LinkFilesTogether", self.LinkFilesTogether)
+        self.ExtraCompileArgs = C.GetVar(
+            TargetFile, "ExtraCompileArgs", self.ExtraCompileArgs
+        )
+        self.ExtraLinkingArgs = C.GetVar(
+            TargetFile, "ExtraLinkingArgs", self.ExtraLinkingArgs
+        )
+        self.ToolchainOverride = C.GetVar(
+            TargetFile, "ToolchainOverride", self.ToolchainOverride
+        )
+        self.LinkFilesTogether = C.GetVar(
+            TargetFile, "LinkFilesTogether", self.LinkFilesTogether
+        )
         self.BinSubPaths = C.GetVar(TargetFile, "BinSubPaths", self.BinSubPaths)
         self.Arch = C.GetVar(TargetFile, "Arch", self.Arch)
-        self.CopyIncToIntermediate = C.GetVar(TargetFile, "CopyIncToIntermediate", self.CopyIncToIntermediate)
+        self.CopyIncToIntermediate = C.GetVar(
+            TargetFile, "CopyIncToIntermediate", self.CopyIncToIntermediate
+        )
         self.Precompiled = C.GetVar(TargetFile, "Precompiled", self.Precompiled)
-        self.AlwaysCompileThirdParty = C.GetVar(TargetFile, "AlwaysCompileThirdParty", self.AlwaysCompileThirdParty)
-        self.UnityMinSourceFiles = C.GetVar(TargetFile, "UnityMinSourceFiles", self.UnityMinSourceFiles)
+        self.AlwaysCompileThirdParty = C.GetVar(
+            TargetFile, "AlwaysCompileThirdParty", self.AlwaysCompileThirdParty
+        )
+        self.UnityMinSourceFiles = C.GetVar(
+            TargetFile, "UnityMinSourceFiles", self.UnityMinSourceFiles
+        )
 
         # Linux-specific flags
-        self.UseAddressSanitizer = C.GetVar(TargetFile, "UseAddressSanitizer", self.UseAddressSanitizer)
-        self.UseThreadSanitizer = C.GetVar(TargetFile, "UseThreadSanitizer", self.UseThreadSanitizer)
-        self.UseUnknownSanitizer = C.GetVar(TargetFile, "UseUnknownSanitizer", self.UseUnknownSanitizer)
+        self.UseAddressSanitizer = C.GetVar(
+            TargetFile, "UseAddressSanitizer", self.UseAddressSanitizer
+        )
+        self.UseThreadSanitizer = C.GetVar(
+            TargetFile, "UseThreadSanitizer", self.UseThreadSanitizer
+        )
+        self.UseUnknownSanitizer = C.GetVar(
+            TargetFile, "UseUnknownSanitizer", self.UseUnknownSanitizer
+        )
         self.SavePSYM = C.GetVar(TargetFile, "SavePSYM", self.SavePSYM)
 
         # Set LinkType if default

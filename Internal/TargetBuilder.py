@@ -43,20 +43,29 @@ class TargetBuilder:
         self.StartingTarget = InStartingTarget
         self.Target = InTarget
 
-
         # If arch set in command argument, we will use that, otherwise we will use target arch
         if self.StartingTarget.Arch is not None:
-            Logger.Logger(3, "Arch we are using (based on command line): " + str(self.StartingTarget.Arch))
+            Logger.Logger(
+                3,
+                "Arch we are using (based on command line): "
+                + str(self.StartingTarget.Arch),
+            )
             self.ArchToUse = self.StartingTarget.Arch
         else:
-            Logger.Logger(3, "Arch we are using (based on target file): " + str(self.Target.Arch))
+            Logger.Logger(
+                3, "Arch we are using (based on target file): " + str(self.Target.Arch)
+            )
             self.ArchToUse = self.Target.Arch
 
         if self.StartingTarget.BuildType is not None:
             Logger.Logger(3, "Using BuildType: " + self.StartingTarget.BuildType)
             self.BuildType = self.StartingTarget.BuildType
         else:
-            Logger.Logger(4, "BuildType not defined in command line, using target's definition: " + self.Target.BuildType)
+            Logger.Logger(
+                4,
+                "BuildType not defined in command line, using target's definition: "
+                + self.Target.BuildType,
+            )
             self.BuildType = self.Target.BuildType
 
         self.PlatformIntermedFolder = TargetBuilder.GetIntermediateProject(
@@ -189,7 +198,9 @@ class TargetBuilder:
     def SearchThroughDir(self, Dir, TargetDir):
         BlacklistFolders = ["Intermediate", "bin"]
         for Root, SubDirList, Files in os.walk(Dir):
-            if TargetDir in SubDirList and all(BlacklistItem not in Root for BlacklistItem in BlacklistFolders):
+            if TargetDir in SubDirList and all(
+                BlacklistItem not in Root for BlacklistItem in BlacklistFolders
+            ):
                 return os.path.join(Root, TargetDir)
         return None
 
@@ -212,14 +223,19 @@ class TargetBuilder:
             ProjectDirSource = os.path.join(
                 os.path.dirname(self.Target._Project), "Src"
             )
-            #Temp = os.path.dirname(self.Target._Project)
+            # Temp = os.path.dirname(self.Target._Project)
         else:
             ProjectDirSource = Directory_Manager.Engine_Directory
 
         ModuleFile = self.SearchThroughDir(ProjectDirSource, Name)
 
         if ModuleFile is None:
-            Logger.Logger(5, "We could not find Module " + Name + " because ModuleFile is none, Skipping...")
+            Logger.Logger(
+                5,
+                "We could not find Module "
+                + Name
+                + " because ModuleFile is none, Skipping...",
+            )
 
         if ModuleFile is not None:
             FullModuleFile = os.path.join(ModuleFile, Name + ".Build")
@@ -228,7 +244,11 @@ class TargetBuilder:
             # TODO: Add generated code stuff here
 
             ModuleRet = ModuleBuilder.ModuleBuilder(
-                ModReader, os.path.join(ProjectDirSource, "Intermediate"), self.Target, self.StartingTarget, self.BuildType
+                ModReader,
+                os.path.join(ProjectDirSource, "Intermediate"),
+                self.Target,
+                self.StartingTarget,
+                self.BuildType,
             )
 
             self.ModuleName_ModuleBuilder[ModReader.Name] = ModuleRet
@@ -298,7 +318,7 @@ class TargetBuilder:
         if self.Target.IncludeLaunch == True:
             LaunchModule = self.FindModuleName(self.Target.LaunchName)
         else:
-            #Logger.Logger(4, "LaunchModule is turned off, the main function MUST be the first on the Module List!")
+            # Logger.Logger(4, "LaunchModule is turned off, the main function MUST be the first on the Module List!")
             # If we don't have Launch Module, just use the first module
             LaunchModule = self.FindModuleName(self.Target.Modules[0])
 
@@ -309,7 +329,7 @@ class TargetBuilder:
             is True
             and self.Target.LinkType == "Monolithic"
         ):
-            #GetIntermediateModule()
+            # GetIntermediateModule()
             IntermediateDir = os.path.join(
                 Directory_Manager.Engine_Directory,
                 self.PlatformIntermedFolder,
@@ -360,7 +380,7 @@ class TargetBuilder:
 
         LaunchModule.Binary = Bin
 
-        #Bin.Modules.append(LaunchModule)
+        # Bin.Modules.append(LaunchModule)
 
     @staticmethod
     def CreateTargetReaderFromTargetName(TargetName, StartingTarget, ProjectFile=None):
@@ -397,11 +417,9 @@ class TargetBuilder:
 
         return Ret
 
-
     # Set's up the binary for creating a dynamic lib
     def CreateModuleDynamicLib(self, ModuleBuilder):
         pass
-
 
     # Set's up all modules in the target list
     def SetupTargetModules(self):
@@ -417,32 +435,47 @@ class TargetBuilder:
 
             if Mod.Binary is None:
                 if self.Target.LinkType == "Monolithic":
-                    Mod.Binary = self.Binaries[0] # Sync the Module binary to the first binary list (usually the Launch module
-                    Mod.Binary.AddModule(Mod) # Append the binary's Modules list
+                    Mod.Binary = self.Binaries[
+                        0
+                    ]  # Sync the Module binary to the first binary list (usually the Launch module
+                    Mod.Binary.AddModule(Mod)  # Append the binary's Modules list
                 else:
                     Mod.Binary = self.CreateModuleDynamicLib(Mod)
                     self.Binaries.append(Mod.Binary)
 
             IndexToLook += 1
 
-
     # Functions to run before we prepare to build the Target
     def SetupPreBuild(self):
         self.SetupBinaries()
         self.SetupTargetModules()
 
-
     # If arg set, we will run RelightCookerTool with correct params
     def StartCooker(self):
         Logger.Logger(3, "RBT Initialize CookerTool")
-        RCT = os.path.join(Directory_Manager.Program_Directory, "RelightCookerTool", "main.py")
+        RCT = os.path.join(
+            Directory_Manager.Program_Directory, "RelightCookerTool", "main.py"
+        )
 
         ProjectFile = ""
 
         if self.Target._Project is not None:
             ProjectFile = str(os.path.basename(self.Target._Project))
 
-        os.system("python " + RCT + " -Project=" + ProjectFile + " -Target=" + self.Target.Name + " -SourceDir=" + str(os.path.dirname(self.Target.FilePath)) + " -Platform=" + self.StartingTarget.Platform + " -OutputDir=" + os.path.dirname(self.GetExeDir()))
+        os.system(
+            "python "
+            + RCT
+            + " -Project="
+            + ProjectFile
+            + " -Target="
+            + self.Target.Name
+            + " -SourceDir="
+            + str(os.path.dirname(self.Target.FilePath))
+            + " -Platform="
+            + self.StartingTarget.Platform
+            + " -OutputDir="
+            + os.path.dirname(self.GetExeDir())
+        )
 
     # Create's a TargetBuilder class based on StartingTarget
     @staticmethod
@@ -489,7 +522,7 @@ class TargetBuilder:
 
         self.AppendGlobalEnv(Toolchain, CompileEnv, LinkEnv)
 
-        #NewCompileEnv = self.CreateProjectCompileEnv()
+        # NewCompileEnv = self.CreateProjectCompileEnv()
 
         InFileBuilder = FileBuilder.FileBuilder()
 

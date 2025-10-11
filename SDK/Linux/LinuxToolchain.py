@@ -683,7 +683,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
             Args += " -fstack-protector-strong"
             Args += " -D" + "_FORTIFY_SOURCE=2"
 
-
         Args += self._Optimize(CompileEnv)
 
         CPPOut = CompileEnv.Out.ObjectFiles
@@ -817,7 +816,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         Ret += ' -Wl,-rpath="${ORIGIN}" -Wl,-rpath-link="${ORIGIN}"'
 
-        Ret += " -Wl,-rpath='${ORIGIN}/../../bin/Linux' -Wl,-rpath='${ORIGIN}/ThirdParty'"
+        Ret += (
+            " -Wl,-rpath='${ORIGIN}/../../bin/Linux' -Wl,-rpath='${ORIGIN}/ThirdParty'"
+        )
 
         Ret += " -Wl,--as-needed -Wl,--hash-style=gnu -Wl,--build-id"
 
@@ -884,7 +885,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     OutputResp.append(" " + Item)
 
                 AllFiles = File_Manager.GetAllFilesFromDir(Item)
-                #OutputAction.PreconditionItems.append(AllFiles)
+                # OutputAction.PreconditionItems.append(AllFiles)
 
             else:
 
@@ -902,7 +903,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                 Name = os.path.join(NameDir, NameBase)
 
                 OutputAction.PreconditionItems.append(Depend)
-                ExternalLibs += " "+ Name + ".so"
+                ExternalLibs += " " + Name + ".so"
 
         OutputResp.append(" --end-group")
 
@@ -1022,7 +1023,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         for Item in LinkEnv.InputFiles:
 
-            #print(LinkEnv.InputFiles)
+            # print(LinkEnv.InputFiles)
 
             Resp.append(os.path.abspath(Item) + " ")
             # FIXME: THIS IS THE ISSUE THAT CAUSE ENDLESS LOOP IN ACTIONLISTMANAGER! \/
@@ -1081,7 +1082,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         RespFile = self.GetResponseName(LinkEnv, Output)
 
-
         File_Manager.CreateIntermedFile(RespFile, Resp)
 
         Com += ' -Wl,@"' + RespFile + '"'
@@ -1098,9 +1098,9 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         Com += LinkEnv.AdditionalArgs
 
         # Fix bugs if we accidently use windows shit
-        #Com = Com.replace("{", "'{")
-        #Com = Com.replace("}", "}'")
-        #Com = Com.replace("$'{", "'${")
+        # Com = Com.replace("{", "'{")
+        # Com = Com.replace("}", "}'")
+        # Com = Com.replace("$'{", "'${")
 
         self._STEP1LinkShellFiles(LinkEnv, Output, Com, NewAction)
 
@@ -1137,8 +1137,21 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
                     DynamicOutputDir = OutputToCopy
 
                 # Copy and paste dynamic library into
-                Logger.Logger(2, "Copying " + str(ItemNoDir) + "To name " + str(ItemNoDir + ".0") + "Under output directory " + str(os.path.basename(DynamicOutputDir)))
-                os.system("cp " + Item + " " + os.path.join(DynamicOutputDir, ItemNoDir + ".0"))
+                Logger.Logger(
+                    2,
+                    "Copying "
+                    + str(ItemNoDir)
+                    + "To name "
+                    + str(ItemNoDir + ".0")
+                    + "Under output directory "
+                    + str(os.path.basename(DynamicOutputDir)),
+                )
+                os.system(
+                    "cp "
+                    + Item
+                    + " "
+                    + os.path.join(DynamicOutputDir, ItemNoDir + ".0")
+                )
 
         return Output
 

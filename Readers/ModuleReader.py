@@ -73,9 +73,9 @@ class Module:
 
     # -- Third Party -- #
 
-    AdditionalLibs = [] # Additional Libraries to append
+    AdditionalLibs = []  # Additional Libraries to append
 
-    CommandToRun = [] # The command to run for third party
+    CommandToRun = []  # The command to run for third party
 
     def __init__(self, BuildFile, StartingTarget):
 
@@ -92,19 +92,27 @@ class Module:
         self.Description = C.GetVar(BuildFile, "Description", self.Description)
         self.Type = C.GetVar(BuildFile, "Type", self.Type)
         self.Modules = C.GetVar(BuildFile, "Modules", self.Modules)
-        self.ModulesIncludes = C.GetVar(BuildFile, "ModulesIncludes", self.ModulesIncludes)
+        self.ModulesIncludes = C.GetVar(
+            BuildFile, "ModulesIncludes", self.ModulesIncludes
+        )
         self.Includes = C.GetVar(BuildFile, "Includes", self.Includes)
         self.SysIncludes = C.GetVar(BuildFile, "SysIncludes", self.SysIncludes)
         self.Defines = C.GetVar(BuildFile, "Defines", self.Defines)
-        self.DynamicModulePaths = C.GetVar(BuildFile, "DynamicModulePaths", self.DynamicModulePaths)
+        self.DynamicModulePaths = C.GetVar(
+            BuildFile, "DynamicModulePaths", self.DynamicModulePaths
+        )
         self.Static3rdParty = C.GetVar(BuildFile, "Static3rdParty", self.Static3rdParty)
         self.ThirdParty = C.GetVar(BuildFile, "ThirdParty", self.ThirdParty)
         self.Optimization = C.GetVar(BuildFile, "Optimization", self.Optimization)
         self.DisableUnity = C.GetVar(BuildFile, "DisableUnity", self.DisableUnity)
         self.RTTI = C.GetVar(BuildFile, "RTTI", self.RTTI)
         self.AVX = C.GetVar(BuildFile, "AVX", self.AVX)
-        self.AutoIncludeModules = C.GetVar(BuildFile, "AutoIncludeModules", self.AutoIncludeModules)
+        self.AutoIncludeModules = C.GetVar(
+            BuildFile, "AutoIncludeModules", self.AutoIncludeModules
+        )
         self.IsEngineModule = C.GetVar(BuildFile, "IsEngineModule", self.IsEngineModule)
-        self.ModuleUnityMinSourceFiles = C.GetVar(BuildFile, "ModuleUnityMinSourceFiles", self.ModuleUnityMinSourceFiles)
+        self.ModuleUnityMinSourceFiles = C.GetVar(
+            BuildFile, "ModuleUnityMinSourceFiles", self.ModuleUnityMinSourceFiles
+        )
         self.AdditionalLibs = C.GetVar(BuildFile, "AdditionalLibs", self.AdditionalLibs)
         self.CommandToRun = C.GetVar(BuildFile, "CommandToRun", self.CommandToRun)

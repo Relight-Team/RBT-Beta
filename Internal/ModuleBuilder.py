@@ -32,7 +32,9 @@ class ModuleBuilder:
     StartingTarget = None
     BuildType = None
 
-    def __init__(self, InModule, InIntermediateDir, TargetReader, StartingTarget, BuildType):
+    def __init__(
+        self, InModule, InIntermediateDir, TargetReader, StartingTarget, BuildType
+    ):
         self.Module = InModule
         self.IntermediateDir = InIntermediateDir
         self.TargetReader = TargetReader
@@ -40,8 +42,13 @@ class ModuleBuilder:
         self.BuildType = BuildType
 
         # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
-        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType != "Unique":
-            self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate")
+        if (
+            self.Module.IsEngineModule is True
+            and self.TargetReader.IntermediateType != "Unique"
+        ):
+            self.IntermediateDir = os.path.join(
+                Directory_Manager.Engine_Directory, "Intermediate"
+            )
 
         self.SourceDir = os.path.join(self.Module.ModuleDirectory, "Src")
 
@@ -287,7 +294,11 @@ class ModuleBuilder:
                     AlreadyBuiltModulesList.append(FilePathName)
 
                     NewModuleBuilder = ModuleBuilder(
-                        SubModuleReader, self.IntermediateDir, self.TargetReader, self.StartingTarget, self.BuildType
+                        SubModuleReader,
+                        self.IntermediateDir,
+                        self.TargetReader,
+                        self.StartingTarget,
+                        self.BuildType,
                     )
 
                     self.GetAndCompileDependencies(
@@ -307,8 +318,6 @@ class ModuleBuilder:
                         AlreadyBuiltModulesList,
                     )
 
-
-
     def CopyIncToIntermed(self, Plat, TargetReader, ModName):
 
         IncludeIntermediatePath = os.path.join(
@@ -327,14 +336,25 @@ class ModuleBuilder:
             Directory = os.path.dirname(RelPath)
 
             if Directory is not None and Directory != "":
-                os.makedirs(os.path.join(IncludeIntermediatePath, Directory), exist_ok=True)
+                os.makedirs(
+                    os.path.join(IncludeIntermediatePath, Directory), exist_ok=True
+                )
             else:
                 os.makedirs(IncludeIntermediatePath, exist_ok=True)
 
             if not os.path.exists(os.path.join(IncludeIntermediatePath, RelPath)):
-                print("cp " + HeaderFileSource + " " + os.path.join(IncludeIntermediatePath, RelPath))
-                os.system("cp " + HeaderFileSource + " " + os.path.join(IncludeIntermediatePath, RelPath))
-
+                print(
+                    "cp "
+                    + HeaderFileSource
+                    + " "
+                    + os.path.join(IncludeIntermediatePath, RelPath)
+                )
+                os.system(
+                    "cp "
+                    + HeaderFileSource
+                    + " "
+                    + os.path.join(IncludeIntermediatePath, RelPath)
+                )
 
     # Compile's the Module
     # FIXME: Quick hack thrown to ensure atleast the basics will work for the first testing. Once complete, please add these features
@@ -364,7 +384,9 @@ class ModuleBuilder:
 
         # Compile 3rd party modules
 
-        Logger.Logger(1, "Start Collecting Third Party dependencies for " + self.Module.Name)
+        Logger.Logger(
+            1, "Start Collecting Third Party dependencies for " + self.Module.Name
+        )
         for ThirdParty in self.Module.ThirdParty:
             Logger.Logger(3, "Searching for third party module: " + ThirdParty)
             ThirdPartyFile = self.FindModuleReaderFile(TargetReader, ThirdParty)
@@ -372,7 +394,9 @@ class ModuleBuilder:
 
             ThirdPartyReader = ModuleReader.Module(ThirdPartyFile, self.StartingTarget)
 
-            ThirdPartyBuilder = ExternalBuilder(ThirdPartyReader, self.IntermediateDir, TargetReader)
+            ThirdPartyBuilder = ExternalBuilder(
+                ThirdPartyReader, self.IntermediateDir, TargetReader
+            )
 
             AdditionalLibs = ThirdPartyBuilder.Compile()
 
@@ -417,9 +441,7 @@ class ModuleBuilder:
 
         EveryFileToCompile = []
 
-        GenFiles = (
-            []
-        )
+        GenFiles = []
 
         # Check if we should be using Unity
         UsingUnity = False
@@ -450,7 +472,6 @@ class ModuleBuilder:
                 Logger.Logger(3, "Using UNITY System")
                 UsingUnity = True
 
-
         EveryFileToCompile.extend(self.CompileFiles)
 
         EveryFileToCompile.extend(GenFiles)
@@ -465,10 +486,28 @@ class ModuleBuilder:
         # If module doesn't have name, result in error
 
         if ModName == None:
-            Logger.Logger(5, "Module Name and/or Module Short Name is None, we cannot continue! Module Name: (" + str(self.Module.Name) + "), Module Short Name: (" + str(self.Module.ObjectName)) + ")"
+            (
+                Logger.Logger(
+                    5,
+                    "Module Name and/or Module Short Name is None, we cannot continue! Module Name: ("
+                    + str(self.Module.Name)
+                    + "), Module Short Name: ("
+                    + str(self.Module.ObjectName),
+                )
+                + ")"
+            )
 
         if ModName == "":
-            Logger.Logger(5, "Module Name and/or Module Short Name is empty, we cannot continue! Module Name: (" + str(self.Module.Name) + "), Module Short Name: (" + str(self.Module.ObjectName)) + ")"
+            (
+                Logger.Logger(
+                    5,
+                    "Module Name and/or Module Short Name is empty, we cannot continue! Module Name: ("
+                    + str(self.Module.Name)
+                    + "), Module Short Name: ("
+                    + str(self.Module.ObjectName),
+                )
+                + ")"
+            )
 
         Intermed = os.path.join(
             self.IntermediateDir,
@@ -483,10 +522,11 @@ class ModuleBuilder:
         if NewCompileEnv.CopyIncToIntermediate is True:
             self.CopyIncToIntermed(Plat, TargetReader, ModName)
 
-
-
         # QUICK HACK: If we are using shared module and the module is shared, then change the intermediate to engine
-        if self.Module.IsEngineModule is True and TargetReader.IntermediateType == "Shared":
+        if (
+            self.Module.IsEngineModule is True
+            and TargetReader.IntermediateType == "Shared"
+        ):
             Intermed = os.path.join(
                 Directory_Manager.Engine_Directory,
                 "Intermediate",
@@ -498,26 +538,36 @@ class ModuleBuilder:
                 ModName,
             )
 
-            self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate")
-
+            self.IntermediateDir = os.path.join(
+                Directory_Manager.Engine_Directory, "Intermediate"
+            )
 
         # If we are not using precompiled, then just compile everything
         if TargetReader.Precompiled is False:
             if UsingUnity is True:
-                LinkArray.extend(Unity.Unity.UniteCPPFiles(CppFilesForUnity, NewCompileEnv, InToolchain, Intermed, OutputActionList, ModName))
+                LinkArray.extend(
+                    Unity.Unity.UniteCPPFiles(
+                        CppFilesForUnity,
+                        NewCompileEnv,
+                        InToolchain,
+                        Intermed,
+                        OutputActionList,
+                        ModName,
+                    )
+                )
 
             else:
                 LinkArray.extend(
                     InToolchain.CompileMultiArchCPPs(
-                    NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+                        NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
+                    )
                 )
-            )
 
         # if it is an engine module and it's precompiled
         else:
 
             if self.Module.IsEngineModule is True:
-                PrecompiledList = [] # All object files in the precompiled directory
+                PrecompiledList = []  # All object files in the precompiled directory
 
                 for Root, SubFolderList, Files in os.walk(Intermed):
                     for File in Files:
@@ -527,25 +577,47 @@ class ModuleBuilder:
                 # If precompiled list is empty, warn user
 
                 if not PrecompiledList:
-                    Logger.Logger(4, "Warning: Precompiled engine code not found, continuing, but errors might occur!")
+                    Logger.Logger(
+                        4,
+                        "Warning: Precompiled engine code not found, continuing, but errors might occur!",
+                    )
 
                 LinkArray.extend(PrecompiledList)
 
-                IncPath = os.path.join(self.IntermediateDir, "Build", str(Plat.value), TargetReader.Arch, TargetReader.Name, "Inc", ModName)
+                IncPath = os.path.join(
+                    self.IntermediateDir,
+                    "Build",
+                    str(Plat.value),
+                    TargetReader.Arch,
+                    TargetReader.Name,
+                    "Inc",
+                    ModName,
+                )
 
                 NewCompileEnv.UserIncPaths.append(IncPath)
 
             # If the module is not an engine, compile it as normal
             else:
                 if UsingUnity is True:
-                    LinkArray.extend(Unity.Unity.UniteCPPFiles(CppFilesForUnity, NewCompileEnv, InToolchain, Intermed, OutputActionList, ModName))
+                    LinkArray.extend(
+                        Unity.Unity.UniteCPPFiles(
+                            CppFilesForUnity,
+                            NewCompileEnv,
+                            InToolchain,
+                            Intermed,
+                            OutputActionList,
+                            ModName,
+                        )
+                    )
                 else:
                     LinkArray.extend(
                         InToolchain.CompileMultiArchCPPs(
-                        NewCompileEnv, EveryFileToCompile, Intermed, OutputActionList
-                )
-            )
-
+                            NewCompileEnv,
+                            EveryFileToCompile,
+                            Intermed,
+                            OutputActionList,
+                        )
+                    )
 
         FileBuilder.ActionList.extend(OutputActionList)
 
@@ -575,15 +647,17 @@ class ExternalBuilder(ModuleBuilder):
         self.TargetReader = TargetReader
 
         # HACK fix: if module is engine and isn't unique, then we will always set intermediate to engine dir
-        if self.Module.IsEngineModule is True and self.TargetReader.IntermediateType != "Unique":
-            self.IntermediateDir = os.path.join(Directory_Manager.Engine_Directory, "Intermediate", "ThirdParty")
+        if (
+            self.Module.IsEngineModule is True
+            and self.TargetReader.IntermediateType != "Unique"
+        ):
+            self.IntermediateDir = os.path.join(
+                Directory_Manager.Engine_Directory, "Intermediate", "ThirdParty"
+            )
 
         self.SourceDir = os.path.dirname(self.Module.FilePath)
 
-
-    def Compile(
-        self
-    ):
+    def Compile(self):
 
         # If AlwaysCompileThirdParty is false, we don't need to compile
         if self.TargetReader.AlwaysCompileThirdParty is False:
@@ -594,6 +668,3 @@ class ExternalBuilder(ModuleBuilder):
             os.system(Command)
 
         return self.Module.AdditionalLibs
-
-
-

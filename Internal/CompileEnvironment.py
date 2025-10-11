@@ -35,87 +35,99 @@ class CompileEnvironment:
 
     PCHIncludeName = ""  # The name of the header file we will precompile
 
-    UseSharedBuildEnv = False # Create shared environment
+    UseSharedBuildEnv = False  # Create shared environment
 
-    UseAVX = False # If we should use Advanced Vector Extensions
+    UseAVX = False  # If we should use Advanced Vector Extensions
 
-    UseRTTI = False # If we should use Run-Time Type Information
+    UseRTTI = False  # If we should use Run-Time Type Information
 
-    UseInlining = False # If we should use function inlining
+    UseInlining = False  # If we should use function inlining
 
-    BufferSecurityChecks = True # If we should use buffer security checks
+    BufferSecurityChecks = True  # If we should use buffer security checks
 
     FalseUnityOverride = False  # Use if it's faster to not use UNITY system, will disable UNITY even if it's on
 
-    MinUnitySource = 0 # The amount of files needed to enable Unity
+    MinUnitySource = 0  # The amount of files needed to enable Unity
 
-    MinPCHSource = 0 # The amount of files needed before we use Precompiled Header
+    MinPCHSource = 0  # The amount of files needed before we use Precompiled Header
 
-    BuildLocallySNDBS = False # Build Locally when using SN-DBS
+    BuildLocallySNDBS = False  # Build Locally when using SN-DBS
 
-    ExceptionHandling = False # If we should do Exception Handling
+    ExceptionHandling = False  # If we should do Exception Handling
 
-    ShadowVariableWarnings = True # If we should give warnings about Shadow Variables
+    ShadowVariableWarnings = True  # If we should give warnings about Shadow Variables
 
-    ShadowVariableAsError = False # If we shall give an error if there's a shadow variable
+    ShadowVariableAsError = (
+        False  # If we shall give an error if there's a shadow variable
+    )
 
-    UndefinedIdentifierWarnings = True # IF we should give warnings about Undefined Identifiers
+    UndefinedIdentifierWarnings = (
+        True  # IF we should give warnings about Undefined Identifiers
+    )
 
-    UndefinedIdentifierAsError = False # If we shall give an error if there's an Undefined Identifiers
+    UndefinedIdentifierAsError = (
+        False  # If we shall give an error if there's an Undefined Identifiers
+    )
 
-    Optimize = False # If true, we will optimize the binary
+    Optimize = False  # If true, we will optimize the binary
 
-    OptimizeSize = False # If true, we will optimize for smallest possible size
+    OptimizeSize = False  # If true, we will optimize for smallest possible size
 
-    AddDebugInfo = True # If we should create Debug information
+    AddDebugInfo = True  # If we should create Debug information
 
-    IsLibrary = False # If we are compiling static library (.a/.lib)
+    IsLibrary = False  # If we are compiling static library (.a/.lib)
 
-    IsDynamic = False # If we are compiling dynamically (.so/.dll)
+    IsDynamic = False  # If we are compiling dynamically (.so/.dll)
 
-    UseStaticCRT = False # If we should compile using statically-linked CRT
+    UseStaticCRT = False  # If we should compile using statically-linked CRT
 
-    UseDebugCRT = False # If we should use Debug CRT
+    UseDebugCRT = False  # If we should use Debug CRT
 
-    ExcludeFramePointers = True # If true, we shall not include frame pointers
+    ExcludeFramePointers = True  # If true, we shall not include frame pointers
 
-    IncrementalLinking = True # If true, we shall only link files that are updated
+    IncrementalLinking = True  # If true, we shall only link files that are updated
 
-    AllowLTCG = False # If we should use link time code generation
+    AllowLTCG = False  # If we should use link time code generation
 
-    PGOProfile = False # If we should use Profile Guided Optimization Instrumentation
+    PGOProfile = False  # If we should use Profile Guided Optimization Instrumentation
 
-    PGOOptimize = False # If we should optimize using Profile Guided Optimization
+    PGOOptimize = False  # If we should optimize using Profile Guided Optimization
 
-    PGODirectory = "" # Directory where PGO is stored
+    PGODirectory = ""  # Directory where PGO is stored
 
-    PGOFilePrefix = "" # Filename where PGO is stored
+    PGOFilePrefix = ""  # Filename where PGO is stored
 
-    PrintTimingInfo = False # If true, we will log timing info from the compiler we are using
+    PrintTimingInfo = (
+        False  # If true, we will log timing info from the compiler we are using
+    )
 
-    GenerateDependFile = True # If true, we shall Put Dependencies file along with output build products
+    GenerateDependFile = (
+        True  # If true, we shall Put Dependencies file along with output build products
+    )
 
-    AllowRemotelyCompiledPCHs = False # If true, we shall let XGE compile PCH files externally, instead of locally
+    AllowRemotelyCompiledPCHs = False  # If true, we shall let XGE compile PCH files externally, instead of locally
 
-    UserIncPaths = [] # Included paths
+    UserIncPaths = []  # Included paths
 
-    SysIncPaths = [] # Included System paths, will supress warnings
+    SysIncPaths = []  # Included System paths, will supress warnings
 
-    CheckSysHeaderForChanges = False # If headers in SysIncPaths are modified, then the action is outdated
+    CheckSysHeaderForChanges = (
+        False  # If headers in SysIncPaths are modified, then the action is outdated
+    )
 
-    ForceIncFiles = [] # Paths to include no matter what
+    ForceIncFiles = []  # Paths to include no matter what
 
     Defines = []  # Definitions we will use across the engine
 
     AdditionalArgs = ""  # Any additional arguments we will use
 
-    AdditionalFrameworks = [] # Any additional Frameworks we will use
+    AdditionalFrameworks = []  # Any additional Frameworks we will use
 
-    PCHFile = None # The Precompiled Header file
+    PCHFile = None  # The Precompiled Header file
 
-    UsingRHT = False # If we are using Relight Header Tool
+    UsingRHT = False  # If we are using Relight Header Tool
 
-    HideSymbols = False # If we should hide Symbols by default
+    HideSymbols = False  # If we should hide Symbols by default
 
     LinkEnvPrecondition = (
         []

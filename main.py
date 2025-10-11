@@ -8,7 +8,12 @@ from Internal import Logger
 def main():
     Args = GetArgs()
 
-    Logger.Logger(3, "Setting Up Logger...", Args.GetAndParse("NoMessages"), Args.GetAndParse("NoLog"))
+    Logger.Logger(
+        3,
+        "Setting Up Logger...",
+        Args.GetAndParse("NoMessages"),
+        Args.GetAndParse("NoLog"),
+    )
 
     if Args.GetAndParse("NoLog") is not True:
         F = open("log.txt", "w")
@@ -27,7 +32,10 @@ def main():
     elif ModeToUse.lower() == "clean":
         from Modes import CleanMode as Mode
     elif ModeToUse.lower() == "projectfiles":
-        Logger.Logger(5, "Project Files are not yet implemented due to lack of .RProject reader. Add this in future!")
+        Logger.Logger(
+            5,
+            "Project Files are not yet implemented due to lack of .RProject reader. Add this in future!",
+        )
     elif ModeToUse.lower() == "test":
         from Modes import TestMode as Mode
     else:
@@ -127,7 +135,6 @@ def GetArgs():
         metavar="(Build) [BOOL]",
         help="If true, we will run RelightCookerTool on the project",
     )
-
 
     # Clean Mode
     Parser.add_argument(

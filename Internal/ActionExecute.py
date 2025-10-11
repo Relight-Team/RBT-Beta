@@ -6,6 +6,7 @@ from pathlib import Path
 
 from Internal import Logger
 
+
 # This handles the different types of execution of the list of actions
 class RBTThread:
 

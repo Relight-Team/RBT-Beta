@@ -1,6 +1,7 @@
 import os
 from Internal import Logger
 
+
 # System that combines .cpp files together
 class Unity:
 
@@ -38,13 +39,13 @@ class Unity:
 
             Ret += StrippedLine + "\n"
 
-
         return Ret
-
 
     # Main function, compiles Unity object files, returns list of output object files
     @staticmethod
-    def UniteCPPFiles(FilesList, CompileEnv, InToolchain, Intermed, OutputActionList, ModName):
+    def UniteCPPFiles(
+        FilesList, CompileEnv, InToolchain, Intermed, OutputActionList, ModName
+    ):
 
         Logger.Logger(3, "Uniting module: " + ModName)
 
@@ -71,7 +72,9 @@ class Unity:
             if Unity.DoesCodeHaveConficts(ReadCppCode) is True:
                 ObjFileCount += 1
 
-            IntermedCppFile = os.path.join(Intermed, "Unity", ModName + "." + str(ObjFileCount) + ".cpp")
+            IntermedCppFile = os.path.join(
+                Intermed, "Unity", ModName + "." + str(ObjFileCount) + ".cpp"
+            )
 
             os.makedirs(os.path.dirname(IntermedCppFile), exist_ok=True)
 
@@ -95,13 +98,16 @@ class Unity:
 
             ReadCpp.close()
 
-            WriteCpp = (open(PostFiles, "w"))
+            WriteCpp = open(PostFiles, "w")
 
             WriteCpp.write(UpdatedCppCode)
 
             WriteCpp.close()
 
-
-        LinkArray.extend(InToolchain.CompileMultiArchCPPs(CompileEnv, OutputObjectFiles, Intermed, OutputActionList))
+        LinkArray.extend(
+            InToolchain.CompileMultiArchCPPs(
+                CompileEnv, OutputObjectFiles, Intermed, OutputActionList
+            )
+        )
 
         return LinkArray

@@ -1,6 +1,7 @@
 import os
 from . import Logger
 
+
 # Get every file from dirctory
 def GetAllFilesFromDir(Path):
 
@@ -10,6 +11,7 @@ def GetAllFilesFromDir(Path):
         return Path  # Return the file name only
     else:
         return []
+
 
 # Create an intermediate file and add content into that file
 def CreateIntermedFile(Path, Content):

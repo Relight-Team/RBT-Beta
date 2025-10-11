@@ -1,12 +1,20 @@
 import os
 from Configuration import Directory_Manager
 
+
 # Read values and execute code from a txt fileY
 def load_config_and_execute(filename):
 
-    InConfig = {"TARGET_NAME": None, "TARGET_DIRECTORY": None, "PROJECT": None, "PLATFORM": None, "PLATFORM_GROUP": None, "FILEPATH": None}  # Default defines
+    InConfig = {
+        "TARGET_NAME": None,
+        "TARGET_DIRECTORY": None,
+        "PROJECT": None,
+        "PLATFORM": None,
+        "PLATFORM_GROUP": None,
+        "FILEPATH": None,
+    }  # Default defines
 
-    Config = InConfig.copy() # Final Config we are using
+    Config = InConfig.copy()  # Final Config we are using
 
     # Set each Config to StartingTarget if it exist
     for ConfigItem in InConfig:
@@ -17,9 +25,13 @@ def load_config_and_execute(filename):
 
     Config["ENGINE_DIRECTORY"] = Directory_Manager.Engine_Directory
 
-    Config["ENGINE_BIN_DIRECTORY"] = os.path.join(Directory_Manager.Engine_Directory, "bin")
+    Config["ENGINE_BIN_DIRECTORY"] = os.path.join(
+        Directory_Manager.Engine_Directory, "bin"
+    )
 
-    Config["ENGINE_BIN_THIRDPARTY_DIRECTORY"] = os.path.join(Directory_Manager.Engine_Directory, "bin", "ThirdParty")
+    Config["ENGINE_BIN_THIRDPARTY_DIRECTORY"] = os.path.join(
+        Directory_Manager.Engine_Directory, "bin", "ThirdParty"
+    )
 
     with open(filename, "r") as file:
         exec(
@@ -27,6 +39,7 @@ def load_config_and_execute(filename):
         )  # Execute the contents of the file in a controlled scope
 
     return Config
+
 
 # Get value from key, get's from file
 def InternalGetVar(filename, value, Alt=None):
@@ -38,6 +51,7 @@ def InternalGetVar(filename, value, Alt=None):
         return config_values.get(value)
     else:
         return Alt
+
 
 # Change global var to match settings
 def ChangeVarInternal(StartingTarget, Reader):

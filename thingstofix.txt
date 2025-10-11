@@ -1,11 +1,143 @@
-./Internal/TargetBuilder.py:277:38: E712 comparison to True should be 'if cond is True:' or 'if cond:'
-./Internal/TargetBuilder.py:280:38: E712 comparison to True should be 'if cond is True:' or 'if cond:'
-./Internal/TargetBuilder.py:384:5: E303 too many blank lines (3)
-./Internal/TargetBuilder.py:385:5: E301 expected 1 blank line, found 0
-./Modes/BuildMode.py:30:5: E303 too many blank lines (2)
-./Readers/TargetReader.py:67:26: E261 at least two spaces before inline comment
-./SDK/Linux/LinuxPlatform.py:16:1: E302 expected 2 blank lines, found 1
-./SDK/Linux/LinuxPlatformFactory.py:10:1: E302 expected 2 blank lines, found 1
-./SDK/Linux/LinuxPlatformSDK.py:86:71: E261 at least two spaces before inline comment
-./Template/Platform.py:40:9: E122 continuation line missing indentation or outdented
-./Template/Platform.py:59:14: E126 continuation line over-indented for hanging indent
+./BaseSDK/Platform.py:302:55: E203 whitespace before ':'
+./BaseSDK/Platform.py:319:33: E203 whitespace before ':'
+./BaseSDK/Platform.py:325:44: E203 whitespace before ':'
+./Internal/ActionExecute.py:10:1: E302 expected 2 blank lines, found 1
+./Internal/ActionExecute.py:62:16: F632 use ==/!= to compare constant literals (str, bytes, int, float, tuple)
+./Internal/ActionExecute.py:120:49: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+./Internal/ActionListManager.py:117:79: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./Internal/CompileEnvironment.py:38:30: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:40:19: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:42:20: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:44:24: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:46:32: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:50:23: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:52:21: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:54:30: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:56:30: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:58:34: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:60:34: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:62:39: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:64:39: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:66:21: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:68:25: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:70:24: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:72:22: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:74:22: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:76:25: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:78:24: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:80:32: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:82:30: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:84:22: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:86:23: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:88:24: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:90:22: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:92:23: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:94:28: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:96:30: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:98:38: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:100:22: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:102:21: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:104:37: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:106:23: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:112:30: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:114:19: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:116:21: E261 at least two spaces before inline comment
+./Internal/CompileEnvironment.py:118:24: E261 at least two spaces before inline comment
+./Internal/FileSystem.py:5:1: E302 expected 2 blank lines, found 1
+./Internal/FileSystem.py:9:29: E261 at least two spaces before inline comment
+./Internal/FileSystem.py:32:1: E302 expected 2 blank lines, found 1
+./Internal/FileSystem.py:43:1: E302 expected 2 blank lines, found 1
+./Internal/FileSystem.py:45:5: F824 `global TARGET_NAME` is unused: name is never assigned in scope
+./Internal/FileSystem.py:46:5: F824 `global TARGET_DIRECTORY` is unused: name is never assigned in scope
+./Internal/FileSystem.py:47:5: F824 `global PROJECT` is unused: name is never assigned in scope
+./Internal/FileSystem.py:48:5: F824 `global PLATFORM` is unused: name is never assigned in scope
+./Internal/FileSystem.py:49:5: F824 `global PLATFORM_GROUP` is unused: name is never assigned in scope
+./Internal/File_Manager.py:5:1: E302 expected 2 blank lines, found 1
+./Internal/File_Manager.py:15:1: E302 expected 2 blank lines, found 1
+./Internal/Logger.py:28:25: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./Internal/Logger.py:96:24: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+./Internal/ModuleBuilder.py:271:9: F811 redefinition of unused 'FileBuilder' from line 8
+./Internal/ModuleBuilder.py:312:5: E303 too many blank lines (3)
+./Internal/ModuleBuilder.py:339:5: E303 too many blank lines (2)
+./Internal/ModuleBuilder.py:342:5: E301 expected 1 blank line, found 0
+./Internal/ModuleBuilder.py:347:9: F811 redefinition of unused 'FileBuilder' from line 8
+./Internal/ModuleBuilder.py:454:9: E303 too many blank lines (2)
+./Internal/ModuleBuilder.py:460:35: E711 comparison to None should be 'if cond is None:'
+./Internal/ModuleBuilder.py:467:20: E711 comparison to None should be 'if cond is None:'
+./Internal/ModuleBuilder.py:488:9: E303 too many blank lines (3)
+./Internal/ModuleBuilder.py:504:9: E303 too many blank lines (2)
+./Internal/ModuleBuilder.py:512:21: E122 continuation line missing indentation or outdented
+./Internal/ModuleBuilder.py:513:17: E122 continuation line missing indentation or outdented
+./Internal/ModuleBuilder.py:514:13: E122 continuation line missing indentation or outdented
+./Internal/ModuleBuilder.py:520:37: E261 at least two spaces before inline comment
+./Internal/ModuleBuilder.py:545:25: E122 continuation line missing indentation or outdented
+./Internal/ModuleBuilder.py:546:17: E122 continuation line missing indentation or outdented
+./Internal/ModuleBuilder.py:547:13: E122 continuation line missing indentation or outdented
+./Internal/ModuleBuilder.py:550:9: E303 too many blank lines (2)
+./Internal/ModuleBuilder.py:584:5: E303 too many blank lines (2)
+./Internal/TargetBuilder.py:47:9: E303 too many blank lines (2)
+./Internal/TargetBuilder.py:215:13: E265 block comment should start with '# '
+./Internal/TargetBuilder.py:293:38: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./Internal/TargetBuilder.py:298:38: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+./Internal/TargetBuilder.py:301:13: E265 block comment should start with '# '
+./Internal/TargetBuilder.py:312:13: E265 block comment should start with '# '
+./Internal/TargetBuilder.py:363:9: E265 block comment should start with '# '
+./Internal/TargetBuilder.py:401:5: E303 too many blank lines (2)
+./Internal/TargetBuilder.py:402:5: E301 expected 1 blank line, found 0
+./Internal/TargetBuilder.py:406:5: E303 too many blank lines (2)
+./Internal/TargetBuilder.py:407:5: E301 expected 1 blank line, found 0
+./Internal/TargetBuilder.py:420:50: E261 at least two spaces before inline comment
+./Internal/TargetBuilder.py:421:46: E261 at least two spaces before inline comment
+./Internal/TargetBuilder.py:429:5: E303 too many blank lines (2)
+./Internal/TargetBuilder.py:430:5: E301 expected 1 blank line, found 0
+./Internal/TargetBuilder.py:435:5: E303 too many blank lines (2)
+./Internal/TargetBuilder.py:436:5: E301 expected 1 blank line, found 0
+./Internal/TargetBuilder.py:492:9: E265 block comment should start with '# '
+./Internal/Unity.py:5:1: E302 expected 2 blank lines, found 1
+./Internal/Unity.py:42:9: E303 too many blank lines (2)
+./Internal/Unity.py:45:5: E303 too many blank lines (2)
+./Internal/Unity.py:46:5: E301 expected 1 blank line, found 0
+./Internal/Unity.py:105:9: E303 too many blank lines (2)
+./Modes/CleanMode.py:48:16: E711 comparison to None should be 'if cond is None:'
+./Modes/CleanMode.py:48:35: E711 comparison to None should be 'if cond is None:'
+./Modes/CleanMode.py:67:5: E303 too many blank lines (3)
+./Modes/CleanMode.py:67:17: E711 comparison to None should be 'if cond is None:'
+./Modes/CleanMode.py:71:13: E711 comparison to None should be 'if cond is None:'
+./Modes/CleanMode.py:75:18: E711 comparison to None should be 'if cond is None:'
+./Modes/CleanMode.py:96:5: E303 too many blank lines (2)
+./Modes/CleanMode.py:112:1: E302 expected 2 blank lines, found 1
+./Modes/CleanMode.py:129:69: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+./Modes/CleanMode.py:144:80: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+./Modes/CleanMode.py:147:72: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+./Modes/CleanMode.py:151:1: E302 expected 2 blank lines, found 1
+./Modes/CleanMode.py:158:41: F821 undefined name 'DirToClear'
+./Modes/CleanMode.py:178:64: E261 at least two spaces before inline comment
+./Modes/CleanMode.py:228:1: E303 too many blank lines (4)
+./Modes/CleanMode.py:230:1: E302 expected 2 blank lines, found 4
+./Modes/CleanMode.py:263:64: E261 at least two spaces before inline comment
+./Modes/CleanMode.py:278:64: E261 at least two spaces before inline comment
+./Modes/CleanMode.py:293:64: E261 at least two spaces before inline comment
+./Modes/CleanMode.py:307:1: E303 too many blank lines (3)
+./Modes/CleanMode.py:308:1: E302 expected 2 blank lines, found 3
+./Modes/CleanMode.py:309:18: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+./Modes/CleanMode.py:319:1: E302 expected 2 blank lines, found 1
+./Modes/CleanMode.py:321:8: E713 test for membership should be 'not in'
+./Modes/TestMode.py:11:1: E302 expected 2 blank lines, found 1
+./Modes/TestMode.py:14:1: E302 expected 2 blank lines, found 1
+./Modes/TestMode.py:35:5: E303 too many blank lines (2)
+./Modes/TestMode.py:39:5: E303 too many blank lines (2)
+./Modes/TestMode.py:43:5: E303 too many blank lines (2)
+./Modes/TestMode.py:48:5: E303 too many blank lines (2)
+./Readers/ModuleReader.py:76:24: E261 at least two spaces before inline comment
+./Readers/ModuleReader.py:78:22: E261 at least two spaces before inline comment
+./Readers/TargetReader.py:19:16: E261 at least two spaces before inline comment
+./Readers/TargetReader.py:26:22: E261 at least two spaces before inline comment
+./SDK/Linux/LinuxToolchain.py:687:9: E303 too many blank lines (2)
+./SDK/Linux/LinuxToolchain.py:887:17: E265 block comment should start with '# '
+./SDK/Linux/LinuxToolchain.py:905:36: E225 missing whitespace around operator
+./SDK/Linux/LinuxToolchain.py:1025:13: E265 block comment should start with '# '
+./SDK/Linux/LinuxToolchain.py:1085:9: E303 too many blank lines (2)
+./SDK/Linux/LinuxToolchain.py:1101:9: E265 block comment should start with '# '
+./SDK/Linux/LinuxToolchain.py:1102:9: E265 block comment should start with '# '
+./SDK/Linux/LinuxToolchain.py:1103:9: E265 block comment should start with '# '
+./main.py:132:5: E303 too many blank lines (2)
