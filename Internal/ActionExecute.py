@@ -33,8 +33,6 @@ class RBTThread:
     # The function that will be run by the thread, this will execute the process based on the action
     def FunctionToRun(self):
 
-        print(self.Action.Arguments)
-
         # Start program
         try:
             try:
@@ -60,7 +58,7 @@ class RBTThread:
 
             self.ExitCode = RunningProgram.returncode
 
-            if self.ExitCode is not 0:
+            if self.ExitCode != 0:
                 Logger.Logger(
                     5,
                     "Error while running program, Error Code: "
@@ -216,5 +214,5 @@ class LinearExecuter(ExecuteBase):
 
 
 # TODO: Add support for ParallelExecuter
-# Executes multiple actions at a time
+# Executes multiple actions at a time, mainly for AutomationTool
 # class ParallelExecuter(ExecuteBase)

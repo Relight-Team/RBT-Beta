@@ -223,7 +223,7 @@ class Platform:
         return self.ExcludeCachedFolder
 
     # Return's true if we have the required SDK installed on this device
-    def HasRequiredSDK():
+    def HasRequiredSDK(self):
         pass  # Will be overwritten with child class
 
     # Return's all platforms that are registered
@@ -243,103 +243,6 @@ class Platform:
     def GetFolderNameArch(Arch):
         Logger.Logger(0, "Platform class's arch is " + Arch)
         return Arch
-
-    # Finds all build files and directories to clean, store these files and directories in CleanFiles and CleanDirs
-    def DetectBuildFilesToClean(
-        self, BaseDir, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
-    ):
-        for Item in BaseDir:
-            if os.path.isfile(os.path.join(BaseDir, Item)):  # if it's a file
-                if self.IsBuildProduct(
-                    Item, TitlePrefixes, TitleSuffixes
-                ) or Platform.IsFileDefaultBuildProduct(
-                    Item, TitlePrefixes, TitleSuffixes
-                ):
-                    CleanFiles.append(Item)
-
-            if os.path.isdir(os.path.join(BaseDir, Item)):  # if it's a directory
-                if self.IsBuildProduct(Item, TitlePrefixes, TitleSuffixes):
-                    CleanDirs.append(Item)
-
-                else:
-                    self.DetectBuildFilesToClean(
-                        Item, TitlePrefixes, TitleSuffixes, CleanFiles, CleanDirs
-                    )
-
-    # Find any additional files to clean, store these files and directories in CleanFiles and CleanDirs
-    def DetectAdditionalBuildToClean(Target, CleanFiles, CleanDirs):
-        pass  # Will be overwritten with child class
-
-    # If The Build Product Name is the RBT's default build prodcut
-    @staticmethod
-    def IsFileDefaultBuildProduct(Name, TitlePrefixes, TitleSuffixes):
-        if (
-            Platform.IsBuildProductName(
-                Name, TitlePrefixes, TitleSuffixes, ".CompileTarget"
-            )
-            or Platform.IsBuildProductName(
-                Name, TitlePrefixes, TitleSuffixes, ".CompileModule"
-            )
-            or Platform.IsBuildProductName(
-                Name, TitlePrefixes, TitleSuffixes, ".CompileVersion"
-            )
-        ):
-            return True
-        return False
-
-    # return's true if the name is the same as RBT's build product for the target
-    @staticmethod
-    def IsBuildProduct(Name, TitlePrefixes, TitleSuffixes):
-        pass  # Will be overwritten with child class
-
-    # Return's true if the name is the main RBT name format without extension
-    # Example: Test-Linux-Debug.so
-    @staticmethod
-    def IsBuildProductName(
-        Name, Index, SubInt, TitlePrefixes, TitleSuffixes, Extension
-    ):
-        if SubInt > len(Extension):
-            tmp = Name[Index + SubInt - len(Extension) : Index + SubInt]  # Substring
-            if tmp.lower() == Extension.lower():
-
-                return Platform.IsBuildProductName(
-                    Name, Index, SubInt - len(Extension), TitlePrefixes, TitleSuffixes
-                )
-        return False
-
-    # Return's true if the name is the main RBT name format without extension
-    # Example: Test-Linux-Debug.so
-    @staticmethod
-    def IsBuildProductNameNoExtension(
-        Name, Index, SubInt, TitlePrefixes, TitleSuffixes
-    ):
-        for Prefix in TitlePrefixes:
-
-            if SubInt >= len(Prefix):
-                tmp = Name[Index : Index + len(Prefix)]
-                if tmp.lower() == Prefix.lower():
-                    MinIndex = Index + len(Prefix)
-
-                    for Suffix in TitleSuffixes:
-                        MaxIndex = Index + SubInt - len(Suffix)
-                        tmp = Name[MaxIndex : MaxIndex + len(Suffix)]
-
-                        if MinIndex >= MaxIndex and tmp.lower() == Suffix.lower():
-                            if MinIndex < MaxIndex and Name[MinIndex] == "-":
-
-                                MinIndex += 1
-
-                                while (
-                                    MinIndex < MaxIndex
-                                    and Name[MinIndex] != "-"
-                                    and Name[MinIndex] != "."
-                                ):
-                                    MinIndex += 1
-
-                            if MinIndex == MaxIndex:
-                                return True
-
-        return False
 
     # Return's true if the name is the main RBT name format without extension
     # Example: Test-Linux-Debug.so
@@ -479,7 +382,7 @@ class Platform:
         return False
 
     # Returns if we should override whether to append the arch to bin name
-    def NeedsArchSuffix():
+    def NeedsArchSuffix(self):
         return True
 
     # Return's the array of binary output files (by default, it will only return 1 item)
@@ -514,7 +417,7 @@ class Platform:
     def RequiresBuild(Platform, ProjectDir):
         return False
 
-    # Add the extra modules the platform requires, wihtout exposing information about the platform
+    # Add the extra modules the platform requires, without exposing information about the platform
     def AddExtraModules(Target, ModuleNames):
         pass  # Will be overwritten with child class
 
@@ -564,7 +467,7 @@ class Platform:
     def ShouldCreateDebugInfo(self, BuildType):
         pass  # Will be overwritten with child class
 
-    # Create the platfomr's toolchain instance
+    # Create the platform's toolchain instance
     def CreateToolChain(InCppPlatform, Target):
         pass  # Will be overwritten with child class
 

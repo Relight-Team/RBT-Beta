@@ -219,8 +219,6 @@ def Execute(BuildConfig, ActionToExecuteList):
     # If not successful, throw an error
 
     if Ex is False:
-        raise ValueError(
-            "We have failed to run ActionToExecuteList"
-        )  # TODO: Add detailed description
+        Logger.Logger(5, "We have failed to run ActionToExecuteList") # TODO: Add detailed description
 
     # FIXME: Verify and read all file output info

@@ -45,7 +45,6 @@ def main():
 
     Mode.Main(Args)
 
-
 def GetArgs():
     Parser = argparse.ArgumentParser(
         description="Builder tool for Relight Engine"

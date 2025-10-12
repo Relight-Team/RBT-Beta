@@ -45,11 +45,6 @@ class ToolchainSDK:
 
         return FileList
 
-    # Return the response file name
-    @staticmethod
-    def ReturnFileResponseName(LinkEnv, File):
-        return LE.IntermediateDir + "/" + os.path.basename(File) + ".resp"
-
     # Return's the actions to do after building
     def PostBuilt(self, File, LinkEnv, ActionList):
         Temp = []

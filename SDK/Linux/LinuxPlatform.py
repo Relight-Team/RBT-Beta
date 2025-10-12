@@ -78,31 +78,6 @@ class LinuxPlatform(Platform.Platform):
     def CanParallelExecute():
         return True
 
-    def IsBuildProduct(Name, TitlePrefixes, TitleSuffixes):
-
-        if Name.startswith("lib"):
-            if Platform.Platform.IsBuildProductName(
-                Name, 3, len(Name) - 3, TitlePrefixes, TitleSuffixes, ".a"
-            ) or Platform.Platform(
-                Name, 3, len(Name) - 3, TitlePrefixes, TitleSuffixes, ".so"
-            ):
-                return True
-
-        else:
-
-            if (
-                Platform.Platform.IsBuildProductNameNoIndex(
-                    Name, TitlePrefixes, TitleSuffixes, ""
-                )
-                or Platform.Platform.IsBuildProductNameNoIndex(
-                    Name, TitlePrefixes, TitleSuffixes, ".a"
-                )
-                or Platform.Platform.IsBuildProductNameNoIndex(
-                    Name, TitlePrefixes, TitleSuffixes, ".so"
-                )
-            ):
-                return True
-
     def GetBinExtension(self, InBinType):
         if InBinType == "EXE":
             return ""
@@ -126,14 +101,16 @@ class LinuxPlatform(Platform.Platform):
 
     def CheckEnvironmentConflicts(self, CompileEnv, LinkEnv):
 
+        ErrMesg = "CompileEnv and LinkEnv mismatch: "
+
         if CompileEnv.PGOOptimize != LinkEnv.PGOOptimize:
-            raise ValueError("")
+            Logger.Logger(5, ErrMesg + " PGOOptimize, CompileEnv: " + str(CompileEnv.PGOOptimize) + " LinkEnv: " + str(LinkEnv.PGOOptimize))
 
         if CompileEnv.PGOProfile != LinkEnv.PGOProfile:
-            raise ValueError("")
+            Logger.Logger(5, ErrMesg + " PGOProfile, CompileEnv: " + str(CompileEnv.PGOProfile) + " LinkEnv: " + str(LinkEnv.PGOProfile))
 
         if CompileEnv.AllowLTCG != LinkEnv.AllowLTCG:
-            raise ValueError("")
+            Logger.Logger(5, ErrMesg + " AllowLTCG, CompileEnv: " + str(CompileEnv.AllowLTCG) + " LinkEnv: " + str(LinkEnv.AllowLTCG))
 
     def SetUpEnvironment(self, Target, CompileEnv, LinkEnv):
 

@@ -168,8 +168,6 @@ class Binary:
 
         for Item in Exes:
             Temp = Toolchain.PostBuilt(Item, BinLinkEnv, FileBuilder.ActionList)
-            OutputFiles.append(Temp)
+            OutputFiles.extend(Temp)
 
         return OutputFiles
-
-    # FIXME: FINISH ME!

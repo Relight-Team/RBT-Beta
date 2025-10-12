@@ -94,7 +94,6 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         # If InPlatform is none, we will use Linux, otherwise we will use InPlatform
         if InPlatform is None:
-            print("InPlatform: " + str(InPlatform))
             self._RunBase(
                 InArch, InSDK, CompileEnvironment.Platform.Linux, InSavePYSM, InOptions
             )
@@ -423,7 +422,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
         elif self.ArPath != "":
             return "ar"
         else:
-            raise ValueError("Cannot create llvm-ar or ar. Both tools cannot be found")
+            Logger.Logger(5, "Cannot create llvm-ar or ar. Both tools cannot be found")
 
     def ArgArchive():
         return " rcs"
@@ -1155,6 +1154,7 @@ class LinuxToolchain(Toolchain.ToolchainSDK):
 
         return Output
 
+    # Return's the actions to do after building
     def PostBuilt(self, File, LinkEnv, ActionList):
         Output = super().PostBuilt(File, LinkEnv, ActionList)
 
